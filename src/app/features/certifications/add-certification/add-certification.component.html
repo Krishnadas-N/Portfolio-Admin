@@ -1,0 +1,170 @@
+<div class="admin-container">
+  <div class="main-div">
+    <form
+      [formGroup]="certificationForm"
+      (ngSubmit)="onSubmit()"
+      id="certificationForm"
+      class="certification-form"
+    >
+      <div class="form-row">
+        <div class="form-group">
+          <label for="title">Certification Title <span>*</span></label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            placeholder="E.g., Certified Java Developer"
+            required
+          />
+          <div
+            *ngIf="
+              certificationForm.get('title')?.invalid &&
+              certificationForm.get('title')?.touched
+            "
+            class="error-message"
+          >
+            Title is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="issuer">Issuer <span>*</span></label>
+          <input
+            type="text"
+            id="issuer"
+            formControlName="issuer"
+            placeholder="E.g., Oracle"
+            required
+          />
+          <div
+            *ngIf="
+              certificationForm.get('issuer')?.invalid &&
+              certificationForm.get('issuer')?.touched
+            "
+            class="error-message"
+          >
+            Issuer is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="issueDate">Issue Date <span>*</span></label>
+          <input
+            type="date"
+            id="issueDate"
+            formControlName="issueDate"
+            required
+          />
+          <div
+            *ngIf="
+              certificationForm.get('issueDate')?.invalid &&
+              certificationForm.get('issueDate')?.touched
+            "
+            class="error-message"
+          >
+            Issue Date is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expirationDate">Expiration Date</label>
+          <input
+            type="date"
+            id="expirationDate"
+            formControlName="expirationDate"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="credentialId">Credential ID</label>
+          <input
+            type="text"
+            id="credentialId"
+            formControlName="credentialId"
+            placeholder="E.g., ABC-1234"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="credentialUrl">Credential URL</label>
+          <input
+            type="url"
+            id="credentialUrl"
+            formControlName="credentialUrl"
+            placeholder="E.g., https://example.com"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          placeholder="Write a brief description about the certification"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="skillsGained">Skills Gained</label>
+        <input
+          type="text"
+          id="skillsGained"
+          #skillInput
+          (keyup.enter)="addSkill(skillInput.value); skillInput.value = ''"
+          placeholder="E.g., Java, Spring Boot, Hibernate"
+        />
+        <div class="skills-container">
+          @for (skill of skillsGained.controls; track skill; let i =$index) {
+          <div class="skill-item">
+            <span>{{ skill.value }}</span>
+            <button type="button" (click)="removeSkill(i)">
+              <i class="fas fa-trash text-red-600"></i>
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="imageUrl">Image Upload</label>
+        <input
+          class="file-input file-input-bordered file-input-accent w-full"
+          type="file"
+          id="imageUrl"
+          formControlName="imageUrl"
+          accept="image/*"
+          (change)="onFileChange($event)"
+          required
+        />
+        <div
+          *ngIf="
+            certificationForm.get('imageUrl')?.invalid &&
+            certificationForm.get('imageUrl')?.touched
+          "
+          class="error-message"
+        >
+          Please upload a valid image.
+        </div>
+        <div *ngIf="imagePreview" class="image-preview">
+          <img [src]="imagePreview" alt="Preview" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn-submit w-100"
+          [disabled]="certificationForm.invalid"
+        >
+          Add Certification
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

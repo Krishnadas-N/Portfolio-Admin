@@ -1,0 +1,43 @@
+$primary-color: #308E87;
+$accent-color: #F4F4F9;
+$secondary-color: #ffffff;
+$text-color: #222;
+$border-radius: 12px;
+$box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+
+.container {
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding: 2rem;
+
+  form {
+    label {
+      font-weight: bold;
+      color: $text-color;
+    }
+    input,
+    select,
+    textarea {
+      background-color: #ffffff;
+    }
+    input,
+    select,
+    textarea {
+      border: 1px solid $primary-color;
+      border-radius: $border-radius;
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 5px $primary-color;
+      }
+    }
+
+    button {
+      background-color: $primary-color;
+      color: $secondary-color;
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+

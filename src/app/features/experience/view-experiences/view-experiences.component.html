@@ -1,0 +1,90 @@
+<div *ngFor="let experience of experiences; let i = index" class="experience-section w-full max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-8">
+  <!-- Experience Header -->
+  <div class="flex items-start justify-between mb-6">
+    <!-- Left Section: Job Title, Company & Duration -->
+    <div class="flex items-center space-x-6">
+      <!-- Company Logo -->
+      <img *ngIf="experience.companyLogo" [src]="experience.companyLogo" alt="Logo" class="w-16 h-16 rounded-full object-cover border-2 border-[#308E87]" />
+      
+      <div>
+        <h2 class="text-2xl font-semibold text-[#222]">{{ experience.title }}</h2>
+        <p class="text-sm text-gray-700">{{ experience.company }} · {{ experience.workType }}</p>
+        <p class="text-sm text-gray-500">
+          {{ experience.startDate | date:'MMM yyyy' }} - 
+          <span *ngIf="experience.current">Present</span>
+          <span *ngIf="!experience.current">{{ experience.endDate | date:'MMM yyyy' }}</span>
+          · {{ calculateDuration(experience.startDate, experience.endDate, experience.current) }}
+        </p>
+        <p class="text-sm text-gray-500">
+          <span class="font-medium">{{experience.location}} </span> . {{ experience.locationType }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Actions Dropdown -->
+    <div class="relative">
+      <button
+        class="text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
+        (click)="toggleOptions(i)"
+      >
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+      <div
+        *ngIf="showOptions[i]"
+        class="absolute top-8 right-0 bg-white border border-gray-200 rounded-md shadow-lg w-44 z-10"
+      >
+        <ul class="text-sm">
+          <li>
+            <button
+              class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+              (click)="editExperience(i)"
+            >
+              <i class="fas fa-edit mr-2"></i>Edit
+            </button>
+          </li>
+          <li>
+            <button
+              class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+              (click)="hideExperience(i)"
+            >
+              <i class="fas fa-eye-slash mr-2"></i>Hide
+            </button>
+          </li>
+          <li>
+            <button
+              class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+              (click)="deleteExperience(i)"
+            >
+              <i class="fas fa-trash-alt mr-2"></i>Delete
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Details -->
+  <div class="mt-2">
+      <!-- Location -->
+     
+    <!-- Description Section -->
+    <p class="text-sm text-gray-700 mb-4">
+       {{ experience.description }}
+    </p>
+
+  
+
+    <!-- Technologies -->
+    <div class="mt-6">
+      <p class="font-medium text-gray-600 mb-2">Technologies:</p>
+      <div class="flex flex-wrap gap-2">
+        <span
+          *ngFor="let tech of experience.technologies"
+          class="px-4 py-2 bg-[#f4f4f4] text-sm text-[#308E87] rounded-full shadow-md hover:scale-105 transform transition-all"
+        >
+          {{ tech }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

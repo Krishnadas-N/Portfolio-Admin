@@ -1,0 +1,16 @@
+input, select {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  input:focus, select:focus {
+    border-color: #256a64 !important;
+    box-shadow: 0 0 5px rgba(48, 142, 135, 0.5);
+  }
+  
+  button:hover {
+    transform: scale(1.02);
+  }
+  
+  button:active {
+    transform: scale(0.98);
+  }

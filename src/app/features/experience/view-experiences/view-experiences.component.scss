@@ -1,0 +1,86 @@
+$primary-color: #308e87;
+$hover-color: #256e69;
+$bg-light: #f4f4f4;
+
+.experience-section {
+  .experience-header {
+    position: relative;
+    
+    .actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      button {
+        color: $primary-color;
+        &:hover {
+          color: $hover-color;
+        }
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li button {
+          display: block;
+          width: 100%;
+          color: inherit;
+          text-align: left;
+          transition: background 0.2s;
+          &:hover {
+            background: $bg-light;
+          }
+        }
+      }
+    }
+  }
+
+  /* Experience Item */
+  .experience-section {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    
+    &:hover {
+      box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Company Logo Style */
+    .company-logo {
+      border-radius: 50%;
+      border: 2px solid $primary-color;
+    }
+
+    /* Duration & Date Styling */
+    .duration {
+      color: $primary-color;
+      font-weight: bold;
+    }
+
+    /* Action Button Hover Effects */
+    .action-button {
+      &:hover {
+        background-color: $bg-light;
+        transform: scale(1.1);
+      }
+    }
+
+    /* Technology Chips */
+    .tech-chip {
+      background-color: $bg-light;
+      color: $primary-color;
+      border-radius: 16px;
+      padding: 8px 16px;
+      margin-right: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $primary-color;
+        color: white;
+        transform: scale(1.05);
+      }
+    }
+  }
+}

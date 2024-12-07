@@ -1,0 +1,228 @@
+<div class="w-full mx-auto bg-white rounded-lg shadow-lg p-6">
+  <form [formGroup]="experienceForm" (ngSubmit)="onSubmit()" class="space-y-4">
+    <!-- Job Title -->
+    <div>
+      <label for="title" class="block text-sm font-medium text-[#222] mb-1"
+        >Job Title</label
+      >
+      <input
+        type="text"
+        id="title"
+        formControlName="title"
+        class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+        placeholder="e.g., Software Engineer"
+      />
+      @if(experienceForm.get('title')?.invalid &&
+      experienceForm.get('title')?.touched){
+      <div class="text-red-500 text-xs mt-1">Job Title is required.</div>
+      }
+    </div>
+
+    <!-- Company -->
+    <div >
+      <label for="company" class="block text-sm font-medium text-[#222] mb-1"
+        >Company</label
+      >
+      
+          <input
+          type="text"
+          id="company"
+          formControlName="company"
+          class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none pl-4 "
+          placeholder="e.g., Tech Corp"
+          [ngStyle]="logoUrl ? {
+            'background-image': 'url(' + logoUrl + ')', 
+            'background-size': '25px 25px', 
+            'background-position': 'left center', 
+            'padding-left': '50px', 
+            'background-repeat': 'no-repeat'
+          } : {}"
+              (focus)="showSuggestions = true"
+          (blur)="onBlur()"
+        />
+      
+
+      @if(experienceForm.get('company')?.invalid &&
+      experienceForm.get('company')?.touched){
+      <div class="text-red-500 text-xs mt-1">Company is required.</div>
+      }
+      @if(showSuggestions && companySuggestions.length){
+      <ul  class="absolute w-4/5 bg-white border mt-1 shadow-lg rounded-md z-10">
+        @for(suggestion of companySuggestions;track suggestion){
+          <li
+          (click)="selectCompany(suggestion)"
+          class="cursor-pointer px-4 py-2 hover:bg-gray-200"
+        >
+          <!-- Display Company Name and Logo -->
+          <div class="flex items-center">
+            <img [src]="suggestion.logo_url" alt="suggestion.name" class="h-6 w-6 rounded-full mr-2" />
+            {{ suggestion.name }}
+          </div>
+        </li>
+        }
+      
+      </ul>
+     }
+    </div>
+
+    <!-- Location -->
+    <div>
+      <label for="location" class="block text-sm font-medium text-[#222] mb-1"
+        >Location</label
+      >
+      <input
+        type="text"
+        id="location"
+        formControlName="location"
+        class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+        placeholder="e.g., New York, NY"
+      />
+    </div>
+
+    <!-- Dates -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label
+          for="startDate"
+          class="block text-sm font-medium text-[#222] mb-1"
+          >Start Date</label
+        >
+        <input
+          type="date"
+          id="startDate"
+          formControlName="startDate"
+          class="w-full px-4 py-2 border border-[#308E87] rounded-lg focus:ring-2 bg-white focus:ring-[#308E87] focus:outline-none"
+        />
+        @if(experienceForm.get('startDate')?.invalid &&
+        experienceForm.get('startDate')?.touched){
+        <div class="text-red-500 text-xs mt-1">Start Date is required.</div>
+        }
+      </div>
+      <div>
+        <label for="endDate" class="block text-sm font-medium text-[#222] mb-1"
+          >End Date</label
+        >
+        <input
+          type="date"
+          id="endDate"
+          formControlName="endDate"
+          class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+        />
+      </div>
+    </div>
+
+    <!-- Current Job -->
+    <div class="flex items-center space-x-3">
+      <input
+        type="checkbox"
+        id="current"
+        formControlName="current"
+        class="checkbox"
+      />
+      <label for="current" class="text-sm text-[#222]"
+        >I currently work here</label
+      >
+    </div>
+
+    <!-- Technologies -->
+    <div class="form-group">
+      <label
+        for="technologies"
+        class="block text-sm font-medium text-[#222] mb-1"
+        >Technologies</label
+      >
+      <input
+        type="text"
+        id="technologies"
+        #technologyInput
+        (keyup.enter)="
+          addTechnology(technologyInput.value); technologyInput.value = ''
+        "
+        placeholder="E.g., Angular, Node.js, MongoDB"
+        class="w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+      />
+      <div class="technologies-container mt-2">
+        @for(technology of technologies.controls;track technology; let i =
+        $index){
+        <div
+          class="technology-item inline-flex items-center bg-[#f4f4f4] px-3 py-1 rounded-full shadow-sm hover:bg-[#e0e0e0] m-1"
+        >
+          <span class="text-[#308E87] font-medium mr-2">{{
+            technology.value
+          }}</span>
+          <button
+            type="button"
+            (click)="removeTechnology(i)"
+            class="text-red p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400"
+          >
+            <i class="fas fa-trash text-red-600"></i>
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Work Type -->
+    <div>
+      <label for="workType" class="block text-sm font-medium text-[#222] mb-1"
+        >Work Type</label
+      >
+      <select
+        id="workType"
+        formControlName="workType"
+        class="select select-bordered w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+      >
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+        <option value="Internship">Internship</option>
+        <option value="Freelance">Freelance</option>
+        <option value="Contract">Contract</option>
+      </select>
+    </div>
+
+    <!-- Location Type -->
+    <div>
+      <label
+        for="locationType"
+        class="block text-sm font-medium text-[#222] mb-1"
+        >Location Type</label
+      >
+      <select
+        id="locationType"
+        formControlName="locationType"
+        class="select select-bordered w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+      >
+        <option value="Remote">Remote</option>
+        <option value="On-site">On-site</option>
+        <option value="Hybrid">Hybrid</option>
+      </select>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label
+        for="description"
+        class="block text-sm font-medium text-[#222] mb-1"
+        >Description</label
+      >
+      <textarea
+        id="description"
+        rows="3"
+        formControlName="description"
+        class="w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
+        placeholder="Briefly describe your role..."
+      ></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button
+        type="submit"
+        class="bg-[#308E87] text-white px-6 py-2 rounded-lg shadow-md hover:bg-[#256e69] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#308E87]"
+        [disabled]="experienceForm.invalid"
+      >
+        Save Experience
+      </button>
+    </div>
+  </form>
+</div>

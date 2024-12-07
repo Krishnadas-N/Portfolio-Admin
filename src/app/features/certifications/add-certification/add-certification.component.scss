@@ -1,0 +1,185 @@
+
+$primary-color: #308E87;
+$accent-color: #F4F4F9;
+$secondary-color: #ffffff;
+$text-color: #222;
+$border-radius: 12px;
+$box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+
+
+.admin-container {
+  width: 100%;
+  background: $secondary-color;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  overflow: hidden;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+
+ 
+  .main-div {
+    padding: 20px;
+
+    
+    .certification-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        
+        
+        .form-group {
+          flex: 1;
+          min-width: 250px; 
+        }
+      }
+
+      
+      .form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          font-weight: bold;
+          margin-bottom: 8px;
+
+          span {
+            color: red;
+          }
+        }
+
+        input, textarea {
+          border: 1px solid #ddd;
+          border-radius: $border-radius;
+          padding: 10px;
+          font-size: 1rem;
+          transition: 0.3s;
+          outline: none;
+          background-color: #ffffff;
+          margin-top: 5px;
+
+          &:focus {
+            border-color: $primary-color;
+            box-shadow: 0 0 8px rgba(48, 142, 135, 0.2);
+          }
+        }
+
+        textarea {
+          resize: none;
+        }
+      }
+
+     
+      .form-actions {
+        text-align: center;
+        width:100%;
+        .btn-submit {
+          background: $primary-color;
+          color: $secondary-color;
+          padding: 10px 20px;
+          font-size: 1rem;
+          border: none;
+          border-radius: $border-radius;
+          cursor: pointer;
+          transition: 0.3s;
+          margin-top: 20px;
+
+          &:hover {
+            background: darken($primary-color, 10%);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 10px;
+  }
+
+  .certification-form {
+    gap: 15px; 
+  }
+
+  .form-row {
+    flex-direction: column; 
+  }
+
+  .form-group {
+    flex: none;
+    width: 100%; 
+  }
+
+  .btn-submit {
+    width: 100%; 
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 10px; 
+  }
+
+  .certification-form {
+    gap: 10px;
+  }
+
+  .form-row {
+    flex-direction: column; 
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .btn-submit {
+    font-size: 0.9rem; 
+  }
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+}
+
+.skills-container {
+  margin-top: 10px;
+}
+
+.skill-item {
+  display: inline-block;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.skill-item button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.skill-item span {
+  margin-right: 5px;
+}
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}

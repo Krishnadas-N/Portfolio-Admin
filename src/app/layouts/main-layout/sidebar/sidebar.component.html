@@ -1,0 +1,44 @@
+<aside class="page-sidebar">
+  <div class="left-arrow" id="left-arrow">
+    <i data-feather="arrow-left"></i>
+  </div>
+  <div class="main-sidebar" id="main-sidebar">
+    <ul class="sidebar-menu" id="simple-bar">
+      @for(item of sidebarLinks;track item; let i=$index ){
+      <li
+        [ngClass]="{
+          'sidebar-main-title': item.type === 'header',
+          'sidebar-list': item.type === 'link'
+        }"
+      >
+        @if(item.type === 'header'){
+        <div>
+          <h5 class="sidebar-title f-w-700">{{ item.title }}</h5>
+        </div>
+        } @if(item.type === 'link'){
+        <a [routerLink]="item.routerLink" class="sidebar-link">
+          @if(item.icon){
+          <i [class]="item.icon"></i>
+          }
+          <h6>{{ item.title }}</h6>
+          @if(item.subLinks){
+          <i class="iconly-Arrow-Right-2 icli"></i>
+          }
+        </a>
+        }
+
+        <!-- Submenu -->
+        @if(item.subLinks){
+        <ul class="sidebar-submenu">
+          @for(subLink of item.subLinks;track subLink; let i=$index ){
+          <li [routerLink]="subLink.routerLink" routerLinkActive="active">
+            {{ subLink.title }}
+          </li>
+          }
+        </ul>
+        }
+      </li>
+      }
+    </ul>
+  </div>
+</aside>

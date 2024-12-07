@@ -1,0 +1,105 @@
+/* Colors */
+$primary-color: #308E87;
+$primary-color-dark: #267f6b;
+$secondary-color: #ffffff;
+$accent-color: #F4F4F9;
+$text-color: #222;
+$primary-light: #7BD2C0;
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cert-card {
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+
+}
+
+.flex {
+  display: flex;
+}
+
+
+
+img {
+  border-radius: 12px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: $primary-color;
+}
+
+p {
+  font-size: 1rem;
+  color: #555;
+}
+
+/* Bottom Section (Dates + Buttons) */
+.bg-primary-light {
+  background-color: $primary-light;
+}
+
+.flex.justify-between {
+  justify-content: space-between;
+}
+
+.btn-action {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.bg-primary {
+  background-color: $primary-color;
+}
+
+.bg-primary-dark {
+  background-color: $primary-color-dark;
+}
+
+.bg-yellow-500 {
+  background-color: #fbbf24;
+}
+
+.bg-red-500 {
+  background-color: #f87171;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-gray-500 {
+  color: #6b7280;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-primary {
+  color: $primary-color;
+}
+
+.text-white {
+  color: white;
+}
