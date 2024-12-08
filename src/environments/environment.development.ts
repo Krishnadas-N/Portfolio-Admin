@@ -1,3 +1,4 @@
 export const environment = {
-    logoDevAPIKEY:'sk_AMlDe-DGS96nu_fhHUHwGg'
+    logoDevAPIKEY:import.meta.env['LOGO_DEV_APIKEY'],
+    googleAPIKEY:import.meta.env['GOOGLE_MAPS_APIKEY']
 };

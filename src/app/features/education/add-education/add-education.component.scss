@@ -1,0 +1,40 @@
+
+  .form-input {
+    @apply w-full p-3 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white;
+  }
+  
+  .form-textarea {
+    @apply w-full p-3 border bg-white border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-teal-600 text-white rounded-md shadow-md hover:bg-teal-700 transition ease-in-out duration-300;
+  }
+  .btn-secondary {
+    @apply px-6 py-3 bg-gray-400 text-white rounded-md shadow-md hover:bg-gray-500 transition ease-in-out duration-300;
+  }
+  
+.skills-container {
+  margin-top: 10px;
+}
+
+.skill-item {
+  display: inline-block;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.skill-item button {
+  background-color: transparent;
+  border: none;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.skill-item span {
+  margin-right: 5px;
+}

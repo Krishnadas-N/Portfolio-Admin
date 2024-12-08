@@ -4,8 +4,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "types": [
-      "node"
-    ]
+      "node",
+    ],
   },
   "files": [
     "src/main.ts",
@@ -13,6 +13,7 @@
     "server.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/typings/**/*.d.ts" 
   ]
 }

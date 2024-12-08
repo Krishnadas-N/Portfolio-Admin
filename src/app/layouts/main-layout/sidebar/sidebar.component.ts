@@ -63,7 +63,6 @@ export class SidebarComponent {
       type: 'link',
       subLinks: [
         { title: 'View Skills', routerLink: '/skills' },
-        { title: 'Add Skill', routerLink: '/skills/add' }
       ]
     },
     {
@@ -114,7 +113,7 @@ export class SidebarComponent {
       subLinks: [
         { title: 'Manage Admins', routerLink: '/admin/manage-admins' },
         { title: 'Add Admin', routerLink: '/admin/add-admin' },
-        { title: 'Roles & Permissions', routerLink: '/admin/roles' },
+        { title: 'RBAC', routerLink: '/admin/roles' },
         { title: 'Admin Settings', routerLink: '/admin/settings' }
       ]
     },
@@ -155,7 +154,6 @@ export class SidebarComponent {
       type: 'link',
       subLinks: [
         { title: 'View Notifications', routerLink: '/notifications' },
-        { title: 'Manage Notifications', routerLink: '/notifications/manage' }
       ]
     },
     {

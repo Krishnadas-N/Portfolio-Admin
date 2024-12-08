@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { ViewSkillsComponent } from './features/skills/view-skills/view-skills.component';
+
 
 
 
@@ -27,7 +27,11 @@ export const routes: Routes = [
             },
             {
                 path:'skills',
-                component:ViewSkillsComponent
+                loadComponent:()=>import("./features/skills/view-skills/view-skills.component").then(m=>m.ViewSkillsComponent)
+            },
+            {
+                path:'education',
+                loadChildren:()=>import('./features/education/education.routes').then(m=>m.EDUCATION_ROUTES)
             }
         ]
     }

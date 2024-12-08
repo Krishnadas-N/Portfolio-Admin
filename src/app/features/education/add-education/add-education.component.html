@@ -1,0 +1,215 @@
+<div class="container mx-auto p-6 bg-white rounded-lg shadow-lg w-full">
+  <form [formGroup]="educationForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Degree -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="degree" class="block text-sm font-medium text-teal-700"
+          >Degree *</label
+        >
+        <input
+          type="text"
+          id="degree"
+          placeholder="Enter your degree"
+          class="form-input"
+          formControlName="degree"
+        />
+        @if (f['degree'].touched && f['degree'].invalid) {
+        <div class="text-red-500 text-sm">
+          @if (f['degree'].errors?.['required']) {
+          <div >Degree is required.</div>
+          } @if (f['degree'].errors?.['minlength']) {
+          <div>Degree must be at least 3 characters long.</div>
+          }
+        </div>
+        }
+      </div>
+      <div>
+        <label
+          for="fieldOfStudy"
+          class="block text-sm font-medium text-teal-700"
+          >Field of Study *</label
+        >
+        <input
+          type="text"
+          id="fieldOfStudy"
+          placeholder="e.g., Computer Science"
+          class="form-input"
+          formControlName="fieldOfStudy"
+        />
+        @if (f['fieldOfStudy'].touched && f['fieldOfStudy'].invalid) {
+        <div class="text-red-500 text-sm">
+          @if (f['fieldOfStudy'].errors?.['required']) {
+          <div>Field of Study is required.</div>
+          } @if (f['fieldOfStudy'].errors?.['minlength']) {
+          <div>Field of Study must be at least 3 characters long.</div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Institution -->
+    <div>
+      <label for="institution" class="block text-sm font-medium text-teal-700"
+        >Institution *</label
+      >
+      <input
+        type="text"
+        id="institution"
+        placeholder="Enter your institution"
+        class="form-input"
+        formControlName="institution"
+      />
+      @if (f['institution'].touched && f['institution'].invalid) {
+      <div class="text-red-500 text-sm">
+        @if (f['institution'].errors?.['required']) {
+        <div>Institution is required.</div>
+        } @if (f['institution'].errors?.['minlength']) {
+        <div>Institution must be at least 3 characters long.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Location -->
+    <div>
+      <label for="location" class="block text-sm font-medium text-teal-700"
+        >Location</label
+      >
+      <input
+        type="text"
+        id="location"
+        placeholder="City, State"
+        class="form-input"
+        formControlName="location"
+      />
+    </div>
+
+    <!-- Start and End Date -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="startDate" class="block text-sm font-medium text-teal-700"
+          >Start Date *</label
+        >
+        <input
+          type="date"
+          id="startDate"
+          class="form-input"
+          formControlName="startDate"
+        />
+        @if (f['startDate'].touched && f['startDate'].invalid) {
+        <div class="text-red-500 text-sm">
+          @if (f['startDate'].errors?.['required']) {
+          <div>Start Date is required.</div>
+          }
+        </div>
+        }
+      </div>
+      <div>
+        <label for="endDate" class="block text-sm font-medium text-teal-700"
+          >End Date</label
+        >
+        <input
+          type="date"
+          id="endDate"
+          class="form-input"
+          formControlName="endDate"
+        />
+      </div>
+    </div>
+
+    <!-- Grade -->
+    <div>
+      <label for="grade" class="block text-sm font-medium text-teal-700"
+        >Grade</label
+      >
+      <input
+        type="text"
+        id="grade"
+        placeholder="e.g., A+, 4.0 GPA"
+        class="form-input"
+        formControlName="grade"
+      />
+      @if (f['grade'].touched && f['grade'].invalid) {
+      <div class="text-red-500 text-sm">
+        @if (f['grade'].errors?.['pattern']) {
+        <div>Invalid grade format.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Activities -->
+    <div>
+      <label for="activities" class="block text-sm font-medium text-teal-700"
+        >Activities</label
+      >
+      <textarea
+        id="activities"
+        placeholder="e.g., Member of Coding Club, Sports Team"
+        class="form-textarea"
+        formControlName="activities"
+      ></textarea>
+      @if (f['activities'].touched && f['activities'].invalid) {
+      <div class="text-red-500 text-sm">
+        @if (f['activities'].errors?.['maxlength']) {
+        <div>Activities must be less than 300 characters.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Skills -->
+    <div>
+      <label for="skills" class="block text-sm font-medium text-teal-700"
+        >Skills</label
+      >
+      <input
+        type="text"
+        id="skills"
+        placeholder="e.g., JavaScript, Python"
+        class="form-input"
+        #skillInput
+        (keyup.enter)="addSkill(skillInput.value); skillInput.value = ''"
+      />
+      <div class="skills-container">
+        @for (skill of skills.controls; track skill; let i =$index) {
+        <div class="skill-item">
+          <span>{{ skill.value }}</span>
+          <button type="button" (click)="removeSkill(i)">
+            <i class="fas fa-trash text-red-600"></i>
+          </button>
+        </div>
+        }
+      </div>
+      @if (f['skills'].touched && f['skills'].invalid) {
+      <div class="text-red-500 text-sm">
+        @if (f['skills'].errors?.['maxlength']) {
+        <div>Skills must be less than 200 characters.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-right space-x-4">
+      <!-- Save Button -->
+      <button
+        type="submit"
+        [disabled]="educationForm.invalid"
+        class="btn-primary"
+      >
+        Save
+      </button>
+
+      <!-- Discard Button -->
+      <button
+        type="button"
+        (click)="educationForm.reset()"
+        class="btn-secondary"
+      >
+        Discard
+      </button>
+    </div>
+  </form>
+</div>
