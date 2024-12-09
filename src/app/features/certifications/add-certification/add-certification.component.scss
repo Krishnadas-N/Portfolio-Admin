@@ -90,7 +90,7 @@ $box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
           margin-top: 20px;
 
           &:hover {
-            background: darken($primary-color, 10%);
+            background:  rgba($primary-color, 0.9);
           }
         }
       }

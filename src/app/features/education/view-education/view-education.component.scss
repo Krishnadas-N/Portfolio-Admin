@@ -1,0 +1,34 @@
+.container {
+    max-width: 1200px;
+  }
+ 
+
+  .text-xl {
+    @apply text-2xl;
+  }
+ 
+ 
+ 
+
+
+
+  
+  
+
+  
+  
+  
+ 
+  
+ 
+ 
+  
+  
+  
+  .hover\:text-gray-800:hover {
+    @apply text-gray-800;
+  }
+  
+  .hover\:bg-gray-100:hover {
+    @apply bg-gray-100;
+  }

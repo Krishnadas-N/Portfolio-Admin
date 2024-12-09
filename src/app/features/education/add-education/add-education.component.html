@@ -1,5 +1,5 @@
 <div class="container mx-auto p-6 bg-white rounded-lg shadow-lg w-full">
-  <form [formGroup]="educationForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <form [formGroup]="educationForm" (ngSubmit)="onSubmit()" class="space-y-4">
     <!-- Degree -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
@@ -48,42 +48,61 @@
       </div>
     </div>
 
-    <!-- Institution -->
-    <div>
-      <label for="institution" class="block text-sm font-medium text-teal-700"
-        >Institution *</label
-      >
-      <input
-        type="text"
-        id="institution"
-        placeholder="Enter your institution"
-        class="form-input"
-        formControlName="institution"
-      />
-      @if (f['institution'].touched && f['institution'].invalid) {
-      <div class="text-red-500 text-sm">
-        @if (f['institution'].errors?.['required']) {
-        <div>Institution is required.</div>
-        } @if (f['institution'].errors?.['minlength']) {
-        <div>Institution must be at least 3 characters long.</div>
-        }
+    <div class="flex flex-col md:flex-row items-center space-x-2">
+      <!-- Institution Logo Section -->
+      <div class="flex-shrink-0">
+        <img
+          class="h-16 w-14 object-cover rounded-sm border-1 border-teal-700"
+          [src]="logoUrl ? logoUrl : 'https://via.placeholder.com/100'"
+          alt="Institution Logo"
+        />
       </div>
-      }
+    
+      <!-- Institution Input Section -->
+      <div class="flex-1">
+        <label for="institution" class="block text-sm font-medium text-teal-700">Institution *</label>
+        <input
+          type="text"
+          id="institution"
+          placeholder="Enter your institution"
+          class="form-input w-full border border-gray-300 rounded-md p-2 "
+          formControlName="institution"
+           (focus)="showSuggestions = true"
+          (blur)="onBlur()"
+        />
+    
+        @if (f['institution'].touched && f['institution'].invalid) {
+          <div class="text-red-500 text-sm">
+            @if (f['institution'].errors?.['required']) {
+            <div>Institution is required.</div>
+            } @if (f['institution'].errors?.['minlength']) {
+            <div>Institution must be at least 3 characters long.</div>
+            }
+          </div>
+          }
+          @if(showSuggestions && instituteSuggestions.length){
+            <ul  class="absolute w-4/5 bg-white border mt-1 shadow-lg rounded-md z-10">
+              @for(suggestion of instituteSuggestions;track suggestion){
+                <li
+                (click)="selectCompany(suggestion)"
+                class="cursor-pointer px-4 py-2 hover:bg-gray-200"
+              >
+                <!-- Display Company Name and Logo -->
+                <div class="flex items-center">
+                  <img [src]="suggestion.logo_url" alt="suggestion.name" class="h-6 w-6 rounded-full mr-2" />
+                  {{ suggestion.name }}
+                </div>
+              </li>
+              }
+            
+            </ul>
+           }
+      </div>
     </div>
+    
+  
 
-    <!-- Location -->
-    <div>
-      <label for="location" class="block text-sm font-medium text-teal-700"
-        >Location</label
-      >
-      <input
-        type="text"
-        id="location"
-        placeholder="City, State"
-        class="form-input"
-        formControlName="location"
-      />
-    </div>
+    
 
     <!-- Start and End Date -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

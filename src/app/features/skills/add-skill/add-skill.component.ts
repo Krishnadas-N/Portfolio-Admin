@@ -4,11 +4,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 ;
 
 @Component({
-  selector: 'app-add-skill',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  templateUrl: './add-skill.component.html',
-  styleUrl: './add-skill.component.scss'
+    selector: 'app-add-skill',
+    imports: [ReactiveFormsModule],
+    templateUrl: './add-skill.component.html',
+    styleUrl: './add-skill.component.scss'
 })
 export class AddSkillComponent {
   skillForm!: FormGroup;

@@ -14,11 +14,10 @@ interface Experience {
   locationType?: string;
 }
 @Component({
-  selector: 'app-view-experiences',
-  standalone: true,
-  imports: [DatePipe,CommonModule],
-  templateUrl: './view-experiences.component.html',
-  styleUrl: './view-experiences.component.scss'
+    selector: 'app-view-experiences',
+    imports: [DatePipe, CommonModule],
+    templateUrl: './view-experiences.component.html',
+    styleUrl: './view-experiences.component.scss'
 })
 export class ViewExperiencesComponent  implements OnInit{
  ngOnInit(): void {

@@ -12,17 +12,16 @@ import { CompanyDetails } from '../../../core/models';
 import { Subscription } from 'rxjs';
 import { NgStyle } from '@angular/common';
 @Component({
-  selector: 'app-add-experiences',
-  standalone: true,
-  imports: [ReactiveFormsModule,NgStyle],
-  templateUrl: './add-experiences.component.html',
-  styleUrl: './add-experiences.component.scss',
+    selector: 'app-add-experiences',
+    imports: [ReactiveFormsModule,NgStyle],
+    templateUrl: './add-experiences.component.html',
+    styleUrl: './add-experiences.component.scss'
 })
 export class AddExperiencesComponent  implements OnInit, OnDestroy{
   experienceForm!: FormGroup;
   fb = inject(FormBuilder);
   companyLogoService = inject(CompanyLogoService)
-  companySuggestions: any[] = [];
+  companySuggestions: CompanyDetails[] = [];
   logoUrl: string = '';
   selectedCompany: string = '';
   showSuggestions: boolean = false;

@@ -9,11 +9,10 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 @Component({
-  selector: 'app-add-certification',
-  standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
-  templateUrl: './add-certification.component.html',
-  styleUrl: './add-certification.component.scss',
+    selector: 'app-add-certification',
+    imports: [ReactiveFormsModule, NgIf],
+    templateUrl: './add-certification.component.html',
+    styleUrl: './add-certification.component.scss'
 })
 export class AddCertificationComponent implements OnInit {
   certificationForm!: FormGroup;

@@ -3,12 +3,11 @@ import { Component,  } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [RouterLink,NgClass,],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
-  schemas: []
+    selector: 'app-sidebar',
+    imports: [RouterLink, NgClass,],
+    templateUrl: './sidebar.component.html',
+    styleUrl: './sidebar.component.scss',
+    schemas: []
 })
 export class SidebarComponent {
   openSubmenus: Set<string> = new Set();

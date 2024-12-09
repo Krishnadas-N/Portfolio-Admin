@@ -1,4 +1,4 @@
 export const environment = {
-    logoDevAPIKEY:import.meta.env['LOGO_DEV_APIKEY'],
-    googleAPIKEY:import.meta.env['GOOGLE_MAPS_APIKEY']
+    logoDevAPIKEY:import.meta.env.NG_APP_LOGO_DEV_APIKEY,
+    googleAPIKEY:import.meta.env.NG_APP_GOOGLE_MAPS_APIKEY
 };

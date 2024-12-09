@@ -1,11 +1,10 @@
 import { Component, inject, OnInit  } from '@angular/core';
 import { AddSkillComponent } from '../add-skill/add-skill.component';
 @Component({
-  selector: 'app-view-skills',
-  standalone: true,
-  imports: [AddSkillComponent],
-  templateUrl: './view-skills.component.html',
-  styleUrl: './view-skills.component.scss'
+    selector: 'app-view-skills',
+    imports: [AddSkillComponent],
+    templateUrl: './view-skills.component.html',
+    styleUrl: './view-skills.component.scss'
 })
 export class ViewSkillsComponent implements OnInit{
   ngOnInit(): void {

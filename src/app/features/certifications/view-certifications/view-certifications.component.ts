@@ -2,11 +2,10 @@ import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-view-certifications',
-  standalone: true,
-  imports: [DatePipe],
-  templateUrl: './view-certifications.component.html',
-  styleUrl: './view-certifications.component.scss'
+    selector: 'app-view-certifications',
+    imports: [DatePipe],
+    templateUrl: './view-certifications.component.html',
+    styleUrl: './view-certifications.component.scss'
 })
 export class ViewCertificationsComponent {
   certifications = [

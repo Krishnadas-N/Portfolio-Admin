@@ -2,9 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './variables';
-@import './mixins';
-@import './utilities';
+// Colors
+
+$primary-color: #308E87;
+$accent-color: #F4F4F9;
+$secondary-color: #ffffff;
+$text-color: #222;
+
+// Spacing & Borders
+$border-radius: 12px;
+$box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+
+// Typography
+$font-family: 'Poppins', sans-serif;
+$font-size-base: 16px;
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin transition($property: all, $duration: 0.3s, $timing-function: ease-in-out) {
+  transition: $property $duration $timing-function;
+}
+
+@mixin box-shadow {
+  box-shadow: $box-shadow;
+}
 
 * {
   box-sizing: border-box;
@@ -16,4 +41,29 @@ body {
   font-family: $font-family;
   background-color: $accent-color;
   font-size: $font-size-base;
+}
+.text-center {
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: $secondary-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  @include transition();
+
+  // &:hover {
+  //   background-color: darken($primary-color, 10%);
+  // }
+}
+
+.border-radius {
+  border-radius: $border-radius;
+}
+
+.box-shadow {
+  @include box-shadow();
 }

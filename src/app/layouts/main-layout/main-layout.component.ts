@@ -7,12 +7,10 @@ import { RouterOutlet } from '@angular/router';
 import { environment } from '../../../environments/environment.development';
 
 @Component({
-  selector: 'app-main-layout',
-  standalone: true,
-  imports: [HeaderComponent,SidebarComponent,FooterComponent,RouterOutlet],
-  templateUrl: './main-layout.component.html',
-  styleUrl: './main-layout.component.scss',
-  changeDetection:ChangeDetectionStrategy.Default
+    selector: 'app-main-layout',
+    imports: [HeaderComponent, SidebarComponent, FooterComponent, RouterOutlet],
+    templateUrl: './main-layout.component.html',
+    styleUrl: './main-layout.component.scss',
 })
 export class MainLayoutComponent implements OnInit {
   private isLoaded = false;

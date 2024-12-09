@@ -9,6 +9,7 @@ import { CompanyDetails } from '../models';
 })
 export class CompanyLogoService {
   private apiKey =  environment.logoDevAPIKEY
+  
   private http = inject(HttpClient);
   fetchCompanySuggestions(companyName: string): Observable<CompanyDetails[]> {
     const apiUrl = `https://api.logo.dev/search?q=${companyName}`;
