@@ -195,6 +195,13 @@
     <div class="text-right space-x-4">
       <!-- Save Button -->
       <button
+      type="button"
+      (click)="educationForm.reset()"
+      class="btn-secondary"
+    >
+      Discard
+    </button>
+      <button
         type="submit"
         [disabled]="educationForm.invalid"
         class="btn-primary"
@@ -203,13 +210,7 @@
       </button>
 
       <!-- Discard Button -->
-      <button
-        type="button"
-        (click)="educationForm.reset()"
-        class="btn-secondary"
-      >
-        Discard
-      </button>
+     
     </div>
   </form>
 </div>

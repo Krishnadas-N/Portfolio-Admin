@@ -1,5 +1,5 @@
 import { HeaderComponent } from './header/header.component';
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FooterComponent } from './footer/footer.component';
@@ -11,7 +11,8 @@ import { environment } from '../../../environments/environment.development';
   standalone: true,
   imports: [HeaderComponent,SidebarComponent,FooterComponent,RouterOutlet],
   templateUrl: './main-layout.component.html',
-  styleUrl: './main-layout.component.scss'
+  styleUrl: './main-layout.component.scss',
+  changeDetection:ChangeDetectionStrategy.Default
 })
 export class MainLayoutComponent implements OnInit {
   private isLoaded = false;
