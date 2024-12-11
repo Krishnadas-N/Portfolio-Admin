@@ -5,18 +5,23 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CompanyLogoService } from '../../../core/services';
 import { CompanyDetails } from '../../../core/models';
 import { debounceTime, Subscription, switchMap } from 'rxjs';
+import { TagsComponent } from '../../../shared/components';
+import {
+  IMAGE_URL_VALIDATOR,
+  uniqueTagsValidator,
+} from '../../../shared/utils/validators';
 
 @Component({
-    selector: 'app-add-education',
-    imports: [ReactiveFormsModule],
-    templateUrl: './add-education.component.html',
-    styleUrl: './add-education.component.scss'
+  selector: 'app-add-education',
+  imports: [ReactiveFormsModule, TagsComponent],
+  templateUrl: './add-education.component.html',
+  styleUrl: './add-education.component.scss',
 })
-export class AddEducationComponent implements OnInit,OnDestroy {
+export class AddEducationComponent implements OnInit, OnDestroy {
   educationForm!: FormGroup;
   private fb = inject(FormBuilder);
   // placeSuggestServivce = inject(PlaceSuggestionService);
-  instituteLogoService = inject(CompanyLogoService)
+  instituteLogoService = inject(CompanyLogoService);
   instituteSuggestions: CompanyDetails[] = [];
   logoUrl: string = '';
   selectedInstitute: string = '';
@@ -27,15 +32,15 @@ export class AddEducationComponent implements OnInit,OnDestroy {
       degree: ['', [Validators.required, Validators.minLength(3)]],
       fieldOfStudy: ['', [Validators.required, Validators.minLength(3)]],
       institution: ['', [Validators.required, Validators.minLength(3)]],
-      institutionLogo:['', [Validators.required]],
+      institutionLogo: ['', [Validators.required, IMAGE_URL_VALIDATOR]],
       location: ['', [Validators.maxLength(100)]],
       startDate: ['', [Validators.required]],
       endDate: ['', [Validators.required]],
       grade: ['', [Validators.pattern('[A-Za-z0-9 .,+_-]+')]],
       activities: ['', [Validators.maxLength(300)]],
-      skills: this.fb.array([], Validators.required),
+      skills: this.fb.array([], [Validators.required, uniqueTagsValidator]),
     });
-    this.fetchInstituteSuggestions()
+    this.fetchInstituteSuggestions();
   }
 
   get f() {
@@ -58,7 +63,9 @@ export class AddEducationComponent implements OnInit,OnDestroy {
       .get('institution')
       ?.valueChanges.pipe(
         debounceTime(300),
-        switchMap((instituteName) => this.instituteLogoService.fetchCompanySuggestions(instituteName))
+        switchMap((instituteName) =>
+          this.instituteLogoService.fetchCompanySuggestions(instituteName)
+        )
       )
       .subscribe((suggestions: CompanyDetails[]) => {
         this.instituteSuggestions = suggestions;
@@ -72,7 +79,7 @@ export class AddEducationComponent implements OnInit,OnDestroy {
     this.educationForm.get('institution')?.setValue(this.selectedInstitute);
     this.educationForm.get('institutionLogo')?.setValue(this.logoUrl);
     this.instituteSuggestions = [];
-    this.showSuggestions = false; 
+    this.showSuggestions = false;
   }
   onBlur() {
     setTimeout(() => {

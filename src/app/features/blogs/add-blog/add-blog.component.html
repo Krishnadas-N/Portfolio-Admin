@@ -1,76 +1,248 @@
-  <!-- Container-fluid starts-->
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-12">
-        <div class="card">
-          <div class="card-header card-no-border pb-0">
-            <h3>Post Edit</h3>
-          </div>
-          <div class="card-body add-post">
-            <form class="row needs-validation" novalidate="">
-              <div class="col-sm-12">
-                <div class="mb-3">
-                  <label class="mb-2" for="validationCustom01">Title:</label>
-                  <input class="form-control" id="validationCustom01" type="text" placeholder="Post Title" required="">
-                  <div class="valid-feedback">Looks good!</div>
-                </div>
-                <div class="mb-3">
-                  <label class="mb-2">Type:</label>
-                  <div class="m-checkbox-inline">
-                    <label for="edo-ani">
-                      <input class="radio_animated" id="edo-ani" type="radio" name="rdo-ani" checked="">Text
-                    </label>
-                    <label for="edo-ani1">
-                      <input class="radio_animated" id="edo-ani1" type="radio" name="rdo-ani">Image
-                    </label>
-                    <label for="edo-ani2">
-                      <input class="radio_animated" id="edo-ani2" type="radio" name="rdo-ani" checked="">Audio
-                    </label>
-                    <label for="edo-ani3">
-                      <input class="radio_animated" id="edo-ani3" type="radio" name="rdo-ani">Video
-                    </label>
-                  </div>
-                </div>
-                <div class="mb-3" data-test-hook="remove-button">
-                  <label class="col-form-label mb-2" for="choices-remove-button">Category:</label>
-                  <select class="form-control col-sm-12" id="choices-remove-button" name="choices-remove-button" multiple="">
-                    <option value="">Select Your Name</option>
-                    <option value="Choice 1">Lifestyle</option>
-                    <option value="Choice 2">Travel</option>
-                  </select>
-                </div>
-                <div class="email-wrapper">
-                  <div class="theme-form">
-                    <div class="mb-3">
-                      <label class="mb-2">Content:</label>
-                      <div class="toolbar-box">
-                        <div id="toolbar1">
-                          <button class="ql-bold">Bold </button>
-                          <button class="ql-italic">Italic </button>
-                          <button class="ql-underline">underline</button>
-                          <button class="ql-list" value="ordered">List </button>
-                          <button class="ql-list" value="bullet"> </button>
-                          <button class="ql-link"></button>
-                          <button class="ql-image"></button>
-                        </div>
-                        <div id="editor1"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-            <form class="dropzone" id="singleFileUpload" action="https://admin.pixelstrap.net/upload.php">
-              <div class="m-0 dz-message needsclick"><i class="icon-cloud-up"></i>
-                <h6 class="mb-0">Drop files here or click to upload.</h6>
-              </div>
-            </form>
-            <div class="btn-showcase text-end blog-btn">
-              <button class="btn btn-primary" type="submit">Post</button>
-              <input class="btn bg-light font-dark" type="reset" value="Discard">
-            </div>
-          </div>
-        </div>
+<div class="bg-white shadow-xl rounded-lg p-8 max-w-4xl w-full mx-auto mt-10">
+  <h2 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">
+    Create Blog
+  </h2>
+  <form [formGroup]="blogForm" (ngSubmit)="onSubmit()">
+    <!-- Title -->
+    <div class="mb-6">
+      <label for="title" class="block text-lg font-medium text-gray-700"
+        >Title</label
+      >
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+        placeholder="Enter blog title"
+      />
+      <!-- Error Messages for Title -->
+      @if(blogForm.get('title')?.touched && blogForm.get('title')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('title')?.hasError('required')){
+        <div>Title is required.</div>
+        } @if(blogForm.get('title')?.hasError('minlength')){
+        <div>Title must be at least 5 characters long.</div>
+        } @if(blogForm.get('title')?.hasError('maxlength')){
+        <div>Title cannot be more than 100 characters long.</div>
+        }
       </div>
+      }
     </div>
-  </div>
+
+    <!-- Content -->
+     @if(editorInitialized){
+      <div class="mb-6" >
+        <label for="content" class="block text-lg font-medium text-gray-700"
+          >Content</label
+        >
+        <div class="NgxEditor__Wrapper">
+          <ngx-editor-menu
+            [editor]="editor"
+            [toolbar]="toolbar"
+          ></ngx-editor-menu>
+          <ngx-editor
+            [editor]="editor"
+            formControlName="content"
+            [disabled]="false"
+            [placeholder]="'Type here...'"
+          ></ngx-editor>
+        </div>
+        <!-- Error Messages for Content -->
+        @if(blogForm.get('content')?.touched && blogForm.get('content')?.invalid){
+        <div class="text-red-500 text-sm mt-2">
+          @if(blogForm.get('content')?.hasError('required')){
+          <div>Content is required.</div>
+          }
+        </div>
+        }
+      </div>
+     }
+    
+
+    <!-- Summary -->
+    <div class="mb-6">
+      <label for="summary" class="block text-lg font-medium text-gray-700"
+        >Summary</label
+      >
+      <textarea
+        id="summary"
+        rows="3"
+        formControlName="summary"
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+        placeholder="Provide a short summary of the blog"
+      ></textarea>
+      <!-- Error Messages for Summary -->
+      @if(blogForm.get('summary')?.touched && blogForm.get('summary')?.invalid){
+      <div class="text-red-500 text-sm mt-1">
+        @if(blogForm.get('summary')?.hasError('maxlength')){
+        <div>Summary cannot be more than 250 characters long.</div>
+        } @if(blogForm.get('summary')?.hasError('required')){
+        <div>Summary is required.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Author -->
+    <div class="mb-6">
+      <label for="author" class="block text-lg font-medium text-gray-700"
+        >Author</label
+      >
+      <input
+        id="author"
+        type="text"
+        formControlName="author"
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+        placeholder="Enter author's name"
+      />
+      <!-- Error Messages for Author -->
+      @if(blogForm.get('author')?.touched && blogForm.get('author')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('author')?.hasError('required')){
+        <div>Author is required.</div>
+        } @if(blogForm.get('author')?.hasError('pattern')){
+        <div>Author name must contain only letters and spaces.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Tags -->
+    <div class="mb-6">
+      <label for="tags" class="block text-lg font-medium text-gray-700"
+        >Tags</label
+      >
+      <input
+        id="tags"
+        type="text"
+        #tagInput
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+        placeholder="Enter a tag and press Enter (e.g., tech, programming)"
+        (keydown.enter)="addTag(tagInput.value); tagInput.value = ''"
+      />
+      <!-- Display the tags -->
+      <div class="flex flex-wrap gap-2 mt-3">
+        <app-tags
+          *ngFor="let tag of tags.controls; let i = index"
+          [index]="i"
+          (removeTag)="removeTag($event)"
+        >
+          {{ tag.value }}
+        </app-tags>
+      </div>
+      <!-- Error Messages for Tags -->
+      @if(blogForm.get('tags')?.touched && blogForm.get('tags')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('tags')?.hasError('required')){
+        <div>At least one tag is required.</div>
+        } @if(blogForm.get('tags')?.hasError('duplicateTags')){
+        <div>Tags must be unique.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Image -->
+    <div class="mb-6">
+      <label for="image" class="block text-lg font-medium text-gray-700"
+        >Image URL</label
+      >
+      <input
+        id="image"
+        type="text"
+        formControlName="image"
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+        placeholder="Enter image URL"
+      />
+      <!-- Error Messages for Image -->
+      @if(blogForm.get('image')?.touched && blogForm.get('image')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('image')?.hasError('pattern')){
+        <div>Please enter a valid image URL (jpg, jpeg, png, gif, etc.).</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Category -->
+    <div class="mb-6">
+      <label for="category" class="block text-lg font-medium text-gray-700"
+        >Category</label
+      >
+      <select
+        id="category"
+        formControlName="category"
+        class="w-full px-3 py-2 mt-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
+      >
+        <option value="">Select Category</option>
+        <option value="Technology">Technology</option>
+        <option value="Health">Health</option>
+        <option value="Lifestyle">Lifestyle</option>
+      </select>
+      <!-- Error Messages for Category -->
+      @if(blogForm.get('category')?.touched &&
+      blogForm.get('category')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('category')?.hasError('required')){
+        <div>Category is required.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Visibility -->
+    <div class="mb-6">
+      <label class="block text-lg font-medium text-gray-700">Visibility</label>
+      <div class="flex items-center space-x-6">
+        <label class="flex items-center">
+          <input
+            type="radio"
+            value="Public"
+            formControlName="visibility"
+            class="mr-2 focus:ring-teal-800"
+          />
+          Public
+        </label>
+        <label class="flex items-center">
+          <input
+            type="radio"
+            value="Private"
+            formControlName="visibility"
+            class="mr-2 focus:ring-teal-800"
+          />
+          Private
+        </label>
+      </div>
+      <!-- Error Messages for Visibility -->
+      @if(blogForm.get('visibility')?.touched &&
+      blogForm.get('visibility')?.invalid){
+      <div class="text-red-500 text-sm mt-2">
+        @if(blogForm.get('visibility')?.hasError('required')){
+        <div>Visibility is required.</div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Submit Button -->
+    <div class="mt-8 flex justify-end gap-4">
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 transition duration-300"
+        [disabled]="blogForm.invalid"
+      >
+        Submit Blog
+      </button>
+
+      <!-- Discard Button -->
+      <button
+        type="button"
+        (click)="blogForm.reset()"
+        class="bg-gray-300 text-gray-800 py-1 px-6 rounded-lg hover:bg-gray-400 transition duration-300"
+      >
+        Discard
+      </button>
+    </div>
+  </form>
+</div>

@@ -191,14 +191,9 @@
         #skillInput
         (keyup.enter)="addSkill(skillInput.value); skillInput.value = ''"
       />
-      <div class="skills-container">
+      <div class="flex flex-wrap gap-2 mt-3">
         @for (skill of skills.controls; track skill; let i =$index) {
-        <div class="skill-item">
-          <span>{{ skill.value }}</span>
-          <button type="button" (click)="removeSkill(i)">
-            <i class="fas fa-trash text-red-600"></i>
-          </button>
-        </div>
+          <app-tags [index]="i" (removeTag)="removeSkill($event)">{{ skill.value }}</app-tags>
         }
       </div>
       @if (f['skills'].touched && f['skills'].invalid) {

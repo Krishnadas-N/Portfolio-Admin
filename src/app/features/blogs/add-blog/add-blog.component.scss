@@ -1,0 +1,32 @@
+.bg-teal-600 {
+  background-color: #308e87;
+}
+
+
+input, select, textarea {
+  @apply bg-white;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #308e87;
+  box-shadow: 0 0 0 3px rgba(48, 142, 135, 0.2);
+}
+
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+  background-color: #267a72;
+}
+
+@media screen and (max-width: 768px) {
+  .max-w-4xl {
+    max-width: 100%;
+  }
+
+  .p-8 {
+    padding: 20px;
+  }
+}

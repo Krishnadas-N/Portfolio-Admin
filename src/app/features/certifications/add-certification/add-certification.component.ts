@@ -8,11 +8,16 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { TagsComponent } from '../../../shared/components';
+import {
+  IMAGE_URL_VALIDATOR,
+  uniqueTagsValidator,
+} from '../../../shared/utils/validators';
 @Component({
-    selector: 'app-add-certification',
-    imports: [ReactiveFormsModule, NgIf],
-    templateUrl: './add-certification.component.html',
-    styleUrl: './add-certification.component.scss'
+  selector: 'app-add-certification',
+  imports: [ReactiveFormsModule, NgIf, TagsComponent],
+  templateUrl: './add-certification.component.html',
+  styleUrl: './add-certification.component.scss',
 })
 export class AddCertificationComponent implements OnInit {
   certificationForm!: FormGroup;
@@ -27,8 +32,11 @@ export class AddCertificationComponent implements OnInit {
       credentialId: [''],
       credentialUrl: [''],
       description: [''],
-      skillsGained: this.fb.array([], Validators.required),
-      imageUrl: ['', Validators.pattern(/https?:\/\/.+\.(jpg|jpeg|png)$/)],
+      skillsGained: this.fb.array(
+        [],
+        [Validators.required, uniqueTagsValidator]
+      ),
+      imageUrl: ['', [IMAGE_URL_VALIDATOR]],
     });
   }
   onFileChange(event: Event) {

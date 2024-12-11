@@ -141,23 +141,11 @@
         placeholder="E.g., Angular, Node.js, MongoDB"
         class="w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
       />
-      <div class="technologies-container mt-2">
-        @for(technology of technologies.controls;track technology; let i =
-        $index){
-        <div
-          class="technology-item inline-flex items-center bg-[#f4f4f4] px-3 py-1 rounded-full shadow-sm hover:bg-[#e0e0e0] m-1"
-        >
-          <span class="text-[#308E87] font-medium mr-2">{{
+      <div class="flex flex-wrap gap-2 mt-3">
+        @for (technology of technologies.controls;track technology; let i =$index) {
+          <app-tags [index]="i" (removeTag)="removeTechnology($event)">{{
             technology.value
-          }}</span>
-          <button
-            type="button"
-            (click)="removeTechnology(i)"
-            class="text-red p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400"
-          >
-            <i class="fas fa-trash text-red-600"></i>
-          </button>
-        </div>
+          }}</app-tags>
         }
       </div>
     </div>

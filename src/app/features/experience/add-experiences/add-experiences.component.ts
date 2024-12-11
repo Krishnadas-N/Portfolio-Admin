@@ -11,16 +11,17 @@ import { CompanyLogoService } from '../../../core/services';
 import { CompanyDetails } from '../../../core/models';
 import { Subscription } from 'rxjs';
 import { NgStyle } from '@angular/common';
+import { TagsComponent } from '../../../shared/components';
 @Component({
-    selector: 'app-add-experiences',
-    imports: [ReactiveFormsModule,NgStyle],
-    templateUrl: './add-experiences.component.html',
-    styleUrl: './add-experiences.component.scss'
+  selector: 'app-add-experiences',
+  imports: [ReactiveFormsModule, NgStyle, TagsComponent],
+  templateUrl: './add-experiences.component.html',
+  styleUrl: './add-experiences.component.scss',
 })
-export class AddExperiencesComponent  implements OnInit, OnDestroy{
+export class AddExperiencesComponent implements OnInit, OnDestroy {
   experienceForm!: FormGroup;
   fb = inject(FormBuilder);
-  companyLogoService = inject(CompanyLogoService)
+  companyLogoService = inject(CompanyLogoService);
   companySuggestions: CompanyDetails[] = [];
   logoUrl: string = '';
   selectedCompany: string = '';
@@ -29,7 +30,7 @@ export class AddExperiencesComponent  implements OnInit, OnDestroy{
   ngOnInit(): void {
     this.experienceForm = this.fb.group({
       title: ['', Validators.required],
-      companyLogo:['', Validators.required],
+      companyLogo: ['', Validators.required],
       company: ['', Validators.required],
       location: [''],
       startDate: ['', Validators.required],
@@ -61,7 +62,9 @@ export class AddExperiencesComponent  implements OnInit, OnDestroy{
       .get('company')
       ?.valueChanges.pipe(
         debounceTime(300),
-        switchMap((companyName) => this.companyLogoService.fetchCompanySuggestions(companyName))
+        switchMap((companyName) =>
+          this.companyLogoService.fetchCompanySuggestions(companyName)
+        )
       )
       .subscribe((suggestions: CompanyDetails[]) => {
         this.companySuggestions = suggestions;
@@ -75,7 +78,7 @@ export class AddExperiencesComponent  implements OnInit, OnDestroy{
     this.experienceForm.get('company')?.setValue(this.selectedCompany);
     this.experienceForm.get('companyLogo')?.setValue(this.logoUrl);
     this.companySuggestions = [];
-    this.showSuggestions = false; 
+    this.showSuggestions = false;
   }
 
   clearSelection(): void {

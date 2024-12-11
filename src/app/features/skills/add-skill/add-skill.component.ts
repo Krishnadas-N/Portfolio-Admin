@@ -1,13 +1,12 @@
-import { Component, inject, OnInit  } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-;
-
+import { IMAGE_URL_VALIDATOR } from '../../../shared/utils/validators';
 @Component({
-    selector: 'app-add-skill',
-    imports: [ReactiveFormsModule],
-    templateUrl: './add-skill.component.html',
-    styleUrl: './add-skill.component.scss'
+  selector: 'app-add-skill',
+  imports: [ReactiveFormsModule],
+  templateUrl: './add-skill.component.html',
+  styleUrl: './add-skill.component.scss',
 })
 export class AddSkillComponent {
   skillForm!: FormGroup;
@@ -20,7 +19,7 @@ export class AddSkillComponent {
       ],
       skillLevel: ['', Validators.required],
       category: ['', Validators.required],
-      logoUrl: ['', [Validators.pattern(/https?:\/\/[^\s]+/)]], 
+      logoUrl: ['', [IMAGE_URL_VALIDATOR]],
     });
   }
   onSubmit() {
