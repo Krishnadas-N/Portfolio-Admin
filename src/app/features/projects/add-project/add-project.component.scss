@@ -1,0 +1,16 @@
+.custom-btn {
+    @apply bg-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-lg;
+  }
+  .custom-input {
+    @apply border-gray-300 rounded-lg focus:ring-primary focus:border-primary;
+  }
+  input,textarea,select{
+    @apply bg-white border-teal-500
+  }
+  .custom-btn {
+    @apply bg-teal-600 text-white py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all;
+  }
+  .error {
+    color: red;
+    font-size: 0.875em;
+  }

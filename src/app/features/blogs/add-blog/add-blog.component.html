@@ -1,7 +1,4 @@
-<div class="bg-white shadow-xl rounded-lg p-8 max-w-4xl w-full mx-auto mt-10">
-  <h2 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">
-    Create Blog
-  </h2>
+<div class="bg-white shadow-xl rounded-lg p-8 w-full mx-auto mt-4">
   <form [formGroup]="blogForm" (ngSubmit)="onSubmit()">
     <!-- Title -->
     <div class="mb-6">
@@ -122,13 +119,15 @@
       />
       <!-- Display the tags -->
       <div class="flex flex-wrap gap-2 mt-3">
-        <app-tags
-          *ngFor="let tag of tags.controls; let i = index"
+        @for(tag of tags.controls;track tag; let i = $index){
+          <app-tags
           [index]="i"
           (removeTag)="removeTag($event)"
         >
           {{ tag.value }}
         </app-tags>
+        }        
+       
       </div>
       <!-- Error Messages for Tags -->
       @if(blogForm.get('tags')?.touched && blogForm.get('tags')?.invalid){

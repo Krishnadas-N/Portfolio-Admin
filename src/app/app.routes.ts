@@ -32,6 +32,10 @@ export const routes: Routes = [
             {
                 path:'education',
                 loadChildren:()=>import('./features/education/education.routes').then(m=>m.EDUCATION_ROUTES)
+            },
+            {
+                path:'projects',
+                loadChildren:()=>import('./features/projects/project.routes').then(m=>m.PROJECT_ROUTES)
             }
         ]
     }
