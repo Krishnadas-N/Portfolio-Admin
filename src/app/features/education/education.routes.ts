@@ -13,7 +13,7 @@ export const EDUCATION_ROUTES: Routes = [
     component: AddEducationComponent,
   },
   {
-    path: 'edit/:educationId',
+    path: 'edit/:id',
     component: AddEducationComponent,
   },
 ];

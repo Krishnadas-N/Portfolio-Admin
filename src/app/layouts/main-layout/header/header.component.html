@@ -220,10 +220,10 @@
               <h3>15</h3></a></li>
           <li class="profile-nav custom-dropdown">
             <div class="user-wrap">
-              <div class="user-img"><img src="../assets/images/profile.png" alt="user"/></div>
+              <div class="user-img"><img [src]="authService.currentUser()?.avatar || '../assets/images/profile.png'" alt="user"/></div>
               <div class="user-content">
-                <h6>Ava Davis</h6>
-                <p class="mb-0">Admin<i class="fa-solid fa-chevron-down"></i></p>
+                <h6>{{ authService.currentUser()?.username || 'Admin' }}</h6>
+                <p class="mb-0">{{ authService.currentUser()?.role || 'Admin' }}<i class="fa-solid fa-chevron-down"></i></p>
               </div>
             </div>
             <div class="custom-menu overflow-hidden">
@@ -231,22 +231,12 @@
                 <li class="d-flex"> 
                   <svg class="svg-color">
                     <use href="https://admin.pixelstrap.net/admiro/assets/svg/iconly-sprite.svg#Profile"></use>
-                  </svg><a class="ms-2" href="user-profile.html">Account</a>
+                  </svg><a class="ms-2" routerLink="/settings">Account</a>
                 </li>
-                <li class="d-flex"> 
-                  <svg class="svg-color">
-                    <use href="https://admin.pixelstrap.net/admiro/assets/svg/iconly-sprite.svg#Message"></use>
-                  </svg><a class="ms-2" href="letter-box.html">Inbox</a>
-                </li>
-                <li class="d-flex"> 
-                  <svg class="svg-color">
-                    <use href="https://admin.pixelstrap.net/admiro/assets/svg/iconly-sprite.svg#Document"></use>
-                  </svg><a class="ms-2" href="to-do.html">Task</a>
-                </li>
-                <li class="d-flex"> 
+                <li class="d-flex" (click)="logout()" style="cursor: pointer"> 
                   <svg class="svg-color">
                     <use href="https://admin.pixelstrap.net/admiro/assets/svg/iconly-sprite.svg#Login"></use>
-                  </svg><a class="ms-2" href="login.html">Log Out</a>
+                  </svg><a class="ms-2">Log Out</a>
                 </li>
               </ul>
             </div>

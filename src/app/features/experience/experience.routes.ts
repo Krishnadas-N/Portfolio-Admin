@@ -13,7 +13,7 @@ export const EXPERIENCE_ROUTES: Routes = [
     component: AddExperiencesComponent,
   },
   {
-    path: 'edit/:experienceId',
+    path: 'edit/:id',
     component: AddExperiencesComponent,
   },
 ];

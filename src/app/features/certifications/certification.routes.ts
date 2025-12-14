@@ -13,7 +13,7 @@ export const CERTIFICATION_ROUTES: Routes = [
     component: AddCertificationComponent,
   },
   {
-    path: 'edit/:certificationId',
+    path: 'edit/:id',
     component: AddCertificationComponent,
   },
 ];

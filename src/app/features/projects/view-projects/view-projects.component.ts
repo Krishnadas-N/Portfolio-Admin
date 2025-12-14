@@ -1,50 +1,70 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProjectService } from '../../../core/services/project.service';
+import { Project, Pagination } from '../../../core/models/api.models';
+import { finalize } from 'rxjs/operators';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-view-projects',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, RouterLink, PaginationComponent, FormsModule],
   templateUrl: './view-projects.component.html',
   styleUrl: './view-projects.component.scss'
 })
-export class ViewProjectsComponent {
-    projectDetails = {
-    title: "Maitri - Socio Booking Platform",
-    projectType: "Social Media and Booking",
-    status: "Active",
-    license: "MIT",
-    startDate: "2023-01-01",
-    endDate: "2024-12-31",
-    current: true,
-    description:
-      "Maitri is a comprehensive social media and booking platform for mental health patients, featuring seamless video consultations, booking systems, and admin dashboards.",
-    technologies: ["Angular", "Node.js", "MongoDB", "Zego Cloud", "Razorpay"],
-    link: "https://maitri-platform.com",
-    repo: "https://github.com/example/maitri-platform",
-    images: [
-      "https://via.placeholder.com/400x200",
-      "https://via.placeholder.com/400x200",
-      "https://via.placeholder.com/400x200",
-    ],
-    deploymentDetails: [
-      {
-        platform: "AWS EC2",
-        url: "https://maitri-aws.com",
-      },
-      {
-        platform: "Vercel",
-        url: "https://maitri-vercel.com",
-      },
-    ],
-    skills: ["Full-Stack Development", "State Management", "Payment Integration"],
-    viewsCount: 1200,
-    likes: 350,
-    seoKeywords: ["mental health", "video consultation", "booking platform"],
-    tags: ["Mental Health", "Social Media", "Web App"],
-    additionalResources: [
-      "https://docs.example.com",
-      "https://tutorial.example.com",
-    ],
-  };
-  
+export class ViewProjectsComponent implements OnInit {
+    private projectService = inject(ProjectService);
+    
+    projects = signal<Project[]>([]);
+    pagination = signal<Pagination | null>(null);
+    isLoading = signal<boolean>(false);
+    error = signal<string | null>(null);
+    searchTerm = signal<string>('');
+
+    ngOnInit() {
+        this.loadProjects();
+    }
+
+    loadProjects(page: number = 1) {
+        this.isLoading.set(true);
+        this.projectService.getProjects({ page, search: this.searchTerm() }).pipe(
+            finalize(() => this.isLoading.set(false))
+        ).subscribe({
+            next: (res) => {
+                if (res.success && res.data) {
+                    this.projects.set(res.data);
+                    this.pagination.set(res.pagination);
+                }
+            },
+            error: (err) => {
+                console.error('Error loading projects', err);
+                this.error.set('Failed to load projects');
+            }
+        });
+    }
+
+    onSearch() {
+        this.loadProjects(1);
+    }
+
+    onPageChange(page: number) {
+        this.loadProjects(page);
+    }
+
+    deleteProject(id: string) {
+        if (confirm('Are you sure you want to delete this project?')) {
+            this.projectService.deleteProject(id).subscribe({
+                next: (res) => {
+                    if (res.success) {
+                        this.projects.update(current => current.filter(p => p._id !== id));
+                        // Reload to update pagination if needed
+                        this.loadProjects(this.pagination()?.page ?? 1);
+                    }
+                },
+                error: (err) => console.error('Error deleting project', err)
+            });
+        }
+    }
 }

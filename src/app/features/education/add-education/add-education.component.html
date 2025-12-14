@@ -1,230 +1,250 @@
-<div class="container mx-auto p-6 bg-white rounded-lg shadow-lg w-full">
-  <form [formGroup]="educationForm" (ngSubmit)="onSubmit()" class="space-y-4">
-    <!-- Degree -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label for="degree" class="block text-sm font-medium text-teal-700"
-          >Degree *</label
-        >
-        <input
-          type="text"
-          id="degree"
-          placeholder="Enter your degree"
-          class="form-input"
-          formControlName="degree"
-        />
-        @if (f['degree'].touched && f['degree'].invalid) {
-        <div class="text-red-500 text-sm">
-          @if (f['degree'].errors?.['required']) {
-          <div >Degree is required.</div>
-          } @if (f['degree'].errors?.['minlength']) {
-          <div>Degree must be at least 3 characters long.</div>
-          }
-        </div>
-        }
-      </div>
-      <div>
-        <label
-          for="fieldOfStudy"
-          class="block text-sm font-medium text-teal-700"
-          >Field of Study *</label
-        >
-        <input
-          type="text"
-          id="fieldOfStudy"
-          placeholder="e.g., Computer Science"
-          class="form-input"
-          formControlName="fieldOfStudy"
-        />
-        @if (f['fieldOfStudy'].touched && f['fieldOfStudy'].invalid) {
-        <div class="text-red-500 text-sm">
-          @if (f['fieldOfStudy'].errors?.['required']) {
-          <div>Field of Study is required.</div>
-          } @if (f['fieldOfStudy'].errors?.['minlength']) {
-          <div>Field of Study must be at least 3 characters long.</div>
-          }
-        </div>
-        }
-      </div>
-    </div>
-
-    <div class="flex flex-col md:flex-row items-center space-x-2">
-      <!-- Institution Logo Section -->
-      <div class="flex-shrink-0">
-        <img
-          class="h-16 w-14 object-cover rounded-sm border-1 border-teal-700"
-          [src]="logoUrl ? logoUrl : 'https://via.placeholder.com/100'"
-          alt="Institution Logo"
-        />
-      </div>
-    
-      <!-- Institution Input Section -->
-      <div class="flex-1">
-        <label for="institution" class="block text-sm font-medium text-teal-700">Institution *</label>
-        <input
-          type="text"
-          id="institution"
-          placeholder="Enter your institution"
-          class="form-input w-full border border-gray-300 rounded-md p-2 "
-          formControlName="institution"
-           (focus)="showSuggestions = true"
-          (blur)="onBlur()"
-        />
-    
-        @if (f['institution'].touched && f['institution'].invalid) {
-          <div class="text-red-500 text-sm">
-            @if (f['institution'].errors?.['required']) {
-            <div>Institution is required.</div>
-            } @if (f['institution'].errors?.['minlength']) {
-            <div>Institution must be at least 3 characters long.</div>
-            }
-          </div>
-          }
-          @if(showSuggestions && instituteSuggestions.length){
-            <ul  class="absolute w-4/5 bg-white border mt-1 shadow-lg rounded-md z-10">
-              @for(suggestion of instituteSuggestions;track suggestion){
-                <li
-                (click)="selectCompany(suggestion)"
-                class="cursor-pointer px-4 py-2 hover:bg-gray-200"
-              >
-                <!-- Display Company Name and Logo -->
-                <div class="flex items-center">
-                  <img [src]="suggestion.logo_url" alt="suggestion.name" class="h-6 w-6 rounded-full mr-2" />
-                  {{ suggestion.name }}
-                </div>
-              </li>
-              }
-            
-            </ul>
-           }
-      </div>
-    </div>
-    
+<div class="container mx-auto p-4 lg:p-8 max-w-5xl">
   
-
-    
-
-    <!-- Start and End Date -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label for="startDate" class="block text-sm font-medium text-teal-700"
-          >Start Date *</label
-        >
-        <input
-          type="date"
-          id="startDate"
-          class="form-input"
-          formControlName="startDate"
-        />
-        @if (f['startDate'].touched && f['startDate'].invalid) {
-        <div class="text-red-500 text-sm">
-          @if (f['startDate'].errors?.['required']) {
-          <div>Start Date is required.</div>
-          }
-        </div>
-        }
-      </div>
-      <div>
-        <label for="endDate" class="block text-sm font-medium text-teal-700"
-          >End Date</label
-        >
-        <input
-          type="date"
-          id="endDate"
-          class="form-input"
-          formControlName="endDate"
-        />
-      </div>
-    </div>
-
-    <!-- Grade -->
+  <!-- Header Actions -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 bg-base-100/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-base-200 sm:border-none">
     <div>
-      <label for="grade" class="block text-sm font-medium text-teal-700"
-        >Grade</label
-      >
-      <input
-        type="text"
-        id="grade"
-        placeholder="e.g., A+, 4.0 GPA"
-        class="form-input"
-        formControlName="grade"
-      />
-      @if (f['grade'].touched && f['grade'].invalid) {
-      <div class="text-red-500 text-sm">
-        @if (f['grade'].errors?.['pattern']) {
-        <div>Invalid grade format.</div>
-        }
-      </div>
-      }
+      <h1 class="text-3xl font-bold text-base-content tracking-tight">{{ isEditMode() ? 'Edit Education' : 'Add Education' }}</h1>
+      <p class="text-base-content/60 text-sm mt-1">Add your academic achievements.</p>
     </div>
-
-    <!-- Activities -->
-    <div>
-      <label for="activities" class="block text-sm font-medium text-teal-700"
-        >Activities</label
-      >
-      <textarea
-        id="activities"
-        placeholder="e.g., Member of Coding Club, Sports Team"
-        class="form-textarea"
-        formControlName="activities"
-      ></textarea>
-      @if (f['activities'].touched && f['activities'].invalid) {
-      <div class="text-red-500 text-sm">
-        @if (f['activities'].errors?.['maxlength']) {
-        <div>Activities must be less than 300 characters.</div>
-        }
-      </div>
-      }
-    </div>
-
-    <!-- Skills -->
-    <div>
-      <label for="skills" class="block text-sm font-medium text-teal-700"
-        >Skills</label
-      >
-      <input
-        type="text"
-        id="skills"
-        placeholder="e.g., JavaScript, Python"
-        class="form-input"
-        #skillInput
-        (keyup.enter)="addSkill(skillInput.value); skillInput.value = ''"
-      />
-      <div class="flex flex-wrap gap-2 mt-3">
-        @for (skill of skills.controls; track skill; let i =$index) {
-          <app-tags [index]="i" (removeTag)="removeSkill($event)">{{ skill.value }}</app-tags>
-        }
-      </div>
-      @if (f['skills'].touched && f['skills'].invalid) {
-      <div class="text-red-500 text-sm">
-        @if (f['skills'].errors?.['maxlength']) {
-        <div>Skills must be less than 200 characters.</div>
-        }
-      </div>
-      }
-    </div>
-
-    <!-- Submit Button -->
-    <div class="text-right space-x-4">
-      <!-- Save Button -->
-      <button
-      type="button"
-      (click)="educationForm.reset()"
-      class="btn-secondary"
-    >
-      Discard
-    </button>
-      <button
-        type="submit"
-        [disabled]="educationForm.invalid"
-        class="btn-primary"
-      >
-        Save
+    <div class="flex gap-3 w-full sm:w-auto">
+      <button type="button" (click)="onCancel()" class="btn btn-ghost flex-1 sm:flex-none">Cancel</button>
+      <button type="button" (click)="onSubmit()" [disabled]="educationForm.invalid || isSubmitting()" class="btn btn-primary flex-1 sm:flex-none shadow-lg shadow-primary/20">
+        <span *ngIf="isSubmitting()" class="loading loading-spinner loading-xs"></span>
+        <i class="fa-regular fa-floppy-disk mr-2" *ngIf="!isSubmitting()"></i>
+        {{ isEditMode() ? 'Save Changes' : 'Add Education' }}
       </button>
+    </div>
+  </div>
 
-      <!-- Discard Button -->
-     
+  <form [formGroup]="educationForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left Column (Main Content) -->
+    <div class="lg:col-span-2 space-y-8">
+      
+      <!-- Institution Info -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+              <i class="fa-solid fa-school"></i>
+            </div>
+            Academic Details
+          </h2>
+          
+          <div class="space-y-4">
+            <div class="form-control relative">
+              <label class="label"><span class="label-text font-medium">Institution</span></label>
+              <input type="text" formControlName="institution" placeholder="University or College Name" 
+                     class="input input-bordered w-full focus:input-primary transition-all" 
+                     (blur)="onBlur()"
+                     [class.input-error]="f['institution'].touched && f['institution'].invalid" />
+              
+              <!-- Suggestions Dropdown -->
+              <div *ngIf="showSuggestions && instituteSuggestions.length > 0" class="absolute top-full left-0 w-full bg-base-100 border border-base-200 rounded-lg shadow-xl mt-1 z-50 max-h-60 overflow-y-auto">
+                 <button *ngFor="let suggestion of instituteSuggestions" 
+                         (click)="selectInstitute(suggestion)"
+                         type="button"
+                         class="w-full text-left px-4 py-3 hover:bg-base-200 flex items-center gap-3 border-b border-base-100 last:border-0 transition-colors">
+                    <img [src]="suggestion.logo_url" class="w-6 h-6 rounded object-contain" />
+                    <span class="text-sm font-medium">{{ suggestion.name }}</span>
+                 </button>
+              </div>
+
+              <label class="label" *ngIf="f['institution'].touched && f['institution'].invalid">
+                <span class="label-text-alt text-error">Institution is required</span>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div class="form-control">
+                 <label class="label"><span class="label-text font-medium">Degree</span></label>
+                 <input type="text" formControlName="degree" placeholder="e.g. Bachelor's" class="input input-bordered w-full" />
+               </div>
+               <div class="form-control">
+                 <label class="label"><span class="label-text font-medium">Field of Study</span></label>
+                 <input type="text" formControlName="fieldOfStudy" placeholder="e.g. Computer Science" class="input input-bordered w-full" />
+               </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div class="form-control">
+                 <label class="label"><span class="label-text font-medium">Grade / GPA</span></label>
+                 <input type="text" formControlName="grade" placeholder="e.g. 3.8" class="input input-bordered w-full" />
+               </div>
+               <div class="form-control">
+                 <label class="label"><span class="label-text font-medium">Location</span></label>
+                 <input type="text" formControlName="location" placeholder="City, Country" class="input input-bordered w-full" />
+               </div>
+            </div>
+
+            <div class="form-control">
+               <label class="label"><span class="label-text font-medium">Description</span></label>
+               <textarea formControlName="description" class="textarea textarea-bordered h-24" placeholder="Brief description of your studies..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills, Activities & Achievements -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            Highlights
+          </h2>
+
+          <div class="space-y-6">
+             <!-- Skills -->
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Skills Learned</span></label>
+                <div class="relative">
+                   <input #skillInput type="text" placeholder="Add skill..." 
+                          class="input input-bordered w-full pr-12"
+                          (keyup.enter)="addSkill(skillInput.value, skillInput)" />
+                   <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                           (click)="addSkill(skillInput.value, skillInput)">
+                     <i class="fa-solid fa-plus"></i>
+                   </button>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
+                   <div *ngFor="let skill of skills.controls; let i = index" 
+                        class="badge badge-lg gap-2 pl-3 pr-1 py-3 bg-base-200 border-base-300">
+                     {{ skill.value }}
+                     <button type="button" (click)="removeSkill(i)" 
+                             class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 text-base-content/50 hover:text-error">
+                       <i class="fa-solid fa-xmark text-[10px]"></i>
+                     </button>
+                   </div>
+                   <span *ngIf="skills.length === 0" class="text-sm text-base-content/40 italic py-1">No skills added yet</span>
+                </div>
+             </div>
+
+             <!-- Activities -->
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Activities & Societies</span></label>
+                <div class="relative">
+                   <input #activityInput type="text" placeholder="Add activity..." 
+                          class="input input-bordered w-full pr-12"
+                          (keyup.enter)="addActivity(activityInput.value, activityInput)" />
+                   <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                           (click)="addActivity(activityInput.value, activityInput)">
+                     <i class="fa-solid fa-plus"></i>
+                   </button>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
+                   <div *ngFor="let activity of activities.controls; let i = index" 
+                        class="badge badge-lg badge-outline gap-2 pl-3 pr-1 py-3">
+                     {{ activity.value }}
+                     <button type="button" (click)="removeActivity(i)" 
+                             class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 hover:bg-base-200">
+                       <i class="fa-solid fa-xmark text-[10px]"></i>
+                     </button>
+                   </div>
+                   <span *ngIf="activities.length === 0" class="text-sm text-base-content/40 italic py-1">No activities added yet</span>
+                </div>
+             </div>
+
+             <!-- Achievements -->
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Key Achievements</span></label>
+                <div class="relative">
+                   <input #achieveInput type="text" placeholder="Add achievement..." 
+                          class="input input-bordered w-full pr-12"
+                          (keyup.enter)="addAchievement(achieveInput.value, achieveInput)" />
+                   <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                           (click)="addAchievement(achieveInput.value, achieveInput)">
+                     <i class="fa-solid fa-plus"></i>
+                   </button>
+                </div>
+                <div class="flex flex-col gap-2 mt-3 min-h-[2rem]">
+                   <div *ngFor="let achieve of achievements.controls; let i = index" 
+                        class="flex items-start gap-2 p-2 bg-base-50 rounded-lg group hover:bg-base-100 transition-colors">
+                     <span class="text-secondary mt-1.5">•</span>
+                     <span class="flex-1 text-sm">{{ achieve.value }}</span>
+                     <button type="button" (click)="removeAchievement(i)" 
+                             class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity">
+                       <i class="fa-solid fa-xmark text-error"></i>
+                     </button>
+                   </div>
+                   <span *ngIf="achievements.length === 0" class="text-sm text-base-content/40 italic py-1">No achievements added yet</span>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column (Sidebar) -->
+    <div class="space-y-8">
+      
+      <!-- Dates -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Timeline</h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Start Date</span></label>
+              <input type="date" formControlName="startDate" class="input input-bordered w-full" 
+                     [class.input-error]="f['startDate'].touched && f['startDate'].invalid" />
+            </div>
+
+            <div class="form-control">
+               <label class="label cursor-pointer p-0 mb-2">
+                 <span class="label-text font-medium">I currently study here</span>
+                 <input type="checkbox" formControlName="current" class="checkbox checkbox-primary checkbox-sm" />
+               </label>
+            </div>
+
+            <div class="form-control" *ngIf="!f['current'].value">
+              <label class="label"><span class="label-text font-medium">End Date</span></label>
+              <input type="date" formControlName="endDate" class="input input-bordered w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Links & Logo -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Details</h2>
+          
+          <div class="space-y-4">
+             <div class="form-control">
+               <label class="label"><span class="label-text font-medium">Website</span></label>
+               <input type="text" formControlName="website" placeholder="https://..." class="input input-bordered w-full" />
+             </div>
+
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Institution Logo</span></label>
+                <div class="border-2 border-dashed border-base-300 rounded-xl p-4 text-center hover:border-primary/50 hover:bg-base-200/30 transition-all cursor-pointer relative group bg-base-50/50 flex flex-col items-center justify-center min-h-[100px]">
+                   <input type="file" accept="image/*" (change)="onLogoSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                   
+                   <div class="flex flex-col items-center gap-2 text-base-content/60" *ngIf="!educationForm.get('logo')?.value">
+                      <div class="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center mb-1 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                         <i class="fa-solid fa-university text-lg"></i>
+                      </div>
+                      <span class="font-medium text-xs">Upload Logo</span>
+                   </div>
+                   
+                   <div *ngIf="educationForm.get('logo')?.value" class="relative w-16 h-16">
+                      <img [src]="educationForm.get('logo')?.value" class="w-full h-full object-contain" />
+                      <button type="button" (click)="$event.stopPropagation(); educationForm.get('logo')?.setValue('')" 
+                              class="absolute -top-2 -right-2 z-20 btn btn-circle btn-xs btn-error text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                         <i class="fa-solid fa-xmark"></i>
+                      </button>
+                   </div>
+                </div>
+                <div class="divider text-xs text-base-content/30 my-2 font-medium">OR URL</div>
+                <input type="text" formControlName="logo" placeholder="https://..." class="input input-sm input-bordered w-full" />
+             </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </form>
 </div>

@@ -1,529 +1,284 @@
-<div class="container mx-auto p-6 bg-white shadow-xl rounded-lg">
-  <form class="space-y-8" [formGroup]="projectForm" (ngSubmit)="onSubmit()">
-    <div class="grid grid-cols-1 gap-6">
-      <!-- Project Title -->
-      <div class="mb-4">
-        <label for="title" class="block text-sm font-medium text-gray-700"
-          >Project Title</label
-        >
-        <input
-          id="title"
-          type="text"
-          formControlName="title"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (f['title'].touched && f['title'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['title'].errors?.['required']) {
-          <small>Title is required.</small>} @if
-          (f['title'].errors?.['minlength']) {
-          <small>Minimum 3 characters required.</small> }
+<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
+  
+  <!-- Header Actions -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 bg-base-100/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-base-200 sm:border-none">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content tracking-tight">{{ isEditMode ? 'Edit Project' : 'New Project' }}</h1>
+      <p class="text-base-content/60 text-sm mt-1">Create or update your portfolio project details.</p>
+    </div>
+    <div class="flex gap-3 w-full sm:w-auto">
+      <button type="button" (click)="onCancel()" class="btn btn-ghost flex-1 sm:flex-none">Cancel</button>
+      <button type="button" (click)="onSubmit()" [disabled]="projectForm.invalid || isSubmitting" class="btn btn-primary flex-1 sm:flex-none shadow-lg shadow-primary/20">
+        <span *ngIf="isSubmitting" class="loading loading-spinner loading-xs"></span>
+        <i class="fa-regular fa-floppy-disk mr-2" *ngIf="!isSubmitting"></i>
+        {{ isEditMode ? 'Save Changes' : 'Publish Project' }}
+      </button>
         </div>
-        }
       </div>
 
-      <!-- Project Description -->
-      <div class="mb-4">
-        <label for="description" class="block text-sm font-medium text-gray-700"
-          >Description</label
-        >
-        <textarea
-          id="description"
-          formControlName="description"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        ></textarea>
-        @if (f['description'].touched && f['description'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['description'].errors?.['required']) {<small
-            >Description is required.</small
-          >} @if (f['description'].errors?.['minlength']) {<small
-            >Minimum 10 characters required.</small
-          >}
+  <form [formGroup]="projectForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left Column (Main Content) -->
+    <div class="lg:col-span-2 space-y-8">
+      
+      <!-- General Info -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+              <i class="fa-regular fa-file-lines"></i>
         </div>
-        }
+            General Information
+          </h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Project Title</span></label>
+              <input type="text" formControlName="title" placeholder="e.g., AI-Powered Analytics Dashboard" 
+                     class="input input-bordered w-full focus:input-primary transition-all" 
+                     [class.input-error]="f['title'].touched && f['title'].invalid" />
+              <label class="label" *ngIf="f['title'].touched && f['title'].invalid">
+                <span class="label-text-alt text-error">Title is required (min 3 chars)</span>
+              </label>
       </div>
 
-      <!-- Technologies -->
-      <div class="mb-4">
-        <label
-          for="technologies"
-          class="block text-sm font-medium text-gray-700"
-          >Technologies</label
-        >
-        <input
-          id="technologies"
-          type="text"
-          formControlName="technologies"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (f['technologies'].touched && f['technologies'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          <small>Technologies are required.</small>
-        </div>
-        }
-      </div>
-
-      <!-- License -->
-      <div class="mb-4">
-        <label for="license" class="block text-sm font-medium text-gray-700"
-          >License</label
-        >
-        <input
-          id="license"
-          type="text"
-          formControlName="license"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (f['license'].touched && f['license'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          <small>License is required.</small>
-        </div>
-        }
-      </div>
-
-      <!-- Tags -->
-      <div class="mb-4">
-        <label for="tags" class="block text-sm font-medium text-gray-700"
-          >Tags</label
-        >
-        <input
-          id="tags"
-          type="text"
-          formControlName="tags"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (f['tags'].touched && f['tags'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          <small>Tags are required.</small>
-        </div>
-        }
-      </div>
-
-      <div class="form-section grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="form-group">
-          <label for="projectType">Project Type</label>
-          <select
-            id="projectType"
-            class="form-control select"
-            formControlName="projectType"
-          >
-            <option value="">Select Project Type</option>
-            <option value="main">Main Project</option>
-            <option value="mini">Mini Project</option>
-          </select>
-          @if (f['projectType'].touched && f['projectType'].invalid) {
-          <div class="text-danger">
-            @if (f['projectType'].errors?.['required']) {
-            <small>Project type is required.</small>} @if
-            (f['projectType'].errors?.['pattern']) {<small
-              >Invalid project type selected.</small
-            >}
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Description</span></label>
+              <textarea formControlName="description" class="textarea textarea-bordered h-48 focus:textarea-primary transition-all text-base leading-relaxed" 
+                        placeholder="Detailed description of the project features, challenges, and solutions..."
+                        [class.textarea-error]="f['description'].touched && f['description'].invalid"></textarea>
+              <label class="label" *ngIf="f['description'].touched && f['description'].invalid">
+                <span class="label-text-alt text-error">Description is required (min 10 chars)</span>
+              </label>
+            </div>
           </div>
-          }
         </div>
-          <!-- Status -->
-      <div class="form-group">
-        <label for="status" class="block text-sm font-medium text-gray-700"
-          >Status</label
-        >
-        <select
-          id="status"
-          formControlName="status"
-          class="form-control select"
-        >
-          <option value="">Select Status</option>
-          <option value="Planning">Planning</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-        @if (f['status'].touched && f['status'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['status'].errors?.['required']) {
-          <small>Status is required.</small>
-          }
-        </div>
-        }
-      </div>
-      </div>
-      <!-- SEO Keywords -->
-      <div class="mb-4">
-        <label for="seoKeywords" class="block text-sm font-medium text-gray-700"
-          >SEO Keywords</label
-        >
-        <input
-          id="seoKeywords"
-          type="text"
-          formControlName="seoKeywords"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (f['seoKeywords'].touched && f['seoKeywords'].invalid) {
-        <div *ngIf="" class="text-red-500 text-sm mt-1">
-          <small>SEO Keywords are required.</small>
-        </div>
-        }
       </div>
 
-      <!-- Additional Resources -->
-      <div class="form-group">
-        <label for="additionalResources">Additional Resources</label>
-        <input
-          id="additionalResources"
-          type="text"
-          class="form-control"
-          formControlName="additionalResources"
-          placeholder="Enter additional resources"
-        />
-        @if (f['additionalResources'].touched &&
-        f['additionalResources'].invalid) {
-        <div class="text-danger">
-          @if (f['additionalResources'].errors?.['required']) {
-          <small>Additional resources are required.</small>
-          }
+      <!-- Tech Stack -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            Tech Stack
+          </h2>
+
+          <div class="grid grid-cols-1 gap-6">
+            <!-- Technologies -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium">Technologies</span>
+                <span class="label-text-alt text-base-content/50">Core frameworks & tools</span>
+              </label>
+              <div class="relative">
+                <input #techInput type="text" placeholder="Type and press Enter to add..." 
+                       class="input input-bordered w-full pr-12"
+                       (keyup.enter)="addStringItem('technologies', techInput.value, techInput)" />
+                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                        (click)="addStringItem('technologies', techInput.value, techInput)">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
         </div>
-        }
+              <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
+                <div *ngFor="let tech of projectForm.get('technologies')?.value; let i = index" 
+                     class="badge badge-lg gap-2 pl-3 pr-1 py-3 bg-base-200 border-base-300">
+                  {{ tech }}
+                  <button type="button" (click)="removeStringItem('technologies', i)" 
+                          class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 text-base-content/50 hover:text-error">
+                    <i class="fa-solid fa-xmark text-[10px]"></i>
+                  </button>
+      </div>
+                <span *ngIf="!projectForm.get('technologies')?.value?.length" class="text-sm text-base-content/40 italic py-1">No technologies added yet</span>
+        </div>
       </div>
 
-
-      <!-- Related Projects -->
-      <div class="form-section col-span-full">
-        <label
-          for="relatedProjects"
-          class="block text-text-color font-semibold mb-2"
-          >Related Projects</label
-        >
-        <ng-select
-          [items]="projects"
-          bindLabel="name"
-          bindValue="id"
-          [(ngModel)]="selectedProjects"
-          [multiple]="true"
-          placeholder="Select related projects"
-          [searchable]="true"
-          formControlName="relatedProjects"
-        >
-        </ng-select>
-        @if (f['relatedProjects'].touched && f['relatedProjects'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['relatedProjects'].errors?.['required']) {
-          <small>Related projects are required.</small>
-          }
-        </div>
-        }
-      </div>
-
-      <!-- Collaborators -->
-      <div class="form-section col-span-full">
-        <label
-          for="collaborators"
-          class="block text-text-color font-semibold mb-2"
-          >Collaborators</label
-        >
-        <input
-          id="collaborators"
-          type="text"
-          class="custom-input w-full border py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          placeholder="Enter collaborators, separated by commas"
-          formControlName="collaborators"
-        />
-        @if(f['collaborators'].touched && f['collaborators'].invalid){
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['collaborators'].errors?.['required']) {
-          <small>Collaborators are required.</small>
-          }
-        </div>
-        }
-      </div>
-
-      <div class="form-section">
-        <label for="link" class="block text-text-color font-semibold mb-2"
-          >Project Link</label
-        >
-        <input
-          id="link"
-          type="url"
-          class="custom-input w-full border py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          placeholder="Enter project URL"
-          formControlName="link"
-        />
-        @if (f['link'].touched && f['link'].invalid) {
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['link'].errors?.['pattern']) {
-          <small>Please enter a valid URL for the project link.</small>
-          }
-        </div>
-        }
-      </div>
-
-      <!-- Repository Link -->
-      <div class="form-section">
-        <label for="repo" class="block text-text-color font-semibold mb-2"
-          >Repository Link</label
-        >
-        <input
-          id="repo"
-          type="url"
-          class="custom-input w-full border py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          placeholder="Enter repository URL"
-          formControlName="repo"
-        />
-        @if(f['repo'].touched && f['repo'].invalid){
-        <div class="text-red-500 text-sm mt-1">
-          @if (f['repo'].errors?.['pattern']) {
-          <small>Please enter a valid URL for the repository link.</small>
-          }
-        </div>
-        }
-      </div>
-
-      <div class="form-section grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <!-- Start Date -->
-        <div class="mb-4">
-          <label for="startDate" class="block text-sm font-medium text-gray-700"
-            >Start Date</label
-          >
-          <input
-            id="startDate"
-            type="date"
-            formControlName="startDate"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          />
-          @if (f['startDate'].touched && f['startDate'].invalid) {
-          <div class="text-red-500 text-sm mt-1">
-            @if (f['startDate'].errors?.['required']) {
-            <small>Start date is required.</small>
-            }
+            <!-- Skills -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-medium">Skills Learned</span>
+                <span class="label-text-alt text-base-content/50">Concepts & methodologies</span>
+              </label>
+              <div class="relative">
+                <input #skillInput type="text" placeholder="Type and press Enter to add..." 
+                       class="input input-bordered w-full pr-12"
+                       (keyup.enter)="addSkill(skillInput.value, skillInput)" />
+                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                        (click)="addSkill(skillInput.value, skillInput)">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
           </div>
-          }
+              <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
+                <div *ngFor="let skill of skills.controls; let i = index" 
+                     class="badge badge-lg badge-outline gap-2 pl-3 pr-1 py-3 border-primary/30 text-primary">
+                  {{ skill.value }}
+                  <button type="button" (click)="removeSkill(i)" 
+                          class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 hover:bg-primary hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-[10px]"></i>
+                  </button>
         </div>
+                <span *ngIf="!skills.length" class="text-sm text-base-content/40 italic py-1">No skills added yet</span>
+        </div>
+      </div>
+      </div>
+        </div>
+      </div>
 
-        <!-- End Date -->
-        <div class="mb-4">
-          <label for="endDate" class="block text-sm font-medium text-gray-700"
-            >End Date</label
-          >
-          <input
-            id="endDate"
-            type="date"
-            formControlName="endDate"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          />
-          @if (f['endDate'].touched && f['endDate'].invalid) {
-          <div class="text-red-500 text-sm mt-1">
-            @if (f['endDate'].errors?.['required']) {
-            <small>End date is required.</small>
-            }
+      <!-- Media -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+              <i class="fa-regular fa-images"></i>
+        </div>
+            Media Gallery
+          </h2>
+
+          <div class="space-y-6">
+            <!-- Image Upload -->
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Project Screenshots</span></label>
+              <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-base-200/30 transition-all cursor-pointer relative">
+                <input type="file" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                       (change)="onImageSelected($event)" />
+                <div class="flex flex-col items-center gap-2 text-base-content/60">
+                  <i class="fa-solid fa-cloud-arrow-up text-3xl mb-1"></i>
+                  <span class="font-medium">Drop images here or click to upload</span>
+                  <span class="text-xs">Supports JPG, PNG, WEBP</span>
+        </div>
+      </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4" *ngIf="images.length">
+                <div *ngFor="let img of images.controls; let i = index" class="relative group aspect-video bg-base-200 rounded-lg overflow-hidden border border-base-200 shadow-sm">
+                  <img [src]="img.value" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button type="button" (click)="removeImage(i)" 
+                            class="btn btn-circle btn-sm btn-error text-white shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+        </div>
+      </div>
+        </div>
+      </div>
+
+            <!-- Video Upload -->
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Demo Video</span></label>
+              <div class="flex flex-col sm:flex-row gap-4">
+                <input type="file" accept="video/*" class="file-input file-input-bordered w-full"
+                       (change)="onVideoSelected($event)" />
+        </div>
+              <div *ngIf="projectForm.get('videoRepresentation')?.value" class="mt-4 relative rounded-lg overflow-hidden bg-black aspect-video w-full max-w-md border border-base-300 shadow-sm">
+                <video [src]="projectForm.get('videoRepresentation')?.value" controls class="w-full h-full"></video>
+                <button type="button" (click)="projectForm.get('videoRepresentation')?.setValue('')" 
+                        class="absolute top-2 right-2 btn btn-circle btn-xs btn-error text-white opacity-80 hover:opacity-100">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
           </div>
-          }
+        </div>
+          </div>
         </div>
       </div>
     
+    </div>
 
-      <!-- Deployment Details -->
-      <div class="form-section">
-        <label
-          for="deploymentDetails"
-          class="block text-text-color font-semibold mb-2"
-          >Deployment Details</label
-        >
+    <!-- Right Column (Sidebar) -->
+    <div class="space-y-8">
+      
+      <!-- Project Details -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Project Details</h2>
 
-        <!-- Dynamic Fields for Deployment Details -->
-        <div formArrayName="deploymentDetails">
-          @for (deployment of deploymentDetails.controls; track $index;let i =
-          $index) {
-          <div formGroupName="i" class="flex items-center space-x-4 mb-4">
-            <!-- Platform (Frontend/Backend) -->
-            <div class="w-1/2">
-              <input
-                id="platform"
-                type="text"
-                class="custom-input w-full border py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-                placeholder="Enter platform (Frontend/Backend)"
-                formControlName="platform"
-                required
-              />
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Type</span></label>
+              <select formControlName="projectType" class="select select-bordered w-full">
+                <option value="main">Main Project</option>
+                <option value="mini">Mini Project</option>
+              </select>
             </div>
 
-            <!-- URL -->
-            <div class="w-1/2">
-              <input
-                id="url"
-                type="url"
-                class="custom-input w-full border py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-                placeholder="Enter deployment URL"
-                formControlName="url"
-                required
-                [pattern]="'https?://.+'"
-              />
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Status</span></label>
+              <select formControlName="status" class="select select-bordered w-full">
+                <option value="Planning">Planning</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="On Hold">On Hold</option>
+              </select>
             </div>
 
-            <!-- Remove Button (cross icon) -->
-            <div
-              class="text-red-500 cursor-pointer"
-              (click)="removeDeploymentDetail(i)"
-            >
-              &#10005;
-              <!-- Cross icon -->
+            <div class="divider my-2"></div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Start Date</span></label>
+              <input type="date" formControlName="startDate" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">End Date</span></label>
+              <input type="date" formControlName="endDate" class="input input-bordered w-full" />
             </div>
           </div>
-          }
-        </div>
-
-        <!-- Add Deployment Detail Button on the Same Row (Right-Aligned) -->
-        <div class="flex justify-end mt-2">
-          <button
-            type="button"
-            class="bg-blue-500 text-white py-1 px-3 rounded-md text-sm"
-            (click)="addDeploymentDetail()"
-          >
-            Add
-          </button>
         </div>
       </div>
 
-      <!-- Current, Featured, Archived (Same Row on Large Screens) -->
-      <div
-        class="form-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
-        <div class="form-section">
-          <label class="block text-text-color font-semibold mb-2"
-            >Is Current?</label
-          >
-          <input
-            id="current"
-            type="checkbox"
-            formControlName="current"
-            class="h-6 w-6"
-          />
+      <!-- Links -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">External Links</h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label flex justify-between">
+                <span class="label-text font-medium">Live URL</span>
+                <i class="fa-solid fa-globe text-base-content/40"></i>
+              </label>
+              <input type="url" formControlName="url" placeholder="https://..." class="input input-bordered w-full text-sm" />
         </div>
 
-        <div class="form-section">
-          <label class="block text-text-color font-semibold mb-2"
-            >Featured Project?</label
-          >
-          <input
-            id="featured"
-            type="checkbox"
-            formControlName="featured"
-            class="h-6 w-6"
-          />
+            <div class="form-control">
+              <label class="label flex justify-between">
+                <span class="label-text font-medium">Repository</span>
+                <i class="fa-brands fa-github text-base-content/40"></i>
+              </label>
+              <input type="url" formControlName="githubUrl" placeholder="https://github.com/..." class="input input-bordered w-full text-sm" />
+        </div>
+        </div>
+      </div>
         </div>
 
-        <div class="form-section">
-          <label class="block text-text-color font-semibold mb-2"
-            >Archived?</label
-          >
-          <input
-            id="archived"
-            type="checkbox"
-            formControlName="archived"
-            class="h-6 w-6"
-          />
+      <!-- Visibility -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Visibility</h2>
+          
+          <div class="space-y-2">
+            <div class="form-control">
+              <label class="label cursor-pointer p-0 hover:bg-base-200 rounded-lg p-2 -mx-2 transition-colors">
+                <div class="flex flex-col">
+                  <span class="label-text font-medium">Featured Project</span>
+                  <span class="label-text-alt text-base-content/50">Show on home page</span>
         </div>
-      </div>
-      <div>
-        <label for="skills" class="block text-sm font-medium text-teal-700"
-          >Skills</label
-        >
-        <input
-          type="text"
-          id="skills"
-          placeholder="e.g., JavaScript, Python"
-          class="custom-input w-full border py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          #skillInput
-          (keyup.enter)="addSkill(skillInput.value); skillInput.value = ''"
-        />
-        <div class="flex flex-wrap gap-2 mt-3">
-          @for (skill of skills.controls; track skill; let i =$index) {
-          <app-tags [index]="i" (removeTag)="removeSkill($event)">{{
-            skill.value
-          }}</app-tags>
-          }
-        </div>
-        @if (f['skills'].touched && f['skills'].invalid) {
-        <div class="text-red-500 text-sm">
-          @if (f['skills'].errors?.['maxlength']) {
-          <div>Skills must be less than 200 characters.</div>
-          }
-        </div>
-        }
-      </div>
-      <div class="form-section">
-        <label
-          for="documentationLink"
-          class="block text-text-color font-semibold mb-2"
-          >Documentation Link</label
-        >
-
-        <!-- Documentation Link -->
-        <div class="w-full mb-4">
-          <input
-            id="documentationLink"
-            type="url"
-            class="custom-input w-full border py-2 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-            placeholder="Enter documentation link"
-            formControlName="documentationLink"
-            [pattern]="'https?://.+'"
-            required
-          />
-        </div>
-      </div>
-      <!-- Video Representation -->
-      <div class="form-section">
-        <label
-          for="videoRepresentation"
-          class="block text-text-color font-semibold mb-2"
-          >Video Representation</label
-        >
-        <input
-          id="videoRepresentation"
-          type="file"
-          accept="video/*"
-          class="custom-input w-full border py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          (change)="previewVideo($event)"
-          formControlName="videoRepresentation"
-        />
-        <video id="videoPreview" class="mt-4 w-full hidden" controls>
-          <source id="videoSource" />
-          Your browser does not support the video tag.
-        </video>
+                <input type="checkbox" formControlName="featured" class="toggle toggle-primary toggle-sm" />
+              </label>
       </div>
 
-      <!-- Image Content Upload -->
-      <div class="form-section">
-        <label
-          for="imageContent"
-          class="block text-text-color font-semibold mb-2"
-          >Image Content</label
-        >
-        <input
-          id="imageContent"
-          type="file"
-          accept="image/*"
-          multiple
-          class="custom-input w-full border py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-color"
-          (change)="previewImage($event)"
-          formControlName="images"
-        />
-        <img id="imagePreview" class="mt-4 w-full hidden" alt="Image Preview" />
+            <div class="form-control">
+              <label class="label cursor-pointer p-0 hover:bg-base-200 rounded-lg p-2 -mx-2 transition-colors">
+                <div class="flex flex-col">
+                  <span class="label-text font-medium">Archived</span>
+                  <span class="label-text-alt text-base-content/50">Hide from public view</span>
+                </div>
+                <input type="checkbox" formControlName="archived" class="toggle toggle-warning toggle-sm" />
+              </label>
+        </div>
+      </div>
       </div>
     </div>
 
-    <!-- Form Controls -->
-    <div class="flex justify-end space-x-4">
-      <button
-        type="submit"
-        [disabled]="projectForm.invalid"
-        class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-800 focus:ring focus:ring-indigo-300"
-      >
-        Submit
-      </button>
-      <button
-        type="button"
-        (click)="onReset()"
-        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring focus:ring-gray-300"
-      >
-        Reset
-      </button>
     </div>
   </form>
 </div>

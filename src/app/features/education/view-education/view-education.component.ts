@@ -1,65 +1,69 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { EducationService } from '../../../core/services/education.service';
+import { Education, Pagination } from '../../../core/models/api.models';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-view-education',
-    imports: [CommonModule],
+    standalone: true,
+    imports: [CommonModule, RouterLink, PaginationComponent, FormsModule],
     templateUrl: './view-education.component.html',
     styleUrl: './view-education.component.scss'
 })
-export class ViewEducationComponent {
-    educations = [
-        {
-          degree: 'Bachelor of Computer Science',
-          institution: 'University of Calicut',
-          fieldOfStudy: 'Computer Science',
-          startDate: new Date('2019-08-01'),
-          endDate: new Date('2023-05-31'),
-          description: 'Studied a variety of computer science topics including programming, data structures, and algorithms.',
-          activities: ['Coding Club', 'Tech Talks'],
-          skills: ['Data Structures', 'Algorithms', 'Web Development'],
-          grade: 'CGPA: 7.5',
-          showOptions: false,
-        },
-        {
-          degree: 'Certified Java with MEAN Stack Developer',
-          institution: 'Larsen and Toubro Edutech',
-          fieldOfStudy: 'Full Stack Development',
-          startDate: new Date('2023-01-01'),
-          endDate: new Date('2023-12-31'),
-          description: 'Learned full stack development with focus on the MEAN stack.',
-          activities: ['Project Development', 'Hackathons'],
-          skills: ['Angular', 'Node.js', 'MongoDB'],
-          grade: 'Grade: A+',
-          showOptions: false,
-        },
-      ];
-      
-    
-      toggleOptions(event: MouseEvent, index: number) {
-        // Close other open options
-        const currentIndex = this.educations.findIndex(education => education.showOptions);
-        if (currentIndex !== -1) {
-          this.educations[currentIndex].showOptions = false;
+export class ViewEducationComponent implements OnInit {
+  private educationService = inject(EducationService);
+
+  educations = signal<Education[]>([]);
+  pagination = signal<Pagination | null>(null);
+  isLoading = signal<boolean>(false);
+  error = signal<string | null>(null);
+  searchTerm = signal<string>('');
+
+  ngOnInit() {
+    this.loadEducation();
+  }
+
+  loadEducation(page: number = 1) {
+    this.isLoading.set(true);
+    this.educationService.getEducation({ page, search: this.searchTerm() }).pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.educations.set(res.data);
+          this.pagination.set(res.pagination);
         }
-      
-        // Toggle the clicked option
-        this.educations[index].showOptions = !this.educations[index].showOptions;
+      },
+      error: (err) => {
+        console.error('Error loading education', err);
+        this.error.set('Failed to load education details');
       }
-      
-    
-      openDetails(education: any) {
-        alert('Opening details for: ' + education.degree);
-      }
-    
-      editEducation(education: any) {
-        alert('Editing: ' + education.degree);
-      }
-    
-      deleteEducation(education: any) {
-        const index = this.educations.indexOf(education);
-        if (index !== -1) {
-          this.educations.splice(index, 1);
-        }
-      }
+    });
+  }
+
+  onSearch() {
+    this.loadEducation(1);
+  }
+
+  onPageChange(page: number) {
+    this.loadEducation(page);
+  }
+
+  deleteEducation(id: string) {
+    if (confirm('Are you sure you want to delete this education entry?')) {
+      this.educationService.deleteEducation(id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.educations.update(current => current.filter(e => e._id !== id));
+            this.loadEducation(this.pagination()?.page ?? 1);
+          }
+        },
+        error: (err) => console.error('Error deleting education', err)
+      });
+    }
+  }
 }

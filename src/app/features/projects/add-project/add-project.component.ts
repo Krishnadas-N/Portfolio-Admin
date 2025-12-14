@@ -1,158 +1,249 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { ProjectService } from '../../../core/services';
-import {
-  NgLabelTemplateDirective,
-  NgOptionTemplateDirective,
-  NgSelectComponent,
-} from '@ng-select/ng-select';
+import { ProjectService } from '../../../core/services/project.service';
+import { MediaService } from '../../../core/services/media.service';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
-  FormArray,
+  FormArray
 } from '@angular/forms';
-import { uniqueTagsValidator } from '../../../shared/utils/validators';
-import { TagsComponent } from '../../../shared/components';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Project } from '../../../core/models/api.models';
+
 @Component({
   selector: 'app-add-project',
+  standalone: true,
   imports: [
-    // NgLabelTemplateDirective, NgOptionTemplateDirective,
-    TagsComponent,
-    NgSelectComponent,
     ReactiveFormsModule,
-    CommonModule,
+    CommonModule
   ],
   templateUrl: './add-project.component.html',
   styleUrl: './add-project.component.scss',
 })
 export class AddProjectComponent implements OnInit {
   projectForm!: FormGroup;
-  projects: any[] = [];
-  selectedProjects: any[] = [];
+  isEditMode = false;
+  projectId: string | null = null;
+  isLoading = false;
+  isSubmitting = false;
+  
   private projectService = inject(ProjectService);
+  private mediaService = inject(MediaService);
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.initForm();
-    this.loadProjects();
+    this.checkEditMode();
   }
 
   private initForm(): void {
     this.projectForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(5)]],
+      title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      technologies: [[], [Validators.required]],
+      technologies: [[]], // Array of strings
       license: ['', [Validators.required]],
-      tags: [[], [Validators.required]],
-      projectType: [
-        '',
-        [Validators.required, Validators.pattern('^(main|mini)$')],
-      ],
-      seoKeywords: [[], [Validators.required]],
-      additionalResources: [[], [Validators.required]],
-      relatedProjects: [[], [Validators.required]],
-      collaborators: [[], [Validators.required]],
-      link: ['', [Validators.pattern('https?://.+')]],
-      repo: ['', [Validators.pattern('https?://.+')]],
+      tags: [[]], // Array of strings
+      projectType: ['main', [Validators.required]],
+      seoKeywords: [[]], // Array of strings
+      additionalResources: [[]], // Array of strings
+      relatedProjects: [[]], // IDs
+      collaborators: [[]],
+      url: ['', [Validators.pattern('https?://.+')]],
+      githubUrl: ['', [Validators.pattern('https?://.+')]],
       startDate: ['', [Validators.required]],
-      endDate: ['', [Validators.required]],
-      status: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern('^(Planning|In Progress|Completed)$'),
-        ],
-      ],
+      endDate: [''],
+      status: ['Planning', [Validators.required]],
       current: [false],
       featured: [false],
       archived: [false],
-      videoRepresentation: ['', [Validators.pattern('https?://.+')]],
-      images: [[], [Validators.required]],
-      skills: this.fb.array([], [Validators.required, uniqueTagsValidator]),
-      deploymentDetails: this.fb.array([]),
-      viewsCount: [0, [Validators.min(0)]],
-      likes: [0, [Validators.min(0)]],
-      lastUpdatedBy: ['', [Validators.required]],
-      documentationLink: ['', [Validators.pattern('https?://.+')]],
+      videoRepresentation: [''],
+      images: this.fb.array([]), // Array of image URLs
+      skills: this.fb.array([]), // Array of strings
+      viewsCount: [0],
+      likes: [0],
+      documentationLink: ['', [Validators.pattern('https?://.+')]]
     });
   }
 
-  loadProjects(): void {
-    this.projectService.getProjects().subscribe((data) => {
-      this.projects = data;
+  private checkEditMode(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditMode = true;
+      this.projectId = id;
+      this.loadProject(id);
+    }
+  }
+
+  private loadProject(id: string): void {
+    this.isLoading = true;
+    this.projectService.getProject(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.patchForm(res.data);
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load project', err);
+        this.isLoading = false;
+        this.router.navigate(['/projects']);
+      }
     });
   }
 
-  onSubmit(): void {
-    if (this.projectForm.valid) {
-      // Handle form submission
-      console.log(this.projectForm.value);
-    } else {
-      console.log('Form is not valid');
+  private patchForm(project: Project): void {
+    const imagesArray = this.projectForm.get('images') as FormArray;
+    imagesArray.clear();
+    if (project.images) {
+      project.images.forEach(img => imagesArray.push(this.fb.control(img)));
     }
-  }
-  get f() {
-    return this.projectForm.controls;
-  }
-  onReset(): void {
-    this.projectForm.reset();
-  }
-  previewVideo(event: any): void {
-    const videoPreview = document.getElementById(
-      'videoPreview'
-    ) as HTMLVideoElement;
-    const videoSource = document.getElementById(
-      'videoSource'
-    ) as HTMLSourceElement;
 
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      videoSource.src = URL.createObjectURL(file);
-      videoPreview.load();
-      videoPreview.classList.remove('hidden');
+    const skillsArray = this.projectForm.get('skills') as FormArray;
+    skillsArray.clear();
+    if (project.skills) {
+      project.skills.forEach(skill => skillsArray.push(this.fb.control(skill)));
+    }
+
+    const formatDate = (date: Date | string | undefined) => {
+      if (!date) return '';
+      return new Date(date).toISOString().split('T')[0];
+    };
+
+    this.projectForm.patchValue({
+      ...project,
+      startDate: formatDate(project.startDate),
+      endDate: formatDate(project.endDate)
+    });
+  }
+
+  // --- Getters ---
+  get f() { return this.projectForm.controls; }
+  get images() { return this.projectForm.get('images') as FormArray; }
+  get skills() { return this.projectForm.get('skills') as FormArray; }
+
+  // --- Array Manipulation ---
+  
+  // For controls that are simple arrays (technologies, tags, etc.)
+  addStringItem(controlName: string, value: string, inputElement: HTMLInputElement) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    
+    const control = this.projectForm.get(controlName);
+    const currentValues = control?.value || [];
+
+    if (!currentValues.includes(trimmed)) {
+      control?.setValue([...currentValues, trimmed]);
+      inputElement.value = '';
     }
   }
-  get skills() {
-    return this.projectForm.get('skills') as FormArray;
+
+  removeStringItem(controlName: string, index: number) {
+    const control = this.projectForm.get(controlName);
+    const currentValues = control?.value || [];
+    const newValues = [...currentValues];
+    newValues.splice(index, 1);
+    control?.setValue(newValues);
   }
-  addSkill(skill: string) {
-    if (skill && !this.skills.value.includes(skill)) {
-      this.skills.push(this.fb.control(skill));
+
+  // For FormArrays (skills)
+  addSkill(value: string, input: HTMLInputElement) {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    
+    // Check duplicates
+    const currentSkills = this.skills.value;
+    if (!currentSkills.includes(trimmed)) {
+        this.skills.push(this.fb.control(trimmed));
+        input.value = '';
     }
   }
 
   removeSkill(index: number) {
     this.skills.removeAt(index);
   }
-  previewImage(event: any): void {
-    const imagePreview = document.getElementById(
-      'imagePreview'
-    ) as HTMLImageElement;
 
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      imagePreview.src = URL.createObjectURL(file);
-      imagePreview.classList.remove('hidden');
+  // Media
+  onImageSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    if (fileInput.files?.length) {
+      const files = Array.from(fileInput.files);
+      
+      this.mediaService.uploadImages(files, 'projects').subscribe({
+        next: (res) => {
+            if (res.success && res.data) {
+                // If it's MediaBatchUploadResponse
+                const responseData = res.data as any; // Cast to avoid strict check issues if type definition is slightly off
+                if (responseData.data && Array.isArray(responseData.data)) {
+                     responseData.data.forEach((f: any) => {
+                        this.images.push(this.fb.control(f.url));
+                    });
+                } else if (Array.isArray(responseData)) {
+                     // Fallback if structure is different
+                     responseData.forEach((f: any) => {
+                        this.images.push(this.fb.control(f.url));
+                    });
+                }
+            }
+        },
+        error: (err) => console.error('Upload failed', err)
+      });
     }
   }
-  get deploymentDetails() {
-    return this.projectForm.get('deploymentDetails') as FormArray;
+
+  removeImage(index: number) {
+    this.images.removeAt(index);
   }
 
-  // Add a new deployment detail form group
-  addDeploymentDetail() {
-    this.deploymentDetails.push(
-      this.fb.group({
-        platform: ['', [Validators.required]],
-        url: ['', [Validators.required, Validators.pattern('https?://.+')]],
-      })
-    );
+  onVideoSelected(event: Event) {
+    const fileInput = event.target as HTMLInputElement;
+    if (fileInput.files?.length) {
+      const file = fileInput.files[0];
+      this.mediaService.uploadFiles([file]).subscribe({
+          next: (res) => {
+              const responseData = res.data as any;
+               if (res.success && responseData && responseData.data && responseData.data.length > 0) {
+                  this.projectForm.patchValue({
+                      videoRepresentation: responseData.data[0].url
+                  });
+              }
+          },
+          error: (err) => console.error('Video upload failed', err)
+      });
+  }
   }
 
-  // Remove a deployment detail form group
-  removeDeploymentDetail(index: number) {
-    this.deploymentDetails.removeAt(index);
+  onSubmit() {
+    if (this.projectForm.invalid) {
+      this.projectForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+    const projectData = this.projectForm.value;
+
+    const request$ = this.isEditMode && this.projectId
+      ? this.projectService.updateProject(this.projectId, projectData)
+      : this.projectService.createProject(projectData);
+
+    request$.subscribe({
+      next: (res) => {
+        this.isSubmitting = false;
+        if (res.success) {
+          this.router.navigate(['/projects']);
+        }
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        console.error('Save failed', err);
+      }
+    });
+  }
+
+  onCancel() {
+    this.router.navigate(['/projects']);
   }
 }

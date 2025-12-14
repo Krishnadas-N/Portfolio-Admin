@@ -1,530 +1,164 @@
-<div class="main">
-  <div class="container">
-    <div class="blog">
+<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
+  
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 sticky top-0 z-30 bg-base-100/95 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-base-200/50 md:border-none transition-all duration-300">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content tracking-tight">Blog Posts</h1>
+      <p class="text-base-content/60 text-sm mt-1">Manage your blog content and publications</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <div class="join w-full sm:w-auto shadow-sm">
+        <div class="relative w-full sm:w-64">
+          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" 
+                 placeholder="Search posts..." 
+                 class="input input-bordered join-item w-full pl-10 focus:input-primary transition-all bg-base-100 placeholder:text-base-content/40" />
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"></i>
+        </div>
+        <button (click)="onSearch()" class="btn btn-primary join-item px-6">Search</button>
+      </div>
       
-      <div class="blog-card-group">
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/NF5WnH9V/blog-1.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Database</button>
-            <h3>
-              <a href="#" class="h3"
-                >Building Microsservices with Dropwizard, MongoDB & Docker</a
-              >
-            </h3>
-            <p class="blog-text">
-              This NoSQL database oriented to documents (by documents like JSON)
-              combines some of the features from relational databases, easy to
-              use and the multi-platform is the best option for scale up and
-              have fault tolerance, load balancing, map reduce etc
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2024-01-11">Jan 11, 2024</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT3M">3 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/bNLmnJZS/blog-2.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Web Performance</button>
-            <h3>
-              <a href="#" class="h3"
-                >Fast web page loading on a $20 feature phone</a
-              >
-            </h3>
-            <p class="blog-text">
-              Feature phones are affordable (under $20-25), low-end services
-              enabling 100s of millions of users in development countries to
-              leverage the web. Think of them as a light version of a smart
-              phone
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-20-12">Dec 20, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT2M">2 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/ncLv61LM/blog-3.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Accessibility</button>
-            <h3>
-              <a href="#" class="h3">Accessibility Tips for Web Developers</a>
-            </h3>
-            <p class="blog-text">
-              It's awesome to build sites that are inclusive and accessible to
-              everyone. There are at least six key areas of disability we can
-              optimize for: visual, hearing, mobility, cognition, speech and
-              neural. Many tools and resources can help here, even if you're
-              totally new to web accessibility
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-30-11">Nov 30, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT4M">4 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/RZBnvQSc/blog-4.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Web Performance</button>
-            <h3>
-              <a href="#" class="h3"></a>Dynamically Securing Databases using
-              Hashicorp Vault
-            </h3>
-            <p class="blog-text">
-              Nowadays, it's hard to profoundly talk about security in the IT
-              industry, since it has to be considered on so many different
-              levels: from security code chunks, securing containers, up to
-              securing complex infrastructures and defining strong authorization
-              and authentication policies accross the enterprise
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2021-09-11">Nov 9, 2021</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT4M">4 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/k5jVN0xc/blog-5.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Web Performance</button>
-            <h3>
-              <a href="#" class="h3"
-                >Adapttive Loading - Improving Web Performance on
-                low-end-devices</a
-              >
-            </h3>
-            <p class="blog-text">
-              Adaptive Loading: Do not just respond based on screen size, adapt
-              based on actual device hardware. Any user can have a slow
-              experience. In a world with widely varying device capabilities, a
-              "one-size" fits all experience may not always work. Sites that
-              delight users on high-end devices can be unusable on low-end ones,
-              particularly on median mobile and desktop hardware and in emerging
-              markets
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2021-03-11">Nov 3, 2021</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT3M">3 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/kgGP6Lg9/blog-6.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Accessibility</button>
-            <h3>
-              <a href="#" class="h3"
-                >Don't develop just dor yourself - A Developer's checklist to
-                Accessibility</a
-              >
-            </h3>
-            <p class="blog-text">
-              We, as developers, tend to develop sites unconsciously for people
-              like ourselves. If we don't actively pay attention, the sites are
-              often accessible only for certain types of people: Sighted
-              mouse-users, who have good fine motor skills and are good at using
-              computers
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-20-10">Oct 20, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT7M">7 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/FHYs5Ycj/blog-7.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Database</button>
-            <h3>
-              <a href="#" class="h3"
-                >Building a Restful CRUD API with Node JS, Express and
-                MongoDB</a
-              >
-            </h3>
-            <p class="blog-text">
-              Application Programming Interface is the abbreviation for API. An
-              API is a software interface that enables two apps to comunicate
-              with one another. In other words, an API is a messenger thet sends
-              your request to the provider and then return the response to you
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-14-10">Oct 14, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT5M">5 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/cCDZPWL9/blog-8.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Web Performance</button>
-            <h3>
-              <a href="#" class="h3"
-                >Monitoring Performance with the PageSpeed Insights API</a
-              >
-            </h3>
-            <p class="blog-text">
-              The PageSpeed Insights API provides free access to performance
-              monitoring for web pages and returns data with suggestions for how
-              to improve. The V5 API includes lab data from LightHouse and
-              real-world data from the Chrome User Experience Report (CrUX)
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-05-10">Oct 5, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT5M">5 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/DfCTv275/blog-9.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Accessibility</button>
-            <h3>
-              <a href="#" class="h3"
-                >The best web accessibility tools for developers in 2021</a
-              >
-            </h3>
-            <p class="blog-text">
-              The quality of the tools you use defines the speed with which you
-              can diagnose and resolve problems. Each year the landscape changes
-              dramatically in web technologies, and of late the tooling for
-              accessibility is no exception
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-09-11">Sep 11, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT7M">7 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="blog-card">
-          <div class="blog-card-banner">
-            <img
-              src="https://i.postimg.cc/23pTkbyV/blog-10.png"
-              alt="blog image"
-              class="blog-banner-img"
-              width="250"
-            />
-          </div>
-
-          <div class="blog-content-wrapper">
-            <button class="blog-topic text-tiny">Accessibility</button>
-            <h3>
-              <a href="#" class="h3"
-                >How to connect a React frontend with a NodeJS/Express
-                backend</a
-              >
-            </h3>
-            <p class="blog-text">
-              The MERN (MongoDB, Express, React, NodeJS) stack is very popular
-              for making full applications, utilizing Javascript for both the
-              backend and frontend as well as a document-oriented or non
-              relational dataabase (MongoDB), meaning that it's structured like
-              JSON rather than a large excel sheet like SQL dataabases are
-            </p>
-
-            <div class="wrapper-flex">
-              <div class="profile-wrapper">
-                <img
-                  src="https://i.postimg.cc/8Cn8m4sW/author.png"
-                  alt="image"
-                  width="50"
-                />
-              </div>
-
-              <div class="wrapper">
-                <a href="#" class="h4">Julia Walker</a>
-
-                <p class="text-small">
-                  <time datetime="2023-09-02">Sep 02, 2023</time>
-                  <span class="separator"></span>
-                  <i class="fas fa-clock"></i>
-                  <time datetime="PT4M">4 min</time>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <a routerLink="/blogs/add" class="btn btn-primary shadow-lg shadow-primary/20 shrink-0 gap-2">
+        <i class="fa-solid fa-pen-nib"></i>
+        <span class="hidden sm:inline">Write Post</span>
+        <span class="sm:hidden">Write</span>
+      </a>
     </div>
+  </div>
 
-    <div class="aside">
-      <div class="topics">
-        <h2 class="h2">Topics</h2>
-    
-        <a href="#" class="topic-btn">
-          <div class="icon-box">
-            <i class="fas fa-database"></i>
-          </div>
-          <p>Database</p>
-        </a>
-    
-        <a href="#" class="topic-btn">
-          <div class="icon-box">
-            <i class="fas fa-universal-access"></i>
-          </div>
-          <p>Accessibility</p>
-        </a>
-    
-        <a href="#" class="topic-btn">
-          <div class="icon-box">
-            <i class="fas fa-rocket"></i>
-          </div>
-          <p>Web Performance</p>
-        </a>
-      </div>
-    
-      <div class="tags">
-        <h2 class="h2">Tags</h2>
-    
-        <div class="wrapper">
-          <button class="hashtag">#mongodb</button>
-          <button class="hashtag">#nodejs</button>
-          <button class="hashtag">#ally</button>
-          <button class="hashtag">#mobility</button>
-          <button class="hashtag">#inclusion</button>
-          <button class="hashtag">#webperf</button>
-          <button class="hashtag">#optimize</button>
-          <button class="hashtag">#performance</button>
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="card bg-base-100 shadow-sm border border-base-200 h-[28rem] animate-pulse">
+      <div class="h-56 bg-base-200 w-full rounded-t-2xl"></div>
+      <div class="card-body p-6 space-y-4">
+        <div class="flex gap-2">
+           <div class="h-4 bg-base-200 w-16 rounded-full"></div>
+           <div class="h-4 bg-base-200 w-24 rounded-full"></div>
+        </div>
+        <div class="h-6 bg-base-200 w-3/4 rounded"></div>
+        <div class="space-y-2">
+          <div class="h-3 bg-base-200 w-full rounded"></div>
+          <div class="h-3 bg-base-200 w-5/6 rounded"></div>
+        </div>
+        <div class="flex gap-2 mt-auto pt-4 border-t border-base-200/50">
+          <div class="h-8 w-8 bg-base-200 rounded-full"></div>
+          <div class="h-4 w-24 bg-base-200 rounded my-auto"></div>
         </div>
       </div>
     </div>
-    
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error()" class="alert alert-error shadow-lg rounded-xl mb-6 bg-error/10 border-error/20 text-error-content">
+    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+    <div class="flex-1">
+      <h3 class="font-bold">Error loading blogs</h3>
+      <div class="text-xs opacity-80">{{ error() }}</div>
+    </div>
+    <button class="btn btn-sm btn-ghost hover:bg-error/20" (click)="loadBlogs()">Retry</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && !error() && blogs().length === 0" class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-3xl border-2 border-dashed border-base-200 text-center">
+    <div class="w-24 h-24 bg-base-200/50 rounded-full flex items-center justify-center mb-6 text-base-content/20">
+      <i class="fa-regular fa-newspaper text-4xl"></i>
+    </div>
+    <h3 class="text-xl font-bold text-base-content">No blog posts found</h3>
+    <p class="text-base-content/60 max-w-xs mt-2 mb-8">Start sharing your thoughts with the world.</p>
+    <a routerLink="/blogs/add" class="btn btn-primary shadow-lg shadow-primary/20">Write First Post</a>
+  </div>
+
+  <!-- Blog Grid -->
+  <div *ngIf="!isLoading() && blogs().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+    <div class="card bg-base-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-base-200/60 group flex flex-col h-full rounded-2xl overflow-hidden" *ngFor="let blog of blogs()">
+      
+      <!-- Image Area -->
+      <figure class="relative aspect-video overflow-hidden bg-base-200/50 shrink-0">
+        <img [src]="blog.coverImage || 'assets/images/placeholder-blog.jpg'" alt="Blog Cover" 
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+        
+        <!-- Category Badge -->
+        <div class="absolute top-3 left-3 z-10">
+          <span class="badge border-none shadow-sm font-semibold uppercase text-[10px] tracking-wider py-3 px-3 backdrop-blur-md bg-base-100/90 text-base-content hover:bg-base-100 transition-colors">
+            {{blog.category}}
+          </span>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
+            <span class="badge border-none shadow-sm font-bold uppercase text-[10px] tracking-wide py-3 px-3 backdrop-blur-md"
+                  [ngClass]="blog.status === 'published' ? 'bg-success/90 text-white' : 'bg-base-300/90 text-base-content'">
+                {{blog.status}}
+            </span>
+            <span *ngIf="blog.isFeatured" class="badge badge-secondary shadow-sm font-bold uppercase text-[10px] tracking-wide py-3 px-3 backdrop-blur-md border-none text-white">
+               <i class="fa-solid fa-star text-[9px] mr-1"></i> Featured
+            </span>
+        </div>
+
+        <!-- Hover Actions -->
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+            <a [routerLink]="['/blogs/edit', blog._id]" 
+               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110 shadow-xl" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+            </a>
+            <a [routerLink]="['/blogs/details', blog._id]" 
+               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110 shadow-xl" title="View Details">
+                <i class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+      </figure>
+
+      <!-- Content -->
+      <div class="card-body p-6 flex flex-col flex-1 gap-4">
+        
+        <!-- Tags -->
+        <div class="flex flex-wrap gap-1.5">
+            <span *ngFor="let tag of blog.tags.slice(0, 3)" 
+                  class="text-[10px] font-medium text-base-content/60 bg-base-200/50 px-2 py-1 rounded-md border border-base-200/50">
+                #{{tag}}
+            </span>
+            <span *ngIf="blog.tags.length > 3" class="text-[10px] font-medium text-base-content/40 px-1 py-1">+{{blog.tags.length - 3}}</span>
+        </div>
+
+        <!-- Title & Excerpt -->
+        <div>
+          <h2 class="card-title text-lg font-bold leading-tight mb-2 group-hover:text-primary transition-colors">
+            <a [routerLink]="['/blogs/details', blog._id]" class="line-clamp-2" [title]="blog.title">{{blog.title}}</a>
+          </h2>
+          <p class="text-sm text-base-content/70 line-clamp-3 leading-relaxed">{{blog.excerpt}}</p>
+        </div>
+
+        <div class="divider my-0 opacity-50"></div>
+
+        <!-- Footer Info & Actions -->
+        <div class="flex justify-between items-center mt-auto">
+           <div class="flex items-center gap-3">
+              <div class="text-xs">
+                <p class="text-base-content/60 font-medium">{{blog.createdAt | date:'MMM d, y'}}</p>
+              </div>
+           </div>
+
+           <!-- Actions -->
+           <div class="flex items-center gap-1">
+               <div class="flex items-center gap-3 text-xs text-base-content/40 mr-2">
+                   <span class="flex items-center gap-1" title="Views"><i class="fa-regular fa-eye"></i> {{blog.viewsCount || 0}}</span>
+               </div>
+               
+               <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle btn-xs h-7 w-7 min-h-0 text-base-content/40 hover:text-base-content hover:bg-base-200 transition-colors"><i class="fa-solid fa-ellipsis"></i></label>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 border border-base-200 text-sm">
+                    <li><a [routerLink]="['/blogs/edit', blog._id]"><i class="fa-solid fa-pen-to-square w-4"></i> Edit Post</a></li>
+                    <li><a class="text-error hover:bg-error/10" (click)="deleteBlog(blog._id!)"><i class="fa-solid fa-trash-can w-4"></i> Delete Post</a></li>
+                </ul>
+            </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading() && pagination()" class="mt-10 border-t border-base-200 pt-8">
+    <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
   </div>
 </div>

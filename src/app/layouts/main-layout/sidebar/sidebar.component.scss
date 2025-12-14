@@ -1,5 +1,31 @@
-.sidebar-submenu{
-    li{
-        cursor: pointer;
-    }
+.custom-scrollbar {
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Active State Styling */
+.menu li > a.active {
+  @apply bg-primary/10 text-primary font-semibold;
+}
+.menu li > a.active i {
+  @apply text-primary;
+}
+
+/* Submenu Active Indicator */
+.menu li > a.active .nav-dot {
+  @apply bg-primary;
+}
+
+/* Hide default details marker/arrow to prevent duplicates with custom icon */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+.menu details > summary::after {
+  display: none;
 }

@@ -1,216 +1,223 @@
-<div class="w-full mx-auto bg-white rounded-lg shadow-lg p-6">
-  <form [formGroup]="experienceForm" (ngSubmit)="onSubmit()" class="space-y-4">
-    <!-- Job Title -->
+<div class="container mx-auto p-4 lg:p-8 max-w-5xl">
+  
+  <!-- Header Actions -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 bg-base-100/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-base-200 sm:border-none">
     <div>
-      <label for="title" class="block text-sm font-medium text-[#222] mb-1"
-        >Job Title</label
-      >
-      <input
-        type="text"
-        id="title"
-        formControlName="title"
-        class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-        placeholder="e.g., Software Engineer"
-      />
-      @if(experienceForm.get('title')?.invalid &&
-      experienceForm.get('title')?.touched){
-      <div class="text-red-500 text-xs mt-1">Job Title is required.</div>
-      }
+      <h1 class="text-3xl font-bold text-base-content tracking-tight">{{ isEditMode() ? 'Edit Experience' : 'Add Experience' }}</h1>
+      <p class="text-base-content/60 text-sm mt-1">Add your professional work history.</p>
     </div>
-
-    <!-- Company -->
-    <div >
-      <label for="company" class="block text-sm font-medium text-[#222] mb-1"
-        >Company</label
-      >
-      
-          <input
-          type="text"
-          id="company"
-          formControlName="company"
-          class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none pl-4 "
-          placeholder="e.g., Tech Corp"
-          [ngStyle]="logoUrl ? {
-            'background-image': 'url(' + logoUrl + ')', 
-            'background-size': '25px 25px', 
-            'background-position': 'left center', 
-            'padding-left': '50px', 
-            'background-repeat': 'no-repeat'
-          } : {}"
-              (focus)="showSuggestions = true"
-          (blur)="onBlur()"
-        />
-      
-
-      @if(experienceForm.get('company')?.invalid &&
-      experienceForm.get('company')?.touched){
-      <div class="text-red-500 text-xs mt-1">Company is required.</div>
-      }
-      @if(showSuggestions && companySuggestions.length){
-      <ul  class="absolute w-4/5 bg-white border mt-1 shadow-lg rounded-md z-10">
-        @for(suggestion of companySuggestions;track suggestion){
-          <li
-          (click)="selectCompany(suggestion)"
-          class="cursor-pointer px-4 py-2 hover:bg-gray-200"
-        >
-          <!-- Display Company Name and Logo -->
-          <div class="flex items-center">
-            <img [src]="suggestion.logo_url" alt="suggestion.name" class="h-6 w-6 rounded-full mr-2" />
-            {{ suggestion.name }}
-          </div>
-        </li>
-        }
-      
-      </ul>
-     }
-    </div>
-
-    <!-- Location -->
-    <div>
-      <label for="location" class="block text-sm font-medium text-[#222] mb-1"
-        >Location</label
-      >
-      <input
-        type="text"
-        id="location"
-        formControlName="location"
-        class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-        placeholder="e.g., New York, NY"
-      />
-    </div>
-
-    <!-- Dates -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label
-          for="startDate"
-          class="block text-sm font-medium text-[#222] mb-1"
-          >Start Date</label
-        >
-        <input
-          type="date"
-          id="startDate"
-          formControlName="startDate"
-          class="w-full px-4 py-2 border border-[#308E87] rounded-lg focus:ring-2 bg-white focus:ring-[#308E87] focus:outline-none"
-        />
-        @if(experienceForm.get('startDate')?.invalid &&
-        experienceForm.get('startDate')?.touched){
-        <div class="text-red-500 text-xs mt-1">Start Date is required.</div>
-        }
-      </div>
-      <div>
-        <label for="endDate" class="block text-sm font-medium text-[#222] mb-1"
-          >End Date</label
-        >
-        <input
-          type="date"
-          id="endDate"
-          formControlName="endDate"
-          class="w-full px-4 py-2 border border-[#308E87] rounded-lg bg-white focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-        />
-      </div>
-    </div>
-
-    <!-- Current Job -->
-    <div class="flex items-center space-x-3">
-      <input
-        type="checkbox"
-        id="current"
-        formControlName="current"
-        class="checkbox"
-      />
-      <label for="current" class="text-sm text-[#222]"
-        >I currently work here</label
-      >
-    </div>
-
-    <!-- Technologies -->
-    <div class="form-group">
-      <label
-        for="technologies"
-        class="block text-sm font-medium text-[#222] mb-1"
-        >Technologies</label
-      >
-      <input
-        type="text"
-        id="technologies"
-        #technologyInput
-        (keyup.enter)="
-          addTechnology(technologyInput.value); technologyInput.value = ''
-        "
-        placeholder="E.g., Angular, Node.js, MongoDB"
-        class="w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-      />
-      <div class="flex flex-wrap gap-2 mt-3">
-        @for (technology of technologies.controls;track technology; let i =$index) {
-          <app-tags [index]="i" (removeTag)="removeTechnology($event)">{{
-            technology.value
-          }}</app-tags>
-        }
-      </div>
-    </div>
-
-    <!-- Work Type -->
-    <div>
-      <label for="workType" class="block text-sm font-medium text-[#222] mb-1"
-        >Work Type</label
-      >
-      <select
-        id="workType"
-        formControlName="workType"
-        class="select select-bordered w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-      >
-        <option value="Full-time">Full-time</option>
-        <option value="Part-time">Part-time</option>
-        <option value="Internship">Internship</option>
-        <option value="Freelance">Freelance</option>
-        <option value="Contract">Contract</option>
-      </select>
-    </div>
-
-    <!-- Location Type -->
-    <div>
-      <label
-        for="locationType"
-        class="block text-sm font-medium text-[#222] mb-1"
-        >Location Type</label
-      >
-      <select
-        id="locationType"
-        formControlName="locationType"
-        class="select select-bordered w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-      >
-        <option value="Remote">Remote</option>
-        <option value="On-site">On-site</option>
-        <option value="Hybrid">Hybrid</option>
-      </select>
-    </div>
-
-    <!-- Description -->
-    <div>
-      <label
-        for="description"
-        class="block text-sm font-medium text-[#222] mb-1"
-        >Description</label
-      >
-      <textarea
-        id="description"
-        rows="3"
-        formControlName="description"
-        class="w-full px-4 py-2 border border-[#308E87] bg-white rounded-lg focus:ring-2 focus:ring-[#308E87] focus:outline-none"
-        placeholder="Briefly describe your role..."
-      ></textarea>
-    </div>
-
-    <!-- Submit Button -->
-    <div class="text-center">
-      <button
-        type="submit"
-        class="bg-[#308E87] text-white px-6 py-2 rounded-lg shadow-md hover:bg-[#256e69] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#308E87]"
-        [disabled]="experienceForm.invalid"
-      >
-        Save Experience
+    <div class="flex gap-3 w-full sm:w-auto">
+      <button type="button" (click)="onCancel()" class="btn btn-ghost flex-1 sm:flex-none">Cancel</button>
+      <button type="button" (click)="onSubmit()" [disabled]="experienceForm.invalid || isSubmitting()" class="btn btn-primary flex-1 sm:flex-none shadow-lg shadow-primary/20">
+        <span *ngIf="isSubmitting()" class="loading loading-spinner loading-xs"></span>
+        <i class="fa-regular fa-floppy-disk mr-2" *ngIf="!isSubmitting()"></i>
+        {{ isEditMode() ? 'Save Changes' : 'Add Experience' }}
       </button>
+    </div>
+  </div>
+
+  <form [formGroup]="experienceForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left Column (Main Content) -->
+    <div class="lg:col-span-2 space-y-8">
+      
+      <!-- Job Info -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            Job Details
+          </h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Job Title</span></label>
+              <input type="text" formControlName="title" placeholder="e.g. Senior Software Engineer" 
+                     class="input input-bordered w-full focus:input-primary transition-all" 
+                     [class.input-error]="f['title'].touched && f['title'].invalid" />
+              <label class="label" *ngIf="f['title'].touched && f['title'].invalid">
+                <span class="label-text-alt text-error">Job title is required</span>
+              </label>
+            </div>
+
+            <div class="form-control relative">
+              <label class="label"><span class="label-text font-medium">Company</span></label>
+              <input type="text" formControlName="company" placeholder="Company Name" 
+                     class="input input-bordered w-full focus:input-primary transition-all" 
+                     (blur)="onBlur()"
+                     [class.input-error]="f['company'].touched && f['company'].invalid" />
+              
+              <!-- Suggestions Dropdown -->
+              <div *ngIf="showSuggestions && companySuggestions.length > 0" class="absolute top-full left-0 w-full bg-base-100 border border-base-200 rounded-lg shadow-xl mt-1 z-50 max-h-60 overflow-y-auto">
+                 <button *ngFor="let suggestion of companySuggestions" 
+                         (click)="selectCompany(suggestion)"
+                         type="button"
+                         class="w-full text-left px-4 py-3 hover:bg-base-200 flex items-center gap-3 border-b border-base-100 last:border-0 transition-colors">
+                    <img [src]="suggestion.logo_url" class="w-6 h-6 rounded object-contain" />
+                    <span class="text-sm font-medium">{{ suggestion.name }}</span>
+                 </button>
+              </div>
+
+              <label class="label" *ngIf="f['company'].touched && f['company'].invalid">
+                <span class="label-text-alt text-error">Company is required</span>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div class="form-control">
+                 <label class="label"><span class="label-text font-medium">Work Type</span></label>
+                 <select formControlName="workType" class="select select-bordered w-full">
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Internship">Internship</option>
+                 </select>
+               </div>
+            </div>
+
+            <div class="form-control">
+               <label class="label"><span class="label-text font-medium">Location</span></label>
+               <input type="text" formControlName="location" placeholder="City, Country" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+               <label class="label"><span class="label-text font-medium">Description</span></label>
+               <textarea formControlName="description" class="textarea textarea-bordered h-32" placeholder="Describe your role and impact..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills & Responsibilities -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            Skills & Responsibilities
+          </h2>
+
+          <div class="space-y-6">
+             <!-- Skills -->
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Technologies Used</span></label>
+                <div class="relative">
+                   <input #skillInput type="text" placeholder="Add skill..." 
+                          class="input input-bordered w-full pr-12"
+                          (keyup.enter)="addSkill(skillInput.value, skillInput)" />
+                   <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                           (click)="addSkill(skillInput.value, skillInput)">
+                     <i class="fa-solid fa-plus"></i>
+                   </button>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
+                   <div *ngFor="let skill of skills.controls; let i = index" 
+                        class="badge badge-lg gap-2 pl-3 pr-1 py-3 bg-base-200 border-base-300">
+                     {{ skill.value }}
+                     <button type="button" (click)="removeSkill(i)" 
+                             class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 text-base-content/50 hover:text-error">
+                       <i class="fa-solid fa-xmark text-[10px]"></i>
+                     </button>
+                   </div>
+                   <span *ngIf="skills.length === 0" class="text-sm text-base-content/40 italic py-1">No technologies added yet</span>
+                </div>
+             </div>
+
+             <!-- Responsibilities -->
+             <div class="form-control">
+                <label class="label"><span class="label-text font-medium">Key Responsibilities</span></label>
+                <div class="relative">
+                   <input #respInput type="text" placeholder="Add responsibility..." 
+                          class="input input-bordered w-full pr-12"
+                          (keyup.enter)="addResponsibility(respInput.value, respInput)" />
+                   <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
+                           (click)="addResponsibility(respInput.value, respInput)">
+                     <i class="fa-solid fa-plus"></i>
+                   </button>
+                </div>
+                <div class="flex flex-col gap-2 mt-3 min-h-[2rem]">
+                   <div *ngFor="let resp of responsibilities.controls; let i = index" 
+                        class="flex items-start gap-2 p-2 bg-base-50 rounded-lg group hover:bg-base-100 transition-colors">
+                     <span class="text-primary mt-1.5">•</span>
+                     <span class="flex-1 text-sm">{{ resp.value }}</span>
+                     <button type="button" (click)="removeResponsibility(i)" 
+                             class="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity">
+                       <i class="fa-solid fa-xmark text-error"></i>
+                     </button>
+                   </div>
+                   <span *ngIf="responsibilities.length === 0" class="text-sm text-base-content/40 italic py-1">No responsibilities added yet</span>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column (Sidebar) -->
+    <div class="space-y-8">
+      
+      <!-- Dates -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Timeline</h2>
+          
+          <div class="space-y-4">
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Start Date</span></label>
+              <input type="date" formControlName="startDate" class="input input-bordered w-full" 
+                     [class.input-error]="f['startDate'].touched && f['startDate'].invalid" />
+            </div>
+
+            <div class="form-control">
+               <label class="label cursor-pointer p-0 mb-2">
+                 <span class="label-text font-medium">I currently work here</span>
+                 <input type="checkbox" formControlName="current" class="checkbox checkbox-primary checkbox-sm" />
+               </label>
+            </div>
+
+            <div class="form-control" *ngIf="!f['current'].value">
+              <label class="label"><span class="label-text font-medium">End Date</span></label>
+              <input type="date" formControlName="endDate" class="input input-bordered w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo -->
+      <div class="card bg-base-100 shadow-sm border border-base-200">
+        <div class="card-body p-6">
+          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Company Logo</h2>
+          
+          <div class="form-control">
+             <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-base-200/30 transition-all cursor-pointer relative group bg-base-50/50 flex flex-col items-center justify-center min-h-[140px]">
+                <input type="file" accept="image/*" (change)="onLogoSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                
+                <div class="flex flex-col items-center gap-2 text-base-content/60" *ngIf="!experienceForm.get('logo')?.value">
+                   <div class="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mb-1 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <i class="fa-solid fa-building text-xl"></i>
+                   </div>
+                   <span class="font-medium text-sm">Upload Logo</span>
+                </div>
+                
+                <div *ngIf="experienceForm.get('logo')?.value" class="relative w-24 h-24">
+                   <img [src]="experienceForm.get('logo')?.value" class="w-full h-full object-contain" />
+                   <button type="button" (click)="$event.stopPropagation(); experienceForm.get('logo')?.setValue('')" 
+                           class="absolute -top-2 -right-2 z-20 btn btn-circle btn-xs btn-error text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                      <i class="fa-solid fa-xmark"></i>
+                   </button>
+                </div>
+             </div>
+             <div class="divider text-xs text-base-content/30 my-4 font-medium">OR URL</div>
+             <input type="text" formControlName="logo" placeholder="https://..." class="input input-sm input-bordered w-full" />
+          </div>
+        </div>
+      </div>
+
     </div>
   </form>
 </div>
