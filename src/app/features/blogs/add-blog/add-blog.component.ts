@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { NgxEditorModule, Editor, Toolbar } from 'ngx-editor';
 import { BlogService } from '../../../core/services/blog.service';
 import { MediaService } from '../../../core/services/media.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { finalize } from 'rxjs/operators';
 import { Blog } from '../../../core/models/api.models';
 
@@ -19,9 +20,10 @@ export class AddBlogComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private blogService = inject(BlogService);
   private mediaService = inject(MediaService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  
+
   @Inject(PLATFORM_ID) private platformId: Object;
 
   blogForm!: FormGroup;
@@ -37,7 +39,7 @@ export class AddBlogComponent implements OnInit, OnDestroy {
     ['align_left', 'align_center', 'align_right', 'align_justify'],
     ['undo', 'redo'],
   ];
-  
+
   isEditMode = false;
   isSubmitting = false;
   isLoading = false;
@@ -55,7 +57,7 @@ export class AddBlogComponent implements OnInit, OnDestroy {
     }
 
     this.initForm();
-    
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -90,9 +92,14 @@ export class AddBlogComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (res.success && res.data) {
           this.patchForm(res.data);
+        } else {
+          this.toastService.error(res.message || 'Failed to load blog details');
         }
       },
-      error: (err) => console.error('Error loading blog', err)
+      error: (err) => {
+        console.error('Error loading blog', err);
+        this.toastService.error('Connection error while loading blog');
+      }
     });
   }
 
@@ -129,33 +136,32 @@ export class AddBlogComponent implements OnInit, OnDestroy {
   onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.toastService.warning('Image size too large (Max 5MB)');
+        return;
+      }
+
       this.mediaService.uploadFiles([file]).subscribe({
         next: (res) => {
-          if (res.success && res.data && res.data.data && res.data.data.length > 0) {
-            // Assuming res.data is MediaFile[] and we want the url
-            // Adjust based on actual MediaService response structure if needed
-            // Based on add-project, it was res.data.data
-            // Let's check api.models.ts: MediaBatchUploadResponse { message: string, data: MediaFile[] }
-            // So res.data is MediaFile[]. 
-            // Wait, standard ApiResponse wrapper? BlogService returns ApiResponse<T>.
-            // MediaService.uploadFiles returns Observable<ApiResponse<MediaBatchUploadResponse>>?
-            // Let's check media.service.ts if I could read it. 
-            // Assuming standard ApiResponse wrapper from user context "lot mismatches...".
-            // In add-project, I used: `const uploadedFiles = (res.data as any).data || res.data;`
-            
-             const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
-             if (uploadedUrl) {
-               this.blogForm.patchValue({ coverImage: uploadedUrl });
-             }
+          if (res.success && res.data) {
+            const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
+            if (uploadedUrl) {
+              this.blogForm.patchValue({ coverImage: uploadedUrl });
+              this.toastService.success('Cover image uploaded');
+            }
           }
         },
-        error: (err) => console.error('Image upload failed', err)
+        error: (err) => this.toastService.error('Failed to upload image')
       });
     }
   }
 
   onSubmit(): void {
-    if (this.blogForm.invalid) return;
+    if (this.blogForm.invalid) {
+      this.toastService.warning('Please fill in all required fields correctly');
+      this.blogForm.markAllAsTouched();
+      return;
+    }
 
     this.isSubmitting = true;
     const blogData = {
@@ -173,10 +179,16 @@ export class AddBlogComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (res) => {
         if (res.success) {
+          this.toastService.success(this.isEditMode ? 'Blog post updated successfully' : 'Blog post published successfully');
           this.router.navigate(['/blogs']);
+        } else {
+          this.toastService.error(res.message || 'Operation failed');
         }
       },
-      error: (err) => console.error('Error saving blog', err)
+      error: (err) => {
+        console.error('Error saving blog', err);
+        this.toastService.error(err.error?.message || 'Failed to save blog post');
+      }
     });
   }
 

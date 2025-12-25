@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormArray, FormControl } from '@angular/forms';
 import { AdminService } from '../../core/services/admin.service';
+import { ToastService } from '../../core/services/toast.service';
 import { TagsComponent } from '../../shared/components/tags/tags.component';
 
 @Component({
@@ -13,6 +14,7 @@ import { TagsComponent } from '../../shared/components/tags/tags.component';
 export class SettingsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   tabs = [
     { id: 'general', label: 'General', icon: 'fa-solid fa-sliders' },
@@ -28,9 +30,11 @@ export class SettingsComponent implements OnInit {
     siteName: [''],
     profileImage: [''],
     siteDescription: [''],
-    siteUrl: [''],
-    email: [''],
-    phone: [''],
+    siteKeywords: [[]],
+    contact: this.fb.group({
+      email: [''],
+      phone: ['']
+    }),
     social: this.fb.group({
       github: [''],
       linkedin: [''],
@@ -38,9 +42,8 @@ export class SettingsComponent implements OnInit {
       instagram: ['']
     }),
     seo: this.fb.group({
-      title: [''],
-      description: [''],
-      keywords: [[]]
+      metaTitle: [''],
+      metaDescription: ['']
     }),
     features: this.fb.group({
       blog: [true],
@@ -55,15 +58,20 @@ export class SettingsComponent implements OnInit {
   }
 
   loadSettings() {
-    this.adminService.getSettings().subscribe((res: any) => {
-      if (res.success && res.data) {
-        this.settingsForm.patchValue(res.data);
-      }
+    this.adminService.getSettings().subscribe({
+      next: (res: any) => {
+        if (res.success && res.data) {
+          this.settingsForm.patchValue(res.data);
+        } else {
+          this.toastService.error('Failed to load settings');
+        }
+      },
+      error: () => this.toastService.error('Connection error loading settings')
     });
   }
 
   get keywordsControl(): FormControl {
-    return this.settingsForm.get('seo.keywords') as FormControl;
+    return this.settingsForm.get('siteKeywords') as FormControl;
   }
 
   addKeyword(event: any) {
@@ -88,20 +96,25 @@ export class SettingsComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.settingsForm.invalid) return;
+    if (this.settingsForm.invalid) {
+      this.toastService.warning('Please check form for errors');
+      return;
+    }
 
     this.isLoading.set(true);
     this.adminService.updateSettings(this.settingsForm.value).subscribe({
       next: (res: any) => {
         this.isLoading.set(false);
         if (res.success) {
-          alert('Settings saved successfully');
+          this.toastService.success('Settings saved successfully');
           this.settingsForm.markAsPristine();
+        } else {
+          this.toastService.error(res.message || 'Failed to save settings');
         }
       },
-      error: () => {
+      error: (err) => {
         this.isLoading.set(false);
-        alert('Failed to save settings');
+        this.toastService.error(err.error?.message || 'Failed to save settings');
       }
     });
   }

@@ -1,32 +1,75 @@
-.bg-teal-600 {
-  background-color: #308e87;
-}
+:host {
+    ::ng-deep {
+        .NgxEditor {
+            background-color: transparent !important;
+            color: rgb(var(--color-text-primary));
 
+            &__MenuBar {
+                background-color: transparent !important;
+                border-bottom: 1px solid rgba(var(--color-border), 0.6);
 
-input, select, textarea {
-  @apply bg-white;
-  transition: all 0.2s ease-in-out;
-}
+                .NgxEditor__MenuItem {
+                    color: rgb(var(--color-text-tertiary));
 
-input:focus, select:focus, textarea:focus {
-  border-color: #308e87;
-  box-shadow: 0 0 0 3px rgba(48, 142, 135, 0.2);
-}
+                    &:hover {
+                        background-color: rgba(var(--color-surface-elevated), 0.8);
+                        color: rgb(var(--color-text-primary));
+                    }
 
-button {
-  transition: all 0.3s ease-in-out;
-}
+                    &--Active {
+                        background-color: rgba(var(--color-primary), 0.15);
+                        color: rgb(var(--color-primary));
+                    }
 
-button:hover {
-  background-color: #267a72;
-}
+                    svg {
+                        fill: currentColor;
+                    }
+                }
 
-@media screen and (max-width: 768px) {
-  .max-w-4xl {
-    max-width: 100%;
-  }
+                .NgxEditor__Dropdown {
+                    .NgxEditor__Dropdown--Selected {
+                        color: rgb(var(--color-text-primary));
 
-  .p-8 {
-    padding: 20px;
-  }
+                        &:hover {
+                            background-color: rgba(var(--color-surface-elevated), 0.8);
+                        }
+                    }
+
+                    .NgxEditor__Dropdown--Item {
+                        color: rgb(var(--color-text-primary));
+                        background-color: rgb(var(--color-surface));
+
+                        &:hover {
+                            background-color: rgba(var(--color-surface-elevated), 0.8);
+                        }
+                    }
+                }
+            }
+
+            &__Content {
+                color: rgb(var(--color-text-primary));
+
+                // Ensure typography inherits color
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6,
+                p,
+                ul,
+                ol,
+                li,
+                blockquote {
+                    color: inherit;
+                }
+
+                // Placeholder
+                &[data-placeholder]::before {
+                    color: rgb(var(--color-text-tertiary));
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
 }

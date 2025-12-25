@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { SkillService } from '../../../core/services/skill.service';
 import { MediaService } from '../../../core/services/media.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { finalize } from 'rxjs/operators';
 import { Skill } from '../../../core/models/api.models';
 
@@ -18,6 +19,7 @@ export class AddSkillComponent implements OnInit {
   private fb = inject(FormBuilder);
   private skillService = inject(SkillService);
   private mediaService = inject(MediaService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -43,6 +45,7 @@ export class AddSkillComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(2)]],
       category: ['', Validators.required],
       level: ['intermediate', Validators.required],
+      proficiency: [50, [Validators.required, Validators.min(0), Validators.max(100)]],
       icon: [''],
       yearsOfExperience: [0],
       description: [''],
@@ -61,9 +64,14 @@ export class AddSkillComponent implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.patchForm(res.data);
+        } else {
+          this.toastService.error(res.message || 'Failed to load skill');
         }
       },
-      error: (err) => console.error('Error loading skill', err)
+      error: (err) => {
+        console.error('Error loading skill', err);
+        this.toastService.error('Failed to load skill details');
+      }
     });
   }
 
@@ -72,6 +80,7 @@ export class AddSkillComponent implements OnInit {
       name: skill.name,
       category: skill.category,
       level: skill.level,
+      proficiency: skill.proficiency ?? 50,
       icon: skill.icon,
       yearsOfExperience: skill.yearsOfExperience,
       description: skill.description,
@@ -83,27 +92,34 @@ export class AddSkillComponent implements OnInit {
   onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        this.toastService.warning('Image size too large (Max 2MB)');
+        return;
+      }
       this.mediaService.uploadFiles([file]).subscribe({
         next: (res) => {
           if (res.success && res.data) {
-             const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
-             if (uploadedUrl) {
-               this.skillForm.patchValue({ icon: uploadedUrl });
-             }
+            const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
+            if (uploadedUrl) {
+              this.skillForm.patchValue({ icon: uploadedUrl });
+              this.toastService.success('Icon uploaded');
+            }
           }
         },
-        error: (err) => console.error('Image upload failed', err)
+        error: (err) => this.toastService.error('Icon upload failed')
       });
     }
   }
 
   onSubmit() {
-    if (this.skillForm.invalid) return;
+    if (this.skillForm.invalid) {
+      this.toastService.warning('Please check form inputs');
+      return;
+    }
 
     this.isSubmitting.set(true);
     const formValue = this.skillForm.value;
-    
-    // Map form active/featured to model
+
     const skillData: Partial<Skill> = {
       ...formValue
     };
@@ -117,10 +133,16 @@ export class AddSkillComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         if (res.success) {
+          this.toastService.success(this.isEditMode() ? 'Skill updated' : 'Skill created');
           this.router.navigate(['/skills']);
+        } else {
+          this.toastService.error(res.message || 'Operation failed');
         }
       },
-      error: (err) => console.error('Error saving skill', err)
+      error: (err) => {
+        console.error('Error saving skill', err);
+        this.toastService.error(err.error?.message || 'Failed to save skill');
+      }
     });
   }
 

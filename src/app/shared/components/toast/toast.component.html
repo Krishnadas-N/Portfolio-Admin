@@ -1,0 +1,35 @@
+<div class="fixed top-20 right-4 z-[9999] flex flex-col gap-3 pointer-events-none p-4 max-w-sm w-full">
+    <div *ngFor="let toast of toastService.toasts()" @toastAnimation
+        class="pointer-events-auto rounded-xl shadow-xl border backdrop-blur-xl p-4 flex items-start gap-3 transition-all transform hover:scale-[1.02] bg-surface-elevated/90"
+        [ngClass]="{
+         'border-emerald-500/30 shadow-emerald-500/10': toast.type === 'success',
+         'border-red-500/30 shadow-red-500/10': toast.type === 'error',
+         'border-blue-500/30 shadow-blue-500/10': toast.type === 'info',
+         'border-amber-500/30 shadow-amber-500/10': toast.type === 'warning'
+       }">
+
+        <!-- Icon -->
+        <div class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5" [ngClass]="{
+            'bg-emerald-500/20 text-emerald-500': toast.type === 'success',
+            'bg-red-500/20 text-red-500': toast.type === 'error',
+            'bg-blue-500/20 text-blue-500': toast.type === 'info',
+            'bg-amber-500/20 text-amber-500': toast.type === 'warning'
+          }">
+            <i class="fa-solid text-xs" [ngClass]="{
+              'fa-check': toast.type === 'success',
+              'fa-xmark': toast.type === 'error',
+              'fa-info': toast.type === 'info',
+              'fa-exclamation': toast.type === 'warning'
+            }"></i>
+        </div>
+
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-text-primary leading-tight break-words">{{ toast.message }}</p>
+        </div>
+
+        <button (click)="toastService.remove(toast.id)"
+            class="shrink-0 text-text-tertiary hover:text-text-primary transition-colors -mt-1 -mr-1 p-1">
+            <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+    </div>
+</div>

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ProjectService } from '../../../core/services/project.service';
 import { MediaService } from '../../../core/services/media.service';
+import { ToastService } from '../../../core/services/toast.service';
 import {
   FormBuilder,
   FormGroup,
@@ -28,9 +29,10 @@ export class AddProjectComponent implements OnInit {
   projectId: string | null = null;
   isLoading = false;
   isSubmitting = false;
-  
+
   private projectService = inject(ProjectService);
   private mediaService = inject(MediaService);
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -44,13 +46,13 @@ export class AddProjectComponent implements OnInit {
     this.projectForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      technologies: [[]], // Array of strings
+      technologies: [[]],
       license: ['', [Validators.required]],
-      tags: [[]], // Array of strings
+      tags: [[]],
       projectType: ['main', [Validators.required]],
-      seoKeywords: [[]], // Array of strings
-      additionalResources: [[]], // Array of strings
-      relatedProjects: [[]], // IDs
+      seoKeywords: [[]],
+      additionalResources: [[]],
+      relatedProjects: [[]],
       collaborators: [[]],
       url: ['', [Validators.pattern('https?://.+')]],
       githubUrl: ['', [Validators.pattern('https?://.+')]],
@@ -61,8 +63,8 @@ export class AddProjectComponent implements OnInit {
       featured: [false],
       archived: [false],
       videoRepresentation: [''],
-      images: this.fb.array([]), // Array of image URLs
-      skills: this.fb.array([]), // Array of strings
+      images: this.fb.array([]),
+      skills: this.fb.array([]),
       viewsCount: [0],
       likes: [0],
       documentationLink: ['', [Validators.pattern('https?://.+')]]
@@ -84,11 +86,14 @@ export class AddProjectComponent implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.patchForm(res.data);
+        } else {
+          this.toastService.error(res.message || 'Failed to load project');
         }
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Failed to load project', err);
+        this.toastService.error('Connection error loading project');
         this.isLoading = false;
         this.router.navigate(['/projects']);
       }
@@ -126,12 +131,11 @@ export class AddProjectComponent implements OnInit {
   get skills() { return this.projectForm.get('skills') as FormArray; }
 
   // --- Array Manipulation ---
-  
-  // For controls that are simple arrays (technologies, tags, etc.)
+
   addStringItem(controlName: string, value: string, inputElement: HTMLInputElement) {
     const trimmed = value.trim();
     if (!trimmed) return;
-    
+
     const control = this.projectForm.get(controlName);
     const currentValues = control?.value || [];
 
@@ -149,16 +153,14 @@ export class AddProjectComponent implements OnInit {
     control?.setValue(newValues);
   }
 
-  // For FormArrays (skills)
   addSkill(value: string, input: HTMLInputElement) {
     const trimmed = value.trim();
     if (!trimmed) return;
-    
-    // Check duplicates
+
     const currentSkills = this.skills.value;
     if (!currentSkills.includes(trimmed)) {
-        this.skills.push(this.fb.control(trimmed));
-        input.value = '';
+      this.skills.push(this.fb.control(trimmed));
+      input.value = '';
     }
   }
 
@@ -171,25 +173,31 @@ export class AddProjectComponent implements OnInit {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files?.length) {
       const files = Array.from(fileInput.files);
-      
+
+      // Limit file size (example 5MB)
+      if (files.some(f => f.size > 5 * 1024 * 1024)) {
+        this.toastService.warning('Some files are too large (Max 5MB)');
+        return;
+      }
+
       this.mediaService.uploadImages(files, 'projects').subscribe({
         next: (res) => {
-            if (res.success && res.data) {
-                // If it's MediaBatchUploadResponse
-                const responseData = res.data as any; // Cast to avoid strict check issues if type definition is slightly off
-                if (responseData.data && Array.isArray(responseData.data)) {
-                     responseData.data.forEach((f: any) => {
-                        this.images.push(this.fb.control(f.url));
-                    });
-                } else if (Array.isArray(responseData)) {
-                     // Fallback if structure is different
-                     responseData.forEach((f: any) => {
-                        this.images.push(this.fb.control(f.url));
-                    });
-                }
+          if (res.success && res.data) {
+            const responseData = res.data as any;
+            if (responseData.data && Array.isArray(responseData.data)) {
+              responseData.data.forEach((f: any) => {
+                this.images.push(this.fb.control(f.url));
+              });
+              this.toastService.success(`${responseData.data.length} images uploaded`);
+            } else if (Array.isArray(responseData)) {
+              responseData.forEach((f: any) => {
+                this.images.push(this.fb.control(f.url));
+              });
+              this.toastService.success(`${responseData.length} images uploaded`);
             }
+          }
         },
-        error: (err) => console.error('Upload failed', err)
+        error: (err) => this.toastService.error('Upload failed')
       });
     }
   }
@@ -202,22 +210,29 @@ export class AddProjectComponent implements OnInit {
     const fileInput = event.target as HTMLInputElement;
     if (fileInput.files?.length) {
       const file = fileInput.files[0];
+      if (file.size > 50 * 1024 * 1024) { // Example 50MB limit
+        this.toastService.warning('Video file too large (Max 50MB)');
+        return;
+      }
+
       this.mediaService.uploadFiles([file]).subscribe({
-          next: (res) => {
-              const responseData = res.data as any;
-               if (res.success && responseData && responseData.data && responseData.data.length > 0) {
-                  this.projectForm.patchValue({
-                      videoRepresentation: responseData.data[0].url
-                  });
-              }
-          },
-          error: (err) => console.error('Video upload failed', err)
+        next: (res) => {
+          const responseData = res.data as any;
+          if (res.success && responseData && responseData.data && responseData.data.length > 0) {
+            this.projectForm.patchValue({
+              videoRepresentation: responseData.data[0].url
+            });
+            this.toastService.success('Video uploaded');
+          }
+        },
+        error: (err) => this.toastService.error('Video upload failed')
       });
-  }
+    }
   }
 
   onSubmit() {
     if (this.projectForm.invalid) {
+      this.toastService.warning('Please check form inputs');
       this.projectForm.markAllAsTouched();
       return;
     }
@@ -233,12 +248,16 @@ export class AddProjectComponent implements OnInit {
       next: (res) => {
         this.isSubmitting = false;
         if (res.success) {
+          this.toastService.success(this.isEditMode ? 'Project updated' : 'Project created');
           this.router.navigate(['/projects']);
+        } else {
+          this.toastService.error(res.message || 'Operation failed');
         }
       },
       error: (err) => {
         this.isSubmitting = false;
         console.error('Save failed', err);
+        this.toastService.error(err.error?.message || 'Failed to save project');
       }
     });
   }

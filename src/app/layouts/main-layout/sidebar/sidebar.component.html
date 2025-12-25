@@ -74,10 +74,10 @@
           <ng-container *ngIf="item.type === 'group'">
             <div *ngFor="let sub of item.children" class="relative group px-2">
               <a [routerLink]="sub.path" routerLinkActive="active"
-                class="flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50 transition-all duration-200 group-[.active]:bg-primary/10 group-[.active]:text-primary relative"
+                class="flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50 transition-all duration-200 [&.active]:bg-primary/10 [&.active]:text-primary relative"
                 [attr.title]="sub.title">
                 <i [class]="sub.icon"
-                  class="text-lg transition-colors group-hover:text-primary group-[.active]:text-primary"></i>
+                  class="text-lg transition-colors group-hover:text-primary [&.active]:text-primary"></i>
               </a>
 
               <!-- Tooltip -->
@@ -106,7 +106,7 @@
           <!-- Single Link -->
           <div *ngIf="item.type === 'link' && item.path">
             <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}"
-              class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-surface-elevated hover:text-text-primary group-[.active]:bg-primary/10 group-[.active]:text-primary">
+              class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-surface-elevated hover:text-text-primary [&.active]:bg-primary/10 [&.active]:text-primary">
 
               <div
                 class="w-5 flex justify-center shrink-0 text-lg opacity-80 transition-opacity group-hover:opacity-100 group-[.active]:opacity-100">
@@ -118,7 +118,7 @@
               </span>
 
               <!-- Active Pill -->
-              <div class="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-[.active]:opacity-100 transition-opacity">
+              <div class="w-1.5 h-1.5 rounded-full bg-primary opacity-0 [&.active]:opacity-100 transition-opacity">
               </div>
             </a>
           </div>

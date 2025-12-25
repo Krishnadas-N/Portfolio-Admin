@@ -712,7 +712,12 @@ export interface PortfolioSettings {
   theme: ThemeSettings;
   features: FeatureSettings;
   social: SocialSettings;
-  contact: ContactSettings;
+  contact: {
+    email: string;
+    phone?: string;
+    address?: string;
+    mapUrl?: string;
+  };
 }
 
 export interface AdminProfile {
