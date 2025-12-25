@@ -546,12 +546,29 @@ export interface MediaFile {
 }
 
 export interface MediaUploadResponse {
-  original: {
-    url: string;
-    key: string;
-    provider: string;
+  success?: boolean;
+  message?: string;
+  data: {
+    original: {
+      url: string;
+      key: string;
+      provider: string;
+      size: number;
+      mimetype?: string;
+      encoding?: string;
+      originalname?: string;
+    };
+    processed: Array<{
+      size: string;
+      url: string;
+      key: string;
+    }>;
+    metadata?: {
+      originalname: string;
+      mimetype: string;
+      encoding: string;
+    };
   };
-  processed: any[];
 }
 
 export interface MediaBatchUploadResponse {
@@ -574,15 +591,20 @@ export interface SignedUrlResponse {
 }
 
 export interface MediaStatistics {
+  totalFiles: number;
   totalSize: number;
-  fileCount: number;
-  imageCount?: number; // For backward compatibility
-  documentCount?: number; // For backward compatibility
-  videoCount?: number; // For backward compatibility
-  byType: {
-    images: number;
-    documents: number;
-  };
+  byType: Record<string, number>;
+  byFolder: Record<string, number>;
+  recentUploads: MediaRecentUpload[];
+  // Backward compatibility optional fields if needed
+  fileCount?: number;
+  imageCount?: number;
+}
+
+export interface MediaRecentUpload {
+  key: string;
+  size: number;
+  lastModified: string;
 }
 
 // ==================== Comments Models ====================

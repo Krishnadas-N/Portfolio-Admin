@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../core/services/admin.service';
 import { MediaFile, MediaStatistics } from '../../core/models/api.models';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-media',
@@ -11,7 +12,8 @@ import { MediaFile, MediaStatistics } from '../../core/models/api.models';
   templateUrl: './media.component.html',
   styles: [`
     :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
         height: 100%;
         overflow: hidden;
     }
@@ -19,6 +21,7 @@ import { MediaFile, MediaStatistics } from '../../core/models/api.models';
 })
 export class MediaComponent implements OnInit {
   private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   // Data Signals
   files = signal<MediaFile[]>([]);
@@ -52,41 +55,114 @@ export class MediaComponent implements OnInit {
 
   loadFiles(append: boolean = false) {
     this.adminService.getMediaFiles(this.currentPage).subscribe((res: any) => {
+      let rawFiles: any[] = [];
+
+      // Handle different response structures
       if (res.success) {
-        if (append) {
-          this.files.update(current => [...current, ...res.data.files]);
-        } else {
-          this.files.set(res.data.files || []);
+        if (Array.isArray(res.data)) {
+          // Case 1: res.data is the array of files (as seen in recent user log)
+          rawFiles = res.data;
+        } else if (res.data && Array.isArray(res.data.recentUploads)) {
+          // Case 2: res.data.recentUploads is the array
+          rawFiles = res.data.recentUploads;
+        } else if (res.data && Array.isArray(res.data.files)) {
+          // Case 3: res.data.files is the array (legacy/old structure)
+          rawFiles = res.data.files;
         }
+      }
+
+      if (rawFiles.length > 0) {
+        // Map to MediaFile - construct URL if missing and map lowercase fields to UpperCase for UI
+        const mappedFiles: MediaFile[] = rawFiles.map((f: any) => {
+          let url = f.url;
+          if (!url && f.key) {
+            // Fallback to construction if URL missing
+            url = `https://res.cloudinary.com/dpjkuvq1r/image/upload/${f.key}`;
+          }
+
+          return {
+            key: f.key || f.Key,
+            url: url,
+            provider: f.provider || 'cloudinary',
+            Size: f.size || f.Size, // Map lowercase size to Size
+            LastModified: f.lastModified || f.LastModified // Map lowercase lastModified to LastModified
+          } as MediaFile;
+        });
+
+        if (append) {
+          this.files.update(current => [...current, ...mappedFiles]);
+        } else {
+          this.files.set(mappedFiles);
+        }
+      } else if (!append) {
+        // If no files found and not appending, clear the list
+        this.files.set([]);
       }
     });
   }
 
   loadStats() {
     this.adminService.getMediaStats().subscribe((res: any) => {
-      if (res.success) this.stats.set(res.data);
+      if (res.success) {
+        // Map new stats structure to conform to potential UI usages if needed
+        // The UI uses 'fileCount' and 'totalSize'
+        // New JSON: totalFiles, totalSize.
+        // We need to map totalFiles -> fileCount for the template compatibility 
+        // or update template. We update the signal with mapped object.
+        const data = res.data;
+        const stats: MediaStatistics = {
+          ...data,
+          fileCount: data.totalFiles, // Map totalFiles to fileCount
+          imageCount: data.totalFiles // Map totalFiles to imageCount for usage calc
+        };
+        this.stats.set(stats);
+      }
     });
   }
 
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files.length > 0) {
-      // Basic loop upload - usually you'd want a proper queue management
-      // For now, this suffices for small batches
       let completed = 0;
+      let errors = 0;
+      const total = files.length;
+
+      // Show toast for start? "Uploading x files..."
+      this.toastService.info(`Uploading ${total} file(s)...`);
+
       for (let i = 0; i < files.length; i++) {
         this.adminService.uploadImage(files[i]).subscribe({
-          next: () => {
-            completed++;
-            if (completed === files.length) {
-              this.currentPage = 1;
-              this.loadFiles();
-              this.loadStats();
+          next: (res: any) => {
+            if (res.success) {
+              // Individual success toast? Maybe too noisy for many files.
+              // We'll just count success.
             }
+            completed++;
+            this.checkUploadCompletion(completed, total, errors);
           },
-          error: (err) => console.error('Upload failed', err)
+          error: (err) => {
+            console.error('Upload failed', err);
+            errors++;
+            completed++;
+            this.checkUploadCompletion(completed, total, errors);
+          }
         });
       }
+    }
+  }
+
+  checkUploadCompletion(completed: number, total: number, errors: number) {
+    if (completed === total) {
+      if (errors === 0) {
+        this.toastService.success(`Successfully uploaded ${total} file(s)`);
+      } else if (errors === total) {
+        this.toastService.error(`Failed to upload ${total} file(s)`);
+      } else {
+        this.toastService.warning(`Uploaded ${total - errors} files, ${errors} failed`);
+      }
+      this.currentPage = 1;
+      this.loadFiles();
+      this.loadStats();
     }
   }
 
@@ -122,6 +198,7 @@ export class MediaComponent implements OnInit {
     if (confirm('Delete this file permanently?')) {
       this.adminService.deleteMediaFile(key).subscribe(() => {
         this.files.update(files => files.filter(f => (f.key || f.Key) !== key));
+        this.toastService.success('File deleted successfully');
         this.loadStats();
       });
     }
@@ -141,6 +218,7 @@ export class MediaComponent implements OnInit {
           if (processed === keys.length) {
             this.selectedFiles.set(new Set());
             this.isSelectMode.set(false);
+            this.toastService.success('Selected files deleted');
             this.loadStats();
           }
         });
@@ -150,9 +228,39 @@ export class MediaComponent implements OnInit {
 
   copyUrl(url: string) {
     navigator.clipboard.writeText(url).then(() => {
-      // Ideally show a toast here
-      // alert('Copied to clipboard'); 
+      this.toastService.success('Copied to clipboard');
     });
+  }
+
+  downloadFile(file: MediaFile) {
+    if (!file.url) return;
+
+    this.toastService.info('Starting download...');
+
+    // Try fetching as blob to force download behavior
+    fetch(file.url)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.blob();
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const filename = (file.key || file.Key || 'download').split('/').pop() || 'file';
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        this.toastService.success('Download completed');
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        // Fallback: Open in new tab
+        window.open(file.url, '_blank');
+        this.toastService.warning('Download failed. Opened in new tab instead.');
+      });
   }
 
   loadMore() {
@@ -160,3 +268,4 @@ export class MediaComponent implements OnInit {
     this.loadFiles(true);
   }
 }
+
