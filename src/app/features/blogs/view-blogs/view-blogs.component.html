@@ -1,24 +1,30 @@
-<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
-  
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 sticky top-0 z-30 bg-base-100/95 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-base-200/50 md:border-none transition-all duration-300">
+<div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 shrink-0">
     <div>
-      <h1 class="text-3xl font-bold text-base-content tracking-tight">Blog Posts</h1>
-      <p class="text-base-content/60 text-sm mt-1">Manage your blog content and publications</p>
+      <h1 class="text-3xl font-bold text-text-primary tracking-tight">Blog Posts</h1>
+      <p class="text-text-secondary text-sm mt-1">Manage your blog content and publications.</p>
     </div>
-    
+
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-      <div class="join w-full sm:w-auto shadow-sm">
-        <div class="relative w-full sm:w-64">
-          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" 
-                 placeholder="Search posts..." 
-                 class="input input-bordered join-item w-full pl-10 focus:input-primary transition-all bg-base-100 placeholder:text-base-content/40" />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"></i>
-        </div>
-        <button (click)="onSearch()" class="btn btn-primary join-item px-6">Search</button>
+      <!-- Search -->
+      <div class="relative w-full sm:w-72 group">
+        <i
+          class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()"
+          placeholder="Search posts..."
+          class="w-full pl-10 pr-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" />
       </div>
-      
-      <a routerLink="/blogs/add" class="btn btn-primary shadow-lg shadow-primary/20 shrink-0 gap-2">
+
+      <button (click)="onSearch()"
+        class="px-5 py-2.5 rounded-xl bg-surface border border-border text-text-primary hover:bg-surface-elevated hover:border-primary/50 transition-all text-sm font-medium shadow-sm">
+        Search
+      </button>
+
+      <!-- Add Button -->
+      <a routerLink="/blogs/add"
+        class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center justify-center gap-2 transform active:scale-95">
         <i class="fa-solid fa-pen-nib"></i>
         <span class="hidden sm:inline">Write Post</span>
         <span class="sm:hidden">Write</span>
@@ -27,138 +33,169 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    <div *ngFor="let i of [1,2,3,4,5,6]" class="card bg-base-100 shadow-sm border border-base-200 h-[28rem] animate-pulse">
-      <div class="h-56 bg-base-200 w-full rounded-t-2xl"></div>
-      <div class="card-body p-6 space-y-4">
+  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let i of [1,2,3,4,5,6,7,8]"
+      class="glass-panel rounded-2xl h-[400px] animate-pulse overflow-hidden border border-border/50">
+      <div class="h-48 bg-surface-elevated/50 w-full"></div>
+      <div class="p-5 space-y-4">
         <div class="flex gap-2">
-           <div class="h-4 bg-base-200 w-16 rounded-full"></div>
-           <div class="h-4 bg-base-200 w-24 rounded-full"></div>
+          <div class="h-4 bg-surface-elevated/50 w-16 rounded-full"></div>
+          <div class="h-4 bg-surface-elevated/50 w-24 rounded-full"></div>
         </div>
-        <div class="h-6 bg-base-200 w-3/4 rounded"></div>
+        <div class="h-6 bg-surface-elevated/50 w-3/4 rounded"></div>
         <div class="space-y-2">
-          <div class="h-3 bg-base-200 w-full rounded"></div>
-          <div class="h-3 bg-base-200 w-5/6 rounded"></div>
-        </div>
-        <div class="flex gap-2 mt-auto pt-4 border-t border-base-200/50">
-          <div class="h-8 w-8 bg-base-200 rounded-full"></div>
-          <div class="h-4 w-24 bg-base-200 rounded my-auto"></div>
+          <div class="h-3 bg-surface-elevated/50 w-full rounded"></div>
+          <div class="h-3 bg-surface-elevated/50 w-5/6 rounded"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error()" class="alert alert-error shadow-lg rounded-xl mb-6 bg-error/10 border-error/20 text-error-content">
-    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+  <div *ngIf="error()"
+    class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 flex items-start gap-3 mb-6 animate-fade-in">
+    <i class="fa-solid fa-circle-exclamation text-lg mt-0.5"></i>
     <div class="flex-1">
-      <h3 class="font-bold">Error loading blogs</h3>
-      <div class="text-xs opacity-80">{{ error() }}</div>
+      <h3 class="font-bold text-sm">Error loading blogs</h3>
+      <div class="text-xs mt-1 opacity-90">{{ error() }}</div>
     </div>
-    <button class="btn btn-sm btn-ghost hover:bg-error/20" (click)="loadBlogs()">Retry</button>
+    <button class="text-xs font-semibold hover:underline" (click)="loadBlogs()">Retry</button>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading() && !error() && blogs().length === 0" class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-3xl border-2 border-dashed border-base-200 text-center">
-    <div class="w-24 h-24 bg-base-200/50 rounded-full flex items-center justify-center mb-6 text-base-content/20">
-      <i class="fa-regular fa-newspaper text-4xl"></i>
+  <div *ngIf="!isLoading() && !error() && blogs().length === 0"
+    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4">
+    <div class="w-24 h-24 bg-surface-elevated/50 rounded-full flex items-center justify-center mb-6 text-text-tertiary">
+      <i class="fa-regular fa-newspaper text-4xl opacity-50"></i>
     </div>
-    <h3 class="text-xl font-bold text-base-content">No blog posts found</h3>
-    <p class="text-base-content/60 max-w-xs mt-2 mb-8">Start sharing your thoughts with the world.</p>
-    <a routerLink="/blogs/add" class="btn btn-primary shadow-lg shadow-primary/20">Write First Post</a>
+    <h3 class="text-xl font-bold text-text-primary">No blog posts found</h3>
+    <p class="text-text-tertiary max-w-xs mt-2 mb-8">Start sharing your thoughts with the world.</p>
+    <a routerLink="/blogs/add"
+      class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20 text-sm font-medium transition-colors">Write
+      First Post</a>
   </div>
 
-  <!-- Blog Grid -->
-  <div *ngIf="!isLoading() && blogs().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    <div class="card bg-base-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-base-200/60 group flex flex-col h-full rounded-2xl overflow-hidden" *ngFor="let blog of blogs()">
-      
-      <!-- Image Area -->
-      <figure class="relative aspect-video overflow-hidden bg-base-200/50 shrink-0">
-        <img [src]="blog.coverImage || 'assets/images/placeholder-blog.jpg'" alt="Blog Cover" 
-             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-        
-        <!-- Category Badge -->
-        <div class="absolute top-3 left-3 z-10">
-          <span class="badge border-none shadow-sm font-semibold uppercase text-[10px] tracking-wider py-3 px-3 backdrop-blur-md bg-base-100/90 text-base-content hover:bg-base-100 transition-colors">
-            {{blog.category}}
-          </span>
-        </div>
+  <!-- Blog Grid (Scrollable) -->
+  <div *ngIf="!isLoading() && blogs().length > 0" class="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+      <div
+        class="glass-panel group flex flex-col h-full rounded-2xl overflow-hidden card-hover border border-border/50 bg-surface shadow-sm hover:shadow-md transition-all duration-300"
+        *ngFor="let blog of blogs()">
 
-        <!-- Status Badge -->
-        <div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
-            <span class="badge border-none shadow-sm font-bold uppercase text-[10px] tracking-wide py-3 px-3 backdrop-blur-md"
-                  [ngClass]="blog.status === 'published' ? 'bg-success/90 text-white' : 'bg-base-300/90 text-base-content'">
-                {{blog.status}}
-            </span>
-            <span *ngIf="blog.isFeatured" class="badge badge-secondary shadow-sm font-bold uppercase text-[10px] tracking-wide py-3 px-3 backdrop-blur-md border-none text-white">
-               <i class="fa-solid fa-star text-[9px] mr-1"></i> Featured
-            </span>
-        </div>
+        <!-- Image Area -->
+        <figure class="relative aspect-video overflow-hidden bg-surface-elevated shrink-0">
+          <img [src]="blog.coverImage || 'assets/images/placeholder-blog.jpg'" alt="Blog Cover"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
 
-        <!-- Hover Actions -->
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-            <a [routerLink]="['/blogs/edit', blog._id]" 
-               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110 shadow-xl" title="Edit">
-                <i class="fa-solid fa-pen"></i>
+          <!-- Category Badge -->
+          <div class="absolute top-3 left-3 z-10 pointer-events-none">
+            <span
+              class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-white shadow-sm font-semibold uppercase text-[10px] tracking-wider">
+              {{blog.category}}
+            </span>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end pointer-events-none">
+            <span
+              class="px-2.5 py-1 rounded-md shadow-sm font-bold uppercase text-[10px] tracking-wide backdrop-blur-md border border-white/10"
+              [ngClass]="blog.status === 'published' ? 'bg-emerald-500/90 text-white' : 'bg-surface/90 text-text-secondary'">
+              {{blog.status}}
+            </span>
+            <span *ngIf="blog.isFeatured"
+              class="px-2.5 py-1 rounded-md bg-amber-500/90 text-white shadow-sm font-bold uppercase text-[10px] tracking-wide backdrop-blur-md border border-white/10 flex items-center gap-1">
+              <i class="fa-solid fa-star text-[9px]"></i> Featured
+            </span>
+          </div>
+
+          <!-- Hover Actions -->
+          <div
+            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+            <a [routerLink]="['/blogs/edit', blog._id]"
+              class="btn btn-circle btn-sm bg-white/20 hover:bg-white text-white hover:text-black border-none backdrop-blur-md transition-all scale-90 hover:scale-110"
+              title="Edit">
+              <i class="fa-solid fa-pen text-sm"></i>
             </a>
-            <a [routerLink]="['/blogs/details', blog._id]" 
-               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110 shadow-xl" title="View Details">
-                <i class="fa-solid fa-eye"></i>
+            <a [routerLink]="['/blogs/details', blog._id]"
+              class="btn btn-circle btn-sm bg-white/20 hover:bg-white text-white hover:text-black border-none backdrop-blur-md transition-all scale-90 hover:scale-110"
+              title="View Details">
+              <i class="fa-solid fa-eye text-sm"></i>
             </a>
-        </div>
-      </figure>
+          </div>
+        </figure>
 
-      <!-- Content -->
-      <div class="card-body p-6 flex flex-col flex-1 gap-4">
-        
-        <!-- Tags -->
-        <div class="flex flex-wrap gap-1.5">
-            <span *ngFor="let tag of blog.tags.slice(0, 3)" 
-                  class="text-[10px] font-medium text-base-content/60 bg-base-200/50 px-2 py-1 rounded-md border border-base-200/50">
-                #{{tag}}
+        <!-- Content -->
+        <div class="p-5 flex flex-col flex-1 gap-3">
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1.5">
+            <span *ngFor="let tag of blog.tags.slice(0, 3)"
+              class="text-[10px] font-medium text-text-secondary bg-surface-elevated/50 border border-border/50 px-2 py-0.5 rounded-md">
+              #{{tag}}
             </span>
-            <span *ngIf="blog.tags.length > 3" class="text-[10px] font-medium text-base-content/40 px-1 py-1">+{{blog.tags.length - 3}}</span>
-        </div>
+            <span *ngIf="blog.tags.length > 3"
+              class="text-[10px] font-medium text-text-tertiary px-1 py-0.5">+{{blog.tags.length - 3}}</span>
+          </div>
 
-        <!-- Title & Excerpt -->
-        <div>
-          <h2 class="card-title text-lg font-bold leading-tight mb-2 group-hover:text-primary transition-colors">
-            <a [routerLink]="['/blogs/details', blog._id]" class="line-clamp-2" [title]="blog.title">{{blog.title}}</a>
-          </h2>
-          <p class="text-sm text-base-content/70 line-clamp-3 leading-relaxed">{{blog.excerpt}}</p>
-        </div>
+          <!-- Title & Excerpt -->
+          <div>
+            <h2
+              class="text-lg font-bold leading-tight mb-2 text-text-primary group-hover:text-primary transition-colors">
+              <a [routerLink]="['/blogs/details', blog._id]" class="line-clamp-2 hover:underline"
+                [title]="blog.title">{{blog.title}}</a>
+            </h2>
+            <p class="text-sm text-text-secondary line-clamp-3 leading-relaxed h-[60px]">{{blog.excerpt}}</p>
+          </div>
 
-        <div class="divider my-0 opacity-50"></div>
+          <div class="h-px w-full bg-border/50 mt-auto my-2"></div>
 
-        <!-- Footer Info & Actions -->
-        <div class="flex justify-between items-center mt-auto">
-           <div class="flex items-center gap-3">
+          <!-- Footer Info & Actions -->
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
               <div class="text-xs">
-                <p class="text-base-content/60 font-medium">{{blog.createdAt | date:'MMM d, y'}}</p>
+                <p class="text-text-tertiary font-medium flex items-center gap-1">
+                  <i class="fa-regular fa-calendar"></i>
+                  {{blog.createdAt | date:'MMM d, y'}}
+                </p>
               </div>
-           </div>
-
-           <!-- Actions -->
-           <div class="flex items-center gap-1">
-               <div class="flex items-center gap-3 text-xs text-base-content/40 mr-2">
-                   <span class="flex items-center gap-1" title="Views"><i class="fa-regular fa-eye"></i> {{blog.viewsCount || 0}}</span>
-               </div>
-               
-               <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn btn-ghost btn-circle btn-xs h-7 w-7 min-h-0 text-base-content/40 hover:text-base-content hover:bg-base-200 transition-colors"><i class="fa-solid fa-ellipsis"></i></label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 border border-base-200 text-sm">
-                    <li><a [routerLink]="['/blogs/edit', blog._id]"><i class="fa-solid fa-pen-to-square w-4"></i> Edit Post</a></li>
-                    <li><a class="text-error hover:bg-error/10" (click)="deleteBlog(blog._id!)"><i class="fa-solid fa-trash-can w-4"></i> Delete Post</a></li>
-                </ul>
             </div>
-           </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-1">
+              <div class="flex items-center gap-3 text-xs text-text-tertiary mr-2">
+                <span class="flex items-center gap-1" title="Views"><i class="fa-regular fa-eye"></i> {{blog.viewsCount
+                  ||
+                  0}}</span>
+              </div>
+
+              <div class="dropdown dropdown-end dropdown-top relative">
+                <button class="btn btn-ghost btn-xs w-7 h-7 min-h-0 px-0 text-text-tertiary hover:text-text-primary"
+                  title="Menu">
+                  <i class="fa-solid fa-ellipsis"></i>
+                </button>
+                <ul tabindex="0"
+                  class="dropdown-content z-[1] menu p-2 shadow-xl bg-surface-elevated rounded-box w-48 border border-border/50">
+                  <li>
+                    <a [routerLink]="['/blogs/edit', blog._id]" class="text-text-secondary hover:text-primary">
+                      <i class="fa-solid fa-pen-to-square w-4"></i> Edit Post
+                    </a>
+                  </li>
+                  <li>
+                    <a (click)="deleteBlog(blog._id!)" class="text-red-500 hover:bg-red-500/10">
+                      <i class="fa-solid fa-trash-can w-4"></i> Delete Post
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Pagination -->
-  <div *ngIf="!isLoading() && pagination()" class="mt-10 border-t border-base-200 pt-8">
-    <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
+    <!-- Pagination -->
+    <div *ngIf="!isLoading() && pagination()" class="mt-8 border-t border-border/50 pt-6 mb-8">
+      <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
   </div>
 </div>

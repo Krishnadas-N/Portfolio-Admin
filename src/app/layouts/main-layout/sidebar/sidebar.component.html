@@ -1,152 +1,197 @@
-<div class="h-full flex flex-col bg-base-100 text-base-content border-r border-base-200 transition-all duration-300 ease-in-out"
-     [class.w-80]="!isCollapsed()"
-     [class.w-20]="isCollapsed()">
-  
+<div class="h-full flex flex-col bg-transparent text-text-primary transition-all duration-300 ease-in-out"
+  [class.w-72]="!isCollapsed()" [class.w-20]="isCollapsed()">
+
   <!-- Header (Brand + Toggle) -->
-  <div class="h-16 flex items-center px-4 border-b border-base-200 relative shrink-0">
+  <div class="h-16 flex items-center px-4 border-b border-border/50 relative shrink-0">
     <!-- Logo & Text -->
     <div class="flex items-center gap-3 overflow-hidden whitespace-nowrap transition-all duration-300"
-         [class.w-auto]="!isCollapsed()"
-         [class.w-0]="isCollapsed()"
-         [class.opacity-0]="isCollapsed()"
-         [class.mr-0]="isCollapsed()">
-      <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary-focus flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary/30">
-        P
+      [class.w-auto]="!isCollapsed()" [class.w-10]="isCollapsed()" [class.mr-0]="isCollapsed()">
+
+      <div
+        class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary/20 ring-1 ring-white/10 relative group cursor-pointer overflow-hidden">
+        <div
+          class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+        </div>
+        <span class="relative z-10">P</span>
       </div>
-      <div>
-        <div class="text-[0.9375rem] font-bold leading-tight text-base-content">
+
+      <div class="transition-all duration-300 origin-left" [class.opacity-0]="isCollapsed()"
+        [class.scale-90]="isCollapsed()" [class.hidden]="isCollapsed()">
+        <div class="text-base font-bold leading-tight text-text-primary tracking-tight">
           Portfolio
         </div>
-        <div class="text-[0.625rem] font-semibold uppercase tracking-wider text-base-content/60 mt-px">
-          Admin
+        <div class="text-[0.65rem] font-semibold uppercase tracking-widest text-text-tertiary">
+          Admin Console
         </div>
       </div>
     </div>
 
-    <!-- Toggle Button (Absolute to stay fixed) -->
-    <button
-        (click)="toggleCollapse()"
-        class="btn btn-sm btn-ghost btn-square
-              text-base-content/60
+    <!-- Toggle Button -->
+    <button (click)="toggleCollapse()"
+      class="btn btn-sm btn-ghost btn-square
+              text-text-secondary
               hover:text-primary
               hover:bg-primary/10
-              transition-colors
-              absolute right-2 top-1/2 -translate-y-1/2"
-        [attr.title]="isCollapsed() ? 'Expand' : 'Collapse'"
-      >
-        <i
-          class="fa-solid text-lg transition-transform duration-300"
-          [class.fa-angles-left]="!isCollapsed()"
-          [class.fa-bars]="isCollapsed()"
-        ></i>
-      </button>
-
+              transition-all duration-300
+              absolute -right-3 top-1/2 -translate-y-1/2
+              z-50 bg-surface border border-border/50 shadow-sm rounded-full w-6 h-6 flex items-center justify-center backdrop-blur-md hidden lg:flex"
+      [attr.title]="isCollapsed() ? 'Expand' : 'Collapse'">
+      <i class="fa-solid fa-chevron-left text-xs transition-transform duration-300"
+        [class.rotate-180]="isCollapsed()"></i>
+    </button>
   </div>
 
   <!-- Navigation -->
-  <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3 custom-scrollbar">
-    <ul class="menu w-full p-0 gap-1">
-      <ng-container *ngFor="let item of menuItems">
-        
-        <!-- Section Header -->
-        <li *ngIf="item.type === 'header'" 
-            class="menu-title text-xs font-bold uppercase tracking-widest text-base-content/50 mt-4 mb-1 px-3 whitespace-nowrap overflow-hidden transition-all duration-300"
-            [class.opacity-0]="isCollapsed()"
-            [class.h-0]="isCollapsed()"
-            [class.mt-0]="isCollapsed()"
-            [class.mb-0]="isCollapsed()">
-          {{ item.title }}
-        </li>
+  <nav class="flex-1 overflow-y-auto overflow-x-hidden p-3 custom-scrollbar space-y-1">
 
-        <!-- Single Link -->
-        <li *ngIf="item.type === 'link' && item.path">
-          <a [routerLink]="item.path" 
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{exact: false}"
-             class="group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-base-content/70 hover:bg-base-200 hover:text-base-content transition-all duration-200 relative overflow-hidden"
-             [attr.title]="isCollapsed() ? item.title : ''">
-            
-            <div class="w-5 flex justify-center shrink-0">
-               <i [class]="item.icon" class="text-center text-lg transition-colors group-hover:text-primary"></i>
-            </div>
+    <!-- Collapsed State: Flatten Everything -->
+    <ng-container *ngIf="isCollapsed()">
+      <div class="flex flex-col gap-2 pt-2">
+        <ng-container *ngFor="let item of menuItems">
 
-            <span class="flex-1 whitespace-nowrap transition-all duration-300 origin-left"
-                  [class.opacity-0]="isCollapsed()"
-                  [class.translate-x-4]="isCollapsed()"
-                  [class.w-0]="isCollapsed()">{{ item.title }}</span>
-            
+          <!-- Header (Divider) -->
+          <div *ngIf="item.type === 'header'" class="px-2 py-1">
+            <div class="h-px bg-border/50 w-full mx-auto"></div>
+          </div>
+
+          <!-- Direct Link -->
+          <div *ngIf="item.type === 'link' && item.path" class="relative group px-2">
+            <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}"
+              class="flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50 transition-all duration-200 group-[.active]:bg-primary/10 group-[.active]:text-primary relative"
+              [attr.title]="item.title">
+              <i [class]="item.icon"
+                class="text-lg transition-colors group-hover:text-primary group-[.active]:text-primary"></i>
+            </a>
+
             <!-- Tooltip -->
-            <div *ngIf="isCollapsed()" class="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2 py-1 bg-base-300 rounded text-xs font-medium text-base-content whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity shadow-sm">
+            <div
+              class="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-surface-elevated text-text-primary text-xs font-medium rounded-md shadow-lg border border-border/50 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap">
               {{ item.title }}
             </div>
-          </a>
-        </li>
+          </div>
 
-        <!-- Group -->
-        <li *ngIf="item.type === 'group'">
-          <details [open]="!isCollapsed() && isGroupOpen(item.title)" class="group/details">
-            <summary (click)="toggleGroup(item.title)" 
-                     class="group flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-base-content/70 hover:bg-base-200 hover:text-base-content transition-all duration-200 select-none overflow-hidden relative">
-              
-              <div class="w-5 flex justify-center shrink-0">
-                  <i [class]="item.icon" class="text-center text-lg transition-colors group-hover:text-primary"></i>
+          <!-- Group (Flattened Children) -->
+          <ng-container *ngIf="item.type === 'group'">
+            <div *ngFor="let sub of item.children" class="relative group px-2">
+              <a [routerLink]="sub.path" routerLinkActive="active"
+                class="flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50 transition-all duration-200 group-[.active]:bg-primary/10 group-[.active]:text-primary relative"
+                [attr.title]="sub.title">
+                <i [class]="sub.icon"
+                  class="text-lg transition-colors group-hover:text-primary group-[.active]:text-primary"></i>
+              </a>
+
+              <!-- Tooltip -->
+              <div
+                class="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-surface-elevated text-text-primary text-xs font-medium rounded-md shadow-lg border border-border/50 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 whitespace-nowrap">
+                {{ sub.title }}
+              </div>
+            </div>
+          </ng-container>
+
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <!-- Expanded State -->
+    <ng-container *ngIf="!isCollapsed()">
+      <div class="flex flex-col gap-1 px-3 pb-4">
+        <ng-container *ngFor="let item of menuItems">
+
+          <!-- Section Header -->
+          <div *ngIf="item.type === 'header'"
+            class="px-3 mt-6 mb-1 text-xs font-bold text-text-tertiary uppercase tracking-widest opacity-80">
+            {{ item.title }}
+          </div>
+
+          <!-- Single Link -->
+          <div *ngIf="item.type === 'link' && item.path">
+            <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}"
+              class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-surface-elevated hover:text-text-primary group-[.active]:bg-primary/10 group-[.active]:text-primary">
+
+              <div
+                class="w-5 flex justify-center shrink-0 text-lg opacity-80 transition-opacity group-hover:opacity-100 group-[.active]:opacity-100">
+                <i [class]="item.icon"></i>
               </div>
 
-              <span class="flex-1 whitespace-nowrap transition-all duration-300 origin-left"
-                    [class.opacity-0]="isCollapsed()"
-                    [class.translate-x-4]="isCollapsed()"
-                    [class.w-0]="isCollapsed()">{{ item.title }}</span>
-              
-              <i *ngIf="!isCollapsed()" 
-                 class="fa-solid fa-chevron-right text-[0.6rem] transition-transform duration-200 group-open/details:rotate-90"></i>
-            </summary>
-            
-            <ul class="mt-1 ml-2 border-l border-base-200 pl-2 before:hidden"
-                [class.hidden]="isCollapsed()">
-              <li *ngFor="let sub of item.children">
-                <a [routerLink]="sub.path"
-                   routerLinkActive="active"
-                   class="flex items-center gap-2 px-3 py-2 rounded-lg text-[0.8125rem] text-base-content/60 hover:bg-base-200 hover:text-base-content transition-all duration-200">
-                  <span class="nav-dot w-1.5 h-1.5 rounded-full bg-base-300 mr-2 group-[.active]:bg-primary transition-colors"></span>
-                  <span>{{ sub.title }}</span>
-                </a>
-              </li>
-            </ul>
-          </details>
-        </li>
+              <span class="flex-1 tracking-wide truncate">
+                {{ item.title }}
+              </span>
 
-      </ng-container>
-    </ul>
+              <!-- Active Pill -->
+              <div class="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-[.active]:opacity-100 transition-opacity">
+              </div>
+            </a>
+          </div>
+
+          <!-- Group -->
+          <div *ngIf="item.type === 'group'">
+            <div class="flex flex-col rounded-xl transition-colors duration-200"
+              [class.bg-surface-elevated-05]="isGroupOpen(item.title)">
+
+              <!-- Group Toggle -->
+              <div (click)="toggleGroup(item.title)"
+                class="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all duration-200 select-none"
+                [class.text-text-primary]="isGroupOpen(item.title)">
+
+                <div
+                  class="w-5 flex justify-center shrink-0 text-lg opacity-80 transition-opacity group-hover:opacity-100">
+                  <i [class]="item.icon"></i>
+                </div>
+
+                <span class="flex-1 tracking-wide truncate">{{ item.title }}</span>
+
+                <i class="fa-solid fa-chevron-right text-[0.65rem] text-text-tertiary transition-transform duration-300"
+                  [class.rotate-90]="isGroupOpen(item.title)"></i>
+              </div>
+
+              <!-- Children -->
+              <div *ngIf="isGroupOpen(item.title)" class="flex flex-col gap-0.5 mt-0.5 mb-1 animate-fade-in-down">
+                <a *ngFor="let sub of item.children" [routerLink]="sub.path" routerLinkActive="active"
+                  class="group/sub flex items-center gap-3 pl-11 pr-3 py-2 rounded-lg text-[0.85rem] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50 transition-all duration-200 group-[.active]:text-primary">
+
+                  <div
+                    class="w-4 flex justify-center shrink-0 text-sm opacity-60 transition-opacity group-hover/sub:opacity-100 group-[.active]:opacity-100">
+                    <i [class]="sub.icon"></i>
+                  </div>
+
+                  <span class="truncate">{{ sub.title }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+    </ng-container>
   </nav>
 
   <!-- User Profile -->
-  <div class="p-4 border-t border-base-200 bg-base-50/50 shrink-0">
-    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-100 transition-all duration-200 group cursor-pointer overflow-hidden relative"
-         [class.justify-center]="isCollapsed()">
+  <div class="p-4 border-t border-border/50">
+    <div
+      class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-elevated/50 transition-all duration-200 group cursor-pointer relative"
+      [class.justify-center]="isCollapsed()">
+
       <div class="relative shrink-0">
-        <img class="w-10 h-10 rounded-lg object-cover border-2 border-base-100 shadow-sm" 
-             [src]="user()?.profileImage || 'assets/images/profile.png'" 
-             alt="">
-        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-base-100"></div>
+        <img class="w-9 h-9 rounded-lg object-cover ring-2 ring-surface"
+          [src]="user()?.profileImage || 'assets/images/profile.png'" alt="">
+        <span
+          class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-surface"></span>
       </div>
-      
-      <div class="flex-1 min-w-0 transition-all duration-300 whitespace-nowrap"
-           [class.opacity-0]="isCollapsed()"
-           [class.translate-x-4]="isCollapsed()"
-           [class.w-0]="isCollapsed()">
-        <p class="text-sm font-semibold text-base-content truncate group-hover:text-primary transition-colors">
-          {{ user()?.username || 'Admin' }}
+
+      <div class="flex-1 min-w-0 transition-all duration-300" [class.opacity-0]="isCollapsed()"
+        [class.hidden]="isCollapsed()">
+        <p class="text-sm font-semibold text-text-primary truncate">
+          {{ user()?.username || 'Admin User' }}
         </p>
-        <p class="text-xs text-base-content/60 truncate">
+        <p class="text-xs text-text-tertiary truncate">
           {{ user()?.role || 'Administrator' }}
         </p>
       </div>
-      
-      <button (click)="logout()" 
-              *ngIf="!isCollapsed()"
-              class="p-2 rounded-lg text-base-content/40 hover:text-error hover:bg-error/10 transition-colors shrink-0"
-              title="Logout">
-        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+
+      <button (click)="logout()" *ngIf="!isCollapsed()"
+        class="w-8 h-8 flex items-center justify-center rounded-lg text-text-tertiary hover:text-red-500 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+        title="Logout">
+        <i class="fa-solid fa-power-off text-sm"></i>
       </button>
     </div>
   </div>

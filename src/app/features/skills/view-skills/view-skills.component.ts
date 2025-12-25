@@ -1,19 +1,15 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { SkillService } from '../../../core/services/skill.service';
 import { Skill } from '../../../core/models/api.models';
 import { finalize } from 'rxjs/operators';
 
-interface SkillCategory {
-  name: string;
-  skills: (Skill & { showMenu?: boolean })[];
-}
-
 @Component({
   selector: 'app-view-skills',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './view-skills.component.html',
   styleUrl: './view-skills.component.scss',
 })
@@ -21,11 +17,51 @@ export class ViewSkillsComponent implements OnInit {
   private skillService = inject(SkillService);
 
   skills = signal<Skill[]>([]);
-  groupedSkills = signal<SkillCategory[]>([]);
+
+  // Filtering Logic
+  categories = signal<string[]>(['All']);
+  activeTab = signal<string>('All');
+  filteredSkills = signal<Skill[]>([]);
+
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
+  searchTerm = signal<string>('');
 
   defaultLogo = 'assets/images/placeholder-skill.png';
+
+  constructor() {
+    // React to search term or tab changes
+    effect(() => {
+      const term = this.searchTerm().toLowerCase();
+      const tab = this.activeTab();
+      const allSkills = this.skills();
+
+      if (allSkills.length === 0 && !this.isLoading()) {
+        this.filteredSkills.set([]);
+        return;
+      }
+
+      let filtered = allSkills;
+
+      // 1. Filter by Tab
+      if (tab !== 'All') {
+        filtered = filtered.filter(s => (s.category || 'Other') === tab);
+      }
+
+      // 2. Filter by Search
+      if (term) {
+        filtered = filtered.filter(s => s.name.toLowerCase().includes(term));
+      }
+
+      // Prepare list with UI props (ensure proficiency exists)
+      const processed = filtered.map(s => ({
+        ...s,
+        proficiency: s.proficiency || this.getProficiencyFromLevel(s.level)
+      }));
+
+      this.filteredSkills.set(processed);
+    }, { allowSignalWrites: true });
+  }
 
   ngOnInit(): void {
     this.loadSkills();
@@ -33,13 +69,13 @@ export class ViewSkillsComponent implements OnInit {
 
   loadSkills() {
     this.isLoading.set(true);
-    this.skillService.getSkills({ limit: 100 }).pipe( // Fetch all for grouping
+    this.skillService.getSkills({ limit: 100 }).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.skills.set(res.data);
-          this.groupSkills(res.data);
+          this.extractCategories(res.data);
         }
       },
       error: (err) => {
@@ -49,33 +85,22 @@ export class ViewSkillsComponent implements OnInit {
     });
   }
 
-  groupSkills(skills: Skill[]) {
-    const groups: Record<string, Skill[]> = {};
-    
-    skills.forEach(skill => {
-      const category = skill.category || 'Other';
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push({ ...skill });
+  extractCategories(skills: Skill[]) {
+    const cats = new Set<string>(['All']);
+    skills.forEach(s => {
+      if (s.category) cats.add(s.category);
     });
-
-    const categories: SkillCategory[] = Object.keys(groups).map(name => ({
-      name,
-      skills: groups[name]
-    }));
-
-    this.groupedSkills.set(categories);
+    // Sort: All first, then alphabetically
+    const sorted = Array.from(cats).sort((a, b) => {
+      if (a === 'All') return -1;
+      if (b === 'All') return 1;
+      return a.localeCompare(b);
+    });
+    this.categories.set(sorted);
   }
 
-  toggleMenu(skill: any) {
-    // Close other menus
-    this.groupedSkills().forEach(cat => {
-      cat.skills.forEach(s => {
-        if (s !== skill) s.showMenu = false;
-      });
-    });
-    skill.showMenu = !skill.showMenu;
+  setTab(tab: string) {
+    this.activeTab.set(tab);
   }
 
   deleteSkill(skill: Skill) {
@@ -83,11 +108,25 @@ export class ViewSkillsComponent implements OnInit {
       this.skillService.deleteSkill(skill._id).subscribe({
         next: (res) => {
           if (res.success) {
-            this.loadSkills(); // Reload to refresh groups
+            // Remove from local state to update UI immediately
+            this.skills.update(current => current.filter(s => s._id !== skill._id));
+
+            // Re-extract categories in case a category is now empty
+            this.extractCategories(this.skills());
           }
         },
         error: (err) => console.error('Error deleting skill', err)
       });
+    }
+  }
+
+  private getProficiencyFromLevel(level: string): number {
+    switch (level?.toLowerCase()) {
+      case 'expert': return 100;
+      case 'advanced': return 85;
+      case 'intermediate': return 60;
+      case 'beginner': return 35;
+      default: return 50;
     }
   }
 }

@@ -1,141 +1,215 @@
-<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
-  
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 bg-base-100/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-base-200 sm:border-none">
+<div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 shrink-0">
     <div>
-      <h1 class="text-3xl font-bold text-base-content tracking-tight">Education</h1>
-      <p class="text-base-content/60 text-sm mt-1">Manage your academic background and qualifications.</p>
+      <h1 class="text-3xl font-bold text-text-primary tracking-tight">Education</h1>
+      <p class="text-text-secondary text-sm mt-1">Manage your academic background and qualifications.</p>
     </div>
-    
-    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-      <div class="join w-full sm:w-auto shadow-sm">
-        <div class="relative w-full sm:w-64">
-          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" 
-                 placeholder="Search education..." 
-                 class="input input-bordered join-item w-full pl-10 focus:input-primary transition-all bg-base-100 placeholder:text-base-content/40" />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"></i>
-        </div>
-        <button (click)="onSearch()" class="btn btn-primary join-item px-6">Search</button>
+
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <!-- Search Input -->
+      <div class="relative w-full sm:w-72 group">
+        <i
+          class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()"
+          placeholder="Search education..."
+          class="w-full pl-10 pr-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" />
       </div>
-      
-      <a routerLink="/education/add" class="btn btn-primary shadow-lg shadow-primary/20 shrink-0 gap-2">
-        <i class="fa-solid fa-plus"></i> Add New
+
+      <button (click)="onSearch()"
+        class="px-5 py-2.5 rounded-xl bg-surface border border-border text-text-primary hover:bg-surface-elevated hover:border-primary/50 transition-all text-sm font-medium shadow-sm">
+        Search
+      </button>
+
+      <!-- Add Button -->
+      <a routerLink="/education/add"
+        class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center justify-center gap-2 transform active:scale-95">
+        <i class="fa-solid fa-plus"></i>
+        <span class="hidden sm:inline">Add New</span>
+        <span class="sm:hidden">Add</span>
       </a>
     </div>
   </div>
 
   <!-- Loading State -->
   <div *ngIf="isLoading()" class="space-y-6">
-    <div *ngFor="let i of [1,2,3]" class="card bg-base-100 shadow-sm border border-base-200 p-6 animate-pulse">
+    <div *ngFor="let i of [1,2,3]" class="glass-panel rounded-2xl p-6 animate-pulse border border-border/50">
       <div class="flex gap-4">
-        <div class="h-16 w-16 bg-base-200 rounded-xl"></div>
+        <div class="h-16 w-16 bg-surface-elevated/50 rounded-xl"></div>
         <div class="flex-1 space-y-2">
-          <div class="h-6 bg-base-200 w-1/3 rounded"></div>
-          <div class="h-4 bg-base-200 w-1/4 rounded"></div>
-          <div class="h-4 bg-base-200 w-1/2 rounded"></div>
+          <div class="h-6 bg-surface-elevated/50 w-1/3 rounded"></div>
+          <div class="h-4 bg-surface-elevated/50 w-1/4 rounded"></div>
+          <div class="h-4 bg-surface-elevated/50 w-1/2 rounded"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!isLoading() && !error() && educations().length === 0" class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-3xl border-2 border-dashed border-base-200 text-center">
-    <div class="w-24 h-24 bg-base-200/50 rounded-full flex items-center justify-center mb-6 text-base-content/20">
-      <i class="fa-solid fa-graduation-cap text-4xl"></i>
+  <!-- Error State -->
+  <div *ngIf="error()"
+    class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 flex items-start gap-3 mb-6 animate-fade-in">
+    <i class="fa-solid fa-circle-exclamation text-lg mt-0.5"></i>
+    <div class="flex-1">
+      <h3 class="font-bold text-sm">Error loading education</h3>
+      <div class="text-xs mt-1 opacity-90">{{ error() }}</div>
     </div>
-    <h3 class="text-xl font-bold text-base-content">No education added</h3>
-    <p class="text-base-content/60 max-w-xs mt-2 mb-8">Add your educational background to complete your profile.</p>
-    <a routerLink="/education/add" class="btn btn-primary">Add Education</a>
+    <button class="text-xs font-semibold hover:underline" (click)="loadEducation()">Retry</button>
   </div>
 
-  <!-- Timeline Layout -->
-  <div *ngIf="!isLoading() && educations().length > 0" class="relative pl-8 sm:pl-10 space-y-8">
-    
-    <!-- Timeline Line -->
-    <div class="absolute left-3 sm:left-4 top-4 bottom-4 w-0.5 bg-base-300"></div>
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && !error() && educations().length === 0"
+    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4">
+    <div class="w-24 h-24 bg-surface-elevated/50 rounded-full flex items-center justify-center mb-6 text-text-tertiary">
+      <i class="fa-solid fa-graduation-cap text-4xl opacity-50"></i>
+    </div>
+    <h3 class="text-xl font-bold text-text-primary">No education added</h3>
+    <p class="text-text-tertiary max-w-xs mt-2 mb-8">Add your academic qualifications to your profile.</p>
+    <a routerLink="/education/add"
+      class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20 text-sm font-medium transition-colors">Add
+      Education</a>
+  </div>
 
-    <div *ngFor="let edu of educations()" class="relative group">
-      <!-- Timeline Dot -->
-      <div class="absolute -left-[29px] sm:-left-[33px] top-6 w-4 h-4 rounded-full bg-primary border-4 border-base-100 shadow-sm z-10 group-hover:scale-125 transition-transform duration-300"></div>
+  <!-- Education Timeline (Split Layout) -->
+  <div *ngIf="!isLoading() && educations().length > 0" class="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-10">
+    <div class="max-w-5xl mx-auto px-4">
 
-      <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all duration-300 border border-base-200/60 overflow-hidden">
-        <div class="card-body p-6">
-          <div class="flex flex-col sm:flex-row gap-6">
-            
-            <!-- Logo -->
-            <div class="w-16 h-16 rounded-xl bg-base-200/50 border border-base-200 p-2 shrink-0 flex items-center justify-center overflow-hidden">
-               <img [src]="edu.logo || 'assets/images/placeholder-edu.png'" [alt]="edu.institution" class="w-full h-full object-contain" />
+      <div *ngFor="let edu of educations(); let isLast = last"
+        class="relative group grid grid-cols-[auto_1fr] md:grid-cols-[180px_auto_1fr] gap-6 md:gap-10">
+
+        <!-- Left Column: Dates (Hidden on mobile) -->
+        <div class="hidden md:flex flex-col items-end pt-5 text-right">
+          <div class="font-bold text-lg text-text-primary tracking-tight leading-none">
+            {{ edu.startDate | date:'MMM y' }}
+          </div>
+          <div class="text-xs font-medium text-text-tertiary uppercase tracking-wider mt-1.5 mb-1">to</div>
+          <div class="font-bold text-lg text-text-primary tracking-tight leading-none"
+            [class.text-primary]="edu.isCurrent">
+            {{ edu.isCurrent ? 'Present' : (edu.endDate | date:'MMM y') }}
+          </div>
+        </div>
+
+        <!-- Center Column: Line & Node -->
+        <div class="relative flex flex-col items-center">
+          <!-- Vertical Line -->
+          <div class="flex-1 w-px bg-border/60 group-hover:bg-primary/30 transition-colors" *ngIf="!isLast"></div>
+          <div class="h-full w-px bg-transparent" *ngIf="isLast"></div>
+
+          <!-- Node Icon -->
+          <div class="absolute top-5 z-10">
+            <div
+              class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface box-content shadow-[0_0_0_1px_rgba(var(--color-border),0.5)] group-hover:scale-125 transition-transform duration-300">
             </div>
+          </div>
+        </div>
 
-            <!-- Content -->
-            <div class="flex-1 min-w-0 space-y-2">
-              <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div>
-                  <h2 class="text-xl font-bold text-base-content leading-tight">{{ edu.degree }}</h2>
-                  <p class="text-base font-medium text-primary mt-1">{{ edu.institution }}</p>
-                  <p class="text-sm text-base-content/60">{{ edu.fieldOfStudy }} <span *ngIf="edu.gpa" class="mx-1">•</span> {{ edu.gpa }}</p>
+        <!-- Right Column: Card Content -->
+        <div class="pb-12 md:pt-2">
+          <div
+            class="glass-panel rounded-2xl border border-border/50 bg-surface/50 hover:bg-surface transition-all duration-300 overflow-hidden group-hover:shadow-lg group-hover:shadow-primary/5 group-hover:border-primary/20">
+
+            <div class="p-6 md:p-8 flex flex-col gap-6">
+              <!-- Header Group -->
+              <div class="flex gap-4 md:gap-5">
+                <!-- Logo -->
+                <div
+                  class="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-xl bg-surface-elevated border border-border p-2 flex items-center justify-center overflow-hidden">
+                  <img [src]="edu.logo || 'assets/images/placeholder-edu.png'" [alt]="edu.institution"
+                    class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal opacity-90" />
                 </div>
-                
-                <div class="flex flex-col sm:items-end gap-2 shrink-0">
-                   <div class="badge badge-lg bg-base-200 border-none font-medium text-xs">
-                      {{ edu.startDate | date:'MMM y' }} - {{ edu.isCurrent ? 'Present' : (edu.endDate | date:'MMM y') }}
-                   </div>
-                   <span class="text-xs text-base-content/50 flex items-center gap-1" *ngIf="edu.location">
+
+                <!-- Title Block -->
+                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                  <h3
+                    class="text-xl md:text-2xl font-bold text-text-primary leading-tight group-hover:text-primary transition-colors">
+                    {{ edu.degree }}
+                  </h3>
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                    <span class="text-lg font-medium text-text-secondary">{{ edu.institution }}</span>
+
+                    <!-- Mobile Date (Inline) -->
+                    <span
+                      class="md:hidden text-xs font-semibold text-text-tertiary bg-surface-elevated px-2 py-0.5 rounded">
+                      {{ edu.startDate | date:'MMM y' }} - {{ edu.isCurrent ? 'Present' : (edu.endDate | date:'MMM y')
+                      }}
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-3 mt-2 text-xs font-medium text-text-tertiary">
+                    <span class="text-text-secondary font-semibold" *ngIf="edu.fieldOfStudy">{{ edu.fieldOfStudy
+                      }}</span>
+                    <span class="w-1 h-1 rounded-full bg-current opacity-30" *ngIf="edu.location"></span>
+                    <span class="flex items-center gap-1.5" *ngIf="edu.location">
                       <i class="fa-solid fa-location-dot"></i> {{ edu.location }}
-                   </span>
-                   <a *ngIf="edu.website" [href]="edu.website" target="_blank" class="text-xs text-primary flex items-center gap-1 hover:underline">
-                      <i class="fa-solid fa-link"></i> Website
-                   </a>
+                    </span>
+                    <span class="w-1 h-1 rounded-full bg-current opacity-30" *ngIf="edu.gpa"></span>
+                    <span *ngIf="edu.gpa" class="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded">GPA: {{
+                      edu.gpa }}</span>
+                  </div>
                 </div>
               </div>
+
+              <!-- Divider -->
+              <div class="h-px bg-border/40 w-full"></div>
 
               <!-- Description -->
-              <p class="text-sm text-base-content/70 leading-relaxed mt-4 bg-base-50/50 p-3 rounded-lg border border-base-100" *ngIf="edu.description">
-                 {{ edu.description }}
-              </p>
+              <div class="text-sm md:text-[15px] leading-relaxed text-text-secondary whitespace-pre-wrap"
+                *ngIf="edu.description">
+                {{ edu.description }}
+              </div>
 
               <!-- Achievements -->
-              <div *ngIf="edu.achievements && edu.achievements.length > 0" class="mt-4">
-                 <span class="text-xs font-bold text-base-content/40 uppercase tracking-wider block mb-2">Achievements</span>
-                 <ul class="list-disc list-outside ml-4 space-y-1">
-                    <li *ngFor="let achieve of edu.achievements" class="text-sm text-base-content/70 pl-1">{{ achieve }}</li>
-                 </ul>
+              <div *ngIf="edu.achievements && edu.achievements.length > 0">
+                <h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-2">Key Achievements</h4>
+                <ul class="space-y-1.5">
+                  <li *ngFor="let item of edu.achievements" class="flex items-start gap-2 text-sm text-text-secondary">
+                    <i class="fa-solid fa-check text-primary mt-1 text-xs"></i>
+                    <span>{{ item }}</span>
+                  </li>
+                </ul>
               </div>
 
-              <!-- Skills & Activities -->
-              <div class="flex flex-wrap gap-4 mt-4 pt-4 border-t border-base-200/50">
-                 <div *ngIf="edu.gpa">
-                    <span class="text-xs font-bold text-base-content/40 uppercase tracking-wider block mb-2">GPA</span>
-                    <span class="badge badge-sm badge-outline font-mono">{{ edu.gpa }}</span>
-                 </div>
-                 <div *ngIf="edu.skills && edu.skills.length > 0">
-                    <span class="text-xs font-bold text-base-content/40 uppercase tracking-wider block mb-2">Skills</span>
-                    <div class="flex flex-wrap gap-1.5">
-                       <span *ngFor="let skill of edu.skills || []" class="badge badge-sm bg-primary/10 text-primary border-primary/10">
-                          {{ skill }}
-                       </span>
-                    </div>
-                 </div>
-                 
-                  <div *ngIf="edu.activities && edu.activities.length > 0">
-                    <span class="text-xs font-bold text-base-content/40 uppercase tracking-wider block mb-2">Activities</span>
-                    <div class="flex flex-wrap gap-1.5">
-                       <span *ngFor="let activity of edu.activities" class="badge badge-sm badge-ghost">
-                          {{ activity }}
-                       </span>
-                    </div>
-                 </div>
+              <!-- Skills & Activities Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <!-- Skills -->
+                <div *ngIf="edu.skills?.length">
+                  <h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-2">Skills</h4>
+                  <div class="flex flex-wrap gap-2">
+                    <span *ngFor="let skill of edu.skills"
+                      class="text-xs font-medium text-text-primary bg-surface-elevated/50 border border-border/60 px-2.5 py-1 rounded-md">
+                      {{ skill }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Activities -->
+                <div *ngIf="edu.activities?.length">
+                  <h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-2">Activities</h4>
+                  <div class="flex flex-wrap gap-2">
+                    <span *ngFor="let act of edu.activities"
+                      class="text-xs font-medium text-text-secondary bg-surface border border-border/40 px-2.5 py-1 rounded-md">
+                      {{ act }}
+                    </span>
+                  </div>
+                </div>
               </div>
+
             </div>
 
-            <!-- Actions -->
-            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
-               <a [routerLink]="['/education/edit', edu._id]" class="btn btn-sm btn-square btn-ghost hover:bg-base-200" title="Edit">
-                  <i class="fa-solid fa-pen-to-square"></i>
-               </a>
-               <button (click)="deleteEducation(edu._id!)" class="btn btn-sm btn-square btn-ghost text-error hover:bg-error/10" title="Delete">
-                  <i class="fa-regular fa-trash-can"></i>
-               </button>
+            <!-- Action Bar (Reveals on Hover) -->
+            <div
+              class="bg-surface-elevated/30 border-t border-border/50 px-6 py-2.5 flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <a *ngIf="edu.website" [href]="edu.website" target="_blank"
+                class="mr-auto text-xs font-semibold text-primary hover:underline flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website
+              </a>
+              <a [routerLink]="['/education/edit', edu._id]"
+                class="text-xs font-semibold text-text-secondary hover:text-primary flex items-center gap-1.5 px-2 py-1 rounded hover:bg-surface-elevated transition-colors">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </a>
+              <button (click)="deleteEducation(edu._id!)"
+                class="text-xs font-semibold text-text-secondary hover:text-error flex items-center gap-1.5 px-2 py-1 rounded hover:bg-surface-elevated transition-colors">
+                <i class="fa-regular fa-trash-can"></i> Delete
+              </button>
             </div>
 
           </div>
@@ -145,7 +219,7 @@
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="!isLoading() && pagination()" class="mt-10 pt-6">
+  <div *ngIf="!isLoading() && pagination()" class="mt-2 border-t border-border/50 pt-6 mb-8 shrink-0">
     <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
   </div>
 </div>

@@ -1,47 +1,60 @@
-<div class="tap-top"><i class="iconly-Arrow-Up icli"></i></div>
+<div
+    class="h-screen w-full bg-background text-text-primary font-sans antialiased overflow-hidden flex selection:bg-primary/30">
 
-<div class="page-wrapper compact-wrapper" id="pageWrapper">
-  <app-header></app-header>
-  <!-- Page Body Start-->
-  <div class="page-body-wrapper">
-    <!-- Page sidebar start-->
-    <app-sidebar></app-sidebar>
-    <!-- Page sidebar end-->
-    <div class="page-body">
-        
+    <!-- Mobile Drawer Overlay -->
+    <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none peer-checked:opacity-100 peer-checked:pointer-events-auto"
+        onclick="document.getElementById('drawer-toggle').checked = false"></div>
 
-<nav class="flex mb-3" aria-label="Breadcrumb">
-  <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
-    <li class="inline-flex items-center">
-      <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
-        <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
-        </svg>
-        Home
-      </a>
-    </li>
-    <li>
-      <div class="flex items-center">
-        <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-        </svg>
-        <a href="#" class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">Projects</a>
-      </div>
-    </li>
-    <li aria-current="page">
-      <div class="flex items-center">
-        <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-        </svg>
-        <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">Flowbite</span>
-      </div>
-    </li>
-  </ol>
-</nav>
+    <!-- Mobile Sidebar (Off-canvas) -->
+    <!-- Note: We use the same sidebar component. Logic needs to handle the toggle state. 
+         Input hack for pure CSS toggle. 
+    -->
+    <input type="checkbox" id="drawer-toggle" class="drawer-toggle hidden peer" />
+    <aside
+        class="fixed inset-y-0 left-0 z-50 w-72 h-full bg-surface-glass border-r border-border backdrop-blur-2xl transition-transform duration-300 transform -translate-x-full peer-checked:translate-x-0 lg:hidden shadow-2xl">
+        <div class="h-full flex flex-col relative">
+            <button onclick="document.getElementById('drawer-toggle').checked = false"
+                class="absolute top-4 right-4 btn btn-sm btn-circle btn-ghost text-text-secondary z-50 hover:bg-surface-elevated/50">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <app-sidebar class="h-full w-full block"></app-sidebar>
+        </div>
+    </aside>
 
-        <router-outlet> </router-outlet>
-        
+    <!-- Desktop Sidebar -->
+    <aside
+        class="hidden lg:block h-full z-40 bg-surface-glass border-r border-border/50 backdrop-blur-xl shrink-0 transition-all duration-300 ease-in-out relative">
+        <app-sidebar class="h-full w-full block"></app-sidebar>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col h-full min-w-0 relative overflow-hidden bg-background/50">
+
+        <!-- Header -->
+        <header
+            class="flex-none h-16 z-30 flex items-center justify-between px-6 glass-header sticky top-0 bg-surface-glass/90 backdrop-blur-xl border-b border-border/50 w-full">
+            <app-header class="w-full"></app-header>
+        </header>
+
+        <!-- Scrollable Main Content -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden p-6 scroll-smooth custom-scrollbar relative">
+
+            <!-- Breadcrumb / Context Bar (Optional placeholder for spacing if needed) -->
+            <!-- <div class="mb-6 h-6"></div> -->
+
+            <!-- Content Container -->
+            <div class="max-w-[1920px] mx-auto w-full animate-fade-in-up pb-10">
+                <router-outlet></router-outlet>
+            </div>
+
+        </main>
     </div>
-    <app-footer></app-footer>
-  </div>
 </div>
+
+<!-- Fix for peer-checked selector: The input must be a sibling preceding the affected elements. 
+     I'll wrap everything in a way that the input is at the top level.
+-->
+<script>
+    // Simple script to handle mobile sidebar closing on route change if needed, 
+    // effectively handled by Angular router events usually.
+</script>

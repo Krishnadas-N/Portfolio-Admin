@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 export const routes: Routes = [
     {
@@ -37,7 +37,7 @@ export const routes: Routes = [
             },
             {
                 path: 'skills',
-                loadComponent: () => import("./features/skills/view-skills/view-skills.component").then(m => m.ViewSkillsComponent)
+                loadChildren: () => import('./features/skills/skills.routes').then(m => m.SKILL_ROUTES)
             },
             {
                 path: 'education',
@@ -46,10 +46,6 @@ export const routes: Routes = [
             {
                 path: 'projects',
                 loadChildren: () => import('./features/projects/project.routes').then(m => m.PROJECT_ROUTES)
-            },
-            {
-                path: 'users',
-                loadChildren: () => import('./features/users/users.routes').then(m => m.USERS_ROUTES)
             },
             {
                 path: 'settings',

@@ -10,7 +10,7 @@ import { Skill } from '../../../core/models/api.models';
 @Component({
   selector: 'app-add-skill',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './add-skill.component.html',
   styleUrl: './add-skill.component.scss',
 })

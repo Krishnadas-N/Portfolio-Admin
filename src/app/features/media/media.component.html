@@ -1,0 +1,258 @@
+<div class="h-full flex flex-col space-y-4 p-4 md:p-6 overflow-hidden">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary">Media Library</h1>
+            <p class="text-sm text-text-secondary">Manage your images and assets</p>
+        </div>
+
+        <div class="flex gap-2">
+            <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" multiple accept="image/*">
+
+            <button (click)="fileInput.click()" class="btn btn-primary gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Upload Assets
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0" *ngIf="stats() as s">
+        <div class="card bg-surface shadow-sm border border-border/50 p-4 flex flex-col gap-1">
+            <dt class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Total Files</dt>
+            <dd class="text-2xl font-bold text-text-primary">{{ s.fileCount | number }}</dd>
+        </div>
+        <div class="card bg-surface shadow-sm border border-border/50 p-4 flex flex-col gap-1">
+            <dt class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Storage Used</dt>
+            <dd class="text-2xl font-bold text-text-primary">{{ s.totalSize }}</dd>
+        </div>
+        <div class="card bg-surface shadow-sm border border-border/50 p-4 flex flex-col gap-1">
+            <dt class="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Usage</dt>
+            <dd class="text-2xl font-bold text-text-primary">{{ ((s.imageCount || 0) / 1000) * 100 | number:'1.0-1' }}%
+            </dd>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div
+        class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface p-2 rounded-xl border border-border/50 shadow-sm shrink-0">
+
+        <!-- Left: Search & Filter -->
+        <div class="flex items-center gap-2 w-full sm:w-auto relative group">
+            <i
+                class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                placeholder="Search files..."
+                class="input input-sm w-full sm:w-64 pl-9 bg-background focus:outline-none focus:border-primary/50 transition-all border border-border/50 rounded-lg" />
+        </div>
+
+        <!-- Right: Actions & View Toggle -->
+        <div class="flex items-center gap-2">
+
+            <!-- Selection Mode Actions -->
+            <ng-container *ngIf="selectedFiles().size > 0">
+                <span class="text-xs font-medium text-text-secondary mr-2">{{ selectedFiles().size }} selected</span>
+                <button (click)="deleteSelected()" class="btn btn-sm btn-error btn-outline gap-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Delete
+                </button>
+                <div class="h-4 w-px bg-border mx-2"></div>
+            </ng-container>
+
+            <button (click)="toggleSelectMode()" [class.btn-active]="isSelectMode()"
+                class="btn btn-sm btn-ghost btn-square text-text-secondary hover:text-primary" title="Select Mode">
+                <i class="fa-regular fa-square-check text-lg"></i>
+            </button>
+
+            <div class="join border border-border/50 rounded-lg overflow-hidden">
+                <button (click)="viewMode.set('grid')" [class.bg-primary-light]="viewMode() === 'grid'"
+                    [class.text-primary]="viewMode() === 'grid'"
+                    class="join-item btn btn-sm btn-ghost w-9 content-center">
+                    <i class="fa-solid fa-border-all"></i>
+                </button>
+                <button (click)="viewMode.set('list')" [class.bg-primary-light]="viewMode() === 'list'"
+                    [class.text-primary]="viewMode() === 'list'"
+                    class="join-item btn btn-sm btn-ghost w-9 content-center">
+                    <i class="fa-solid fa-list"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area (Scrollable) -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-1 min-h-0 relative">
+
+        <!-- Grid View -->
+        <div *ngIf="viewMode() === 'grid'"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div *ngFor="let file of filteredFiles()" (click)="onFileClick(file)"
+                class="group relative aspect-square bg-surface border border-border/50 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+
+                <img [src]="file.url"
+                    class="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy" alt="">
+
+                <!-- Selection Overlay -->
+                <div *ngIf="isSelectMode() || selectedFiles().has(file.key || file.Key || '')"
+                    class="absolute inset-0 bg-black/20 flex items-start justify-end p-2 transition-opacity"
+                    [class.opacity-0]="!selectedFiles().has(file.key || file.Key || '') && !isSelectMode()"
+                    [class.group-hover:opacity-100]="isSelectMode()">
+
+                    <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors"
+                        [class.bg-primary]="selectedFiles().has(file.key || file.Key || '')"
+                        [class.border-primary]="selectedFiles().has(file.key || file.Key || '')"
+                        [class.border-white]="!selectedFiles().has(file.key || file.Key || '')">
+                        <i class="fa-solid fa-check text-white text-xs"
+                            *ngIf="selectedFiles().has(file.key || file.Key || '')"></i>
+                    </div>
+                </div>
+
+                <!-- Hover Stats (Non-Selection Mode) -->
+                <div *ngIf="!isSelectMode()"
+                    class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex justify-between items-end">
+                    <div class="text-white text-xs truncate max-w-[70%]">
+                        <p class="font-medium truncate">{{ (file.key || file.Key || '').split('/').pop() }}</p>
+                        <p class="opacity-75">{{ ((file.Size || 0) / 1024).toFixed(1) }} KB</p>
+                    </div>
+                    <button (click)="$event.stopPropagation(); deleteFile(file.key || file.Key || '')"
+                        class="text-white/70 hover:text-red-400 transition-colors p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div *ngIf="viewMode() === 'list'" class="flex flex-col gap-2">
+            <div *ngFor="let file of filteredFiles()" (click)="onFileClick(file)"
+                class="flex items-center gap-4 p-3 rounded-xl bg-surface border border-border/50 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer group">
+
+                <!-- Checkbox -->
+                <div *ngIf="isSelectMode()" class="shrink-0 pl-1">
+                    <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors border-border group-hover:border-primary"
+                        [class.bg-primary]="selectedFiles().has(file.key || file.Key || '')"
+                        [class.border-primary]="selectedFiles().has(file.key || file.Key || '')">
+                        <i class="fa-solid fa-check text-white text-xs"
+                            *ngIf="selectedFiles().has(file.key || file.Key || '')"></i>
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="w-12 h-12 rounded-lg bg-background overflow-hidden shrink-0 border border-border">
+                    <img [src]="file.url" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-medium text-text-primary truncate">{{ (file.key || file.Key ||
+                        '').split('/').pop() }}</h4>
+                    <div class="flex items-center gap-3 text-xs text-text-secondary mt-0.5">
+                        <span>{{ ((file.Size || 0) / 1024).toFixed(1) }} KB</span>
+                        <span>•</span>
+                        <span>{{ (file.LastModified | date:'mediumDate') || 'Unknown Date' }}</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    *ngIf="!isSelectMode()">
+                    <button (click)="$event.stopPropagation(); copyUrl(file.url)"
+                        class="btn btn-xs btn-ghost text-text-secondary hover:text-primary">
+                        <i class="fa-regular fa-copy"></i> Copy URL
+                    </button>
+                    <button (click)="$event.stopPropagation(); deleteFile(file.key || file.Key || '')"
+                        class="btn btn-xs btn-ghost text-text-secondary hover:text-red-500">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredFiles().length === 0"
+            class="h-64 flex flex-col items-center justify-center text-text-tertiary">
+            <div class="w-20 h-20 bg-surface-elevated rounded-full flex items-center justify-center mb-4">
+                <i class="fa-regular fa-image text-3xl opacity-50"></i>
+            </div>
+            <p class="text-lg font-medium">No media found</p>
+            <p class="text-sm">Try uploading files or adjust your search.</p>
+        </div>
+
+        <!-- Load More -->
+        <div class="py-8 text-center" *ngIf="filteredFiles().length > 0 && files().length >= 20">
+            <button (click)="loadMore()" class="btn btn-ghost btn-sm text-primary">Load More Files</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Preview Modal -->
+<div *ngIf="previewFile()"
+    class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="absolute inset-0" (click)="previewFile.set(null)"></div>
+
+    <div
+        class="bg-surface rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl relative flex flex-col md:flex-row">
+
+        <!-- Image Preview -->
+        <div class="flex-1 bg-black/5 flex items-center justify-center p-4 min-h-[300px] relative pattern-checkered">
+            <img [src]="previewFile()!.url" class="max-w-full max-h-[70vh] object-contain shadow-lg rounded-lg">
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="w-full md:w-80 bg-surface p-6 flex flex-col gap-6 border-l border-border/50 shrink-0">
+
+            <!-- Header -->
+            <div class="flex items-start justify-between">
+                <h3 class="font-bold text-lg text-text-primary break-all pr-4">{{ (previewFile()!.key ||
+                    previewFile()!.Key || '').split('/').pop() }}</h3>
+                <button (click)="previewFile.set(null)" class="btn btn-sm btn-circle btn-ghost text-text-secondary">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Details -->
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-text-tertiary uppercase">Size</label>
+                        <p class="text-sm font-medium text-text-primary">{{ ((previewFile()!.Size || 0) /
+                            1024).toFixed(2) }} KB</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-text-tertiary uppercase">Type</label>
+                        <p class="text-sm font-medium text-text-primary">Image</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-text-tertiary uppercase">Date Uploaded</label>
+                    <p class="text-sm font-medium text-text-primary">{{ (previewFile()!.LastModified | date:'medium') ||
+                        'N/A' }}</p>
+                </div>
+
+                <div>
+                    <label class="text-xs font-semibold text-text-tertiary uppercase">Full Path</label>
+                    <p
+                        class="text-xs font-mono text-text-secondary break-all bg-background p-2 rounded border border-border mt-1">
+                        {{ previewFile()!.key || previewFile()!.Key }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-auto flex flex-col gap-2">
+                <button (click)="copyUrl(previewFile()!.url)" class="btn btn-outline btn-primary w-full">
+                    <i class="fa-regular fa-copy"></i>
+                    Copy Direct Link
+                </button>
+                <button (click)="deleteFile(previewFile()!.key || previewFile()!.Key || ''); previewFile.set(null)"
+                    class="btn btn-outline btn-error w-full">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Delete File
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

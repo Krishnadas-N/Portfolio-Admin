@@ -458,6 +458,7 @@ export interface Skill {
   icon?: string;
   color?: string;
   isActive?: boolean; // Changed to match JSON (was isHidden)
+  proficiency?: number; // Added for UI progress bar
   projects?: any[];
   certifications?: any[];
   createdAt?: string;
@@ -624,7 +625,7 @@ export interface ContactsResponse {
   };
 }
 
-export interface ContactDetailsResponse extends Contact {}
+export interface ContactDetailsResponse extends Contact { }
 
 export interface ContactStats {
   total: number;

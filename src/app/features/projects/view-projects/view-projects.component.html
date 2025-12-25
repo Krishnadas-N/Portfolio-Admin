@@ -1,26 +1,30 @@
-<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
+<div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
 
-  <!-- Header & Controls -->
-  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 sticky top-0 z-30 bg-base-100/95 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-base-200/50 md:border-none transition-all duration-300">
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 shrink-0">
     <div>
-      <h1 class="text-3xl font-bold text-base-content tracking-tight">Projects</h1>
-      <p class="text-base-content/60 text-sm mt-1">Manage your portfolio showcase.</p>
+      <h1 class="text-3xl font-bold text-text-primary tracking-tight">Projects</h1>
+      <p class="text-text-secondary text-sm mt-1">Manage and showcase your portfolio projects.</p>
     </div>
-    
+
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-      <!-- Search -->
-      <div class="join w-full sm:w-auto shadow-sm">
-        <div class="relative w-full sm:w-64">
-          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" 
-                 placeholder="Search projects..." 
-                 class="input input-bordered join-item w-full pl-10 focus:input-primary transition-all bg-base-100" />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"></i>
-        </div>
-        <button (click)="onSearch()" class="btn btn-primary join-item px-6">Search</button>
+      <!-- Search Input -->
+      <div class="relative w-full sm:w-72 group">
+        <i
+          class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()"
+          placeholder="Search projects..."
+          class="w-full pl-10 pr-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" />
       </div>
-      
+
+      <button (click)="onSearch()"
+        class="px-5 py-2.5 rounded-xl bg-surface border border-border text-text-primary hover:bg-surface-elevated hover:border-primary/50 transition-all text-sm font-medium shadow-sm">
+        Search
+      </button>
+
       <!-- Add Button -->
-      <a routerLink="/projects/add" class="btn btn-primary shadow-lg shadow-primary/20 shrink-0 gap-2">
+      <a routerLink="/projects/add"
+        class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center justify-center gap-2 transform active:scale-95">
         <i class="fa-solid fa-plus"></i>
         <span class="hidden sm:inline">New Project</span>
         <span class="sm:hidden">New</span>
@@ -29,163 +33,181 @@
   </div>
 
   <!-- Loading State (Skeleton) -->
-  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    <div *ngFor="let i of [1,2,3,4,5,6]" class="card bg-base-100 shadow-sm border border-base-200 h-[450px] animate-pulse">
-      <div class="h-56 bg-base-200 w-full rounded-t-2xl"></div>
-      <div class="card-body p-5 space-y-4">
+  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let i of [1,2,3,4,5,6,7,8]"
+      class="glass-panel rounded-2xl h-[400px] animate-pulse overflow-hidden border border-border/50">
+      <div class="h-48 bg-surface-elevated/50 w-full"></div>
+      <div class="p-5 space-y-4">
         <div class="flex justify-between">
-            <div class="h-4 bg-base-200 w-1/3 rounded"></div>
-            <div class="h-4 bg-base-200 w-8 rounded-full"></div>
+          <div class="h-4 bg-surface-elevated/50 w-1/3 rounded"></div>
+          <div class="h-4 bg-surface-elevated/50 w-8 rounded-full"></div>
         </div>
-        <div class="h-6 bg-base-200 w-3/4 rounded mt-2"></div>
+        <div class="h-6 bg-surface-elevated/50 w-3/4 rounded mt-2"></div>
         <div class="space-y-2 pt-2">
-          <div class="h-3 bg-base-200 w-full rounded"></div>
-          <div class="h-3 bg-base-200 w-5/6 rounded"></div>
-        </div>
-        <div class="flex gap-2 mt-auto pt-4 border-t border-base-200/50">
-          <div class="h-8 w-20 bg-base-200 rounded"></div>
-          <div class="h-8 w-8 bg-base-200 rounded ml-auto"></div>
+          <div class="h-3 bg-surface-elevated/50 w-full rounded"></div>
+          <div class="h-3 bg-surface-elevated/50 w-5/6 rounded"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error()" class="alert alert-error shadow-lg rounded-xl mb-6">
-    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+  <div *ngIf="error()"
+    class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 flex items-start gap-3 mb-6 animate-fade-in">
+    <i class="fa-solid fa-circle-exclamation text-lg mt-0.5"></i>
     <div class="flex-1">
-      <h3 class="font-bold">Error loading projects</h3>
-      <div class="text-xs">{{ error() }}</div>
+      <h3 class="font-bold text-sm">Error loading projects</h3>
+      <div class="text-xs mt-1 opacity-90">{{ error() }}</div>
     </div>
-    <button class="btn btn-sm btn-ghost" (click)="loadProjects()">Retry</button>
+    <button class="text-xs font-semibold hover:underline" (click)="loadProjects()">Retry</button>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading() && !error() && projects().length === 0" class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-3xl border-2 border-dashed border-base-200 text-center">
-    <div class="w-24 h-24 bg-base-200/50 rounded-full flex items-center justify-center mb-6 text-base-content/20">
-      <i class="fa-solid fa-layer-group text-4xl"></i>
+  <div *ngIf="!isLoading() && !error() && projects().length === 0"
+    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4">
+    <div class="w-24 h-24 bg-surface-elevated/50 rounded-full flex items-center justify-center mb-6 text-text-tertiary">
+      <i class="fa-solid fa-layer-group text-4xl opacity-50"></i>
     </div>
-    <h3 class="text-xl font-bold text-base-content">No projects found</h3>
-    <p class="text-base-content/60 max-w-xs mt-2 mb-8">Your search didn't match any projects, or you haven't created any yet.</p>
+    <h3 class="text-xl font-bold text-text-primary">No projects found</h3>
+    <p class="text-text-tertiary max-w-xs mt-2 mb-8">Your search didn't match any projects, or start by creating your
+      first showcase.</p>
     <div class="flex gap-3">
-        <button *ngIf="searchTerm()" (click)="searchTerm.set(''); onSearch()" class="btn btn-outline">Clear Search</button>
-        <a routerLink="/projects/add" class="btn btn-primary">Create New Project</a>
+      <button *ngIf="searchTerm()" (click)="searchTerm.set(''); onSearch()"
+        class="px-5 py-2.5 rounded-xl border border-border hover:bg-surface text-sm font-medium transition-colors">Clear
+        Search</button>
+      <a routerLink="/projects/add"
+        class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20 text-sm font-medium transition-colors">Create
+        Project</a>
     </div>
   </div>
 
-  <!-- Projects Grid -->
-  <div *ngIf="!isLoading() && projects().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    
-    <div *ngFor="let project of projects()" class="card bg-base-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-base-200/60 group flex flex-col h-full rounded-2xl overflow-hidden">
-      
-      <!-- Image Area -->
-      <figure class="relative aspect-video overflow-hidden bg-base-200/50 shrink-0">
-        <img [src]="(project.images && project.images.length > 0) ? project.images[0] : 'assets/images/placeholder.jpg'" 
-             [alt]="project.title" 
-             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-        
-        <!-- Status Badges -->
-        <div class="absolute top-3 left-3 flex flex-col gap-2 z-10">
-            <div class="badge border-none shadow-sm font-semibold uppercase text-[10px] tracking-wider py-3 px-3 backdrop-blur-md"
-                [ngClass]="{
-                'bg-success/90 text-white': project.status === 'Completed',
-                'bg-warning/90 text-white': project.status === 'In Progress',
-                'bg-base-100/80 text-base-content': project.status === 'Planning'
-                }">
-                {{ project.status }}
+  <!-- Projects Grid (Scrollable Content) -->
+  <div *ngIf="!isLoading() && projects().length > 0" class="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4">
+    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+
+      <div *ngFor="let project of projects()"
+        class="glass-panel group flex flex-col h-full rounded-2xl overflow-hidden card-hover border border-border/50 bg-surface shadow-sm hover:shadow-md transition-all duration-300">
+
+        <!-- Image Area -->
+        <figure class="relative aspect-video overflow-hidden bg-surface-elevated shrink-0">
+          <img
+            [src]="(project.images && project.images.length > 0) ? project.images[0] : 'assets/images/placeholder.jpg'"
+            [alt]="project.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+
+          <!-- Status Badges -->
+          <div class="absolute top-3 left-3 flex flex-col gap-2 z-10 pointer-events-none">
+            <div
+              class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-white shadow-sm font-semibold uppercase text-[10px] tracking-wider"
+              [ngClass]="{
+                    'text-emerald-400': project.status === 'Completed',
+                    'text-amber-400': project.status === 'In Progress',
+                    'text-slate-300': project.status === 'Planning'
+                    }">
+              {{ project.status }}
             </div>
-        </div>
+          </div>
 
-        <!-- Featured/Current Badges -->
-        <div class="absolute top-3 right-3 flex gap-2 z-10">
-            <div *ngIf="project.status === 'In Progress'" class="badge bg-primary/90 text-white shadow-sm border-none uppercase text-[10px] font-bold tracking-wide py-3 px-3 backdrop-blur-md">Current</div>
-            <div *ngIf="project.featured" class="badge bg-secondary/90 text-white shadow-sm border-none uppercase text-[10px] font-bold tracking-wide py-3 px-3 backdrop-blur-md"><i class="fa-solid fa-star text-[10px] mr-1"></i> Featured</div>
-        </div>
+          <!-- Featured/Current Badges -->
+          <div class="absolute top-3 right-3 flex gap-2 z-10 pointer-events-none">
+            <div *ngIf="project.status === 'In Progress'"
+              class="px-2.5 py-1 rounded-md bg-primary/90 text-white shadow-lg border border-white/10 uppercase text-[10px] font-bold tracking-wide backdrop-blur-md">
+              Current</div>
+            <div *ngIf="project.featured"
+              class="px-2.5 py-1 rounded-md bg-amber-500/90 text-white shadow-lg border border-white/10 uppercase text-[10px] font-bold tracking-wide backdrop-blur-md flex items-center gap-1">
+              <i class="fa-solid fa-star text-[9px]"></i> Featured
+            </div>
+          </div>
 
-        <!-- Hover Actions Overlay (External Links) -->
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-            <a *ngIf="project.link" [href]="project.link" target="_blank" 
-               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110" title="Live Site">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <!-- Hover Actions Overlay -->
+          <div
+            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
+            <a *ngIf="project.link" [href]="project.link" target="_blank"
+              class="btn btn-circle btn-sm bg-white/20 hover:bg-white text-white hover:text-black border-none backdrop-blur-md transition-all scale-90 hover:scale-110"
+              title="Live Site">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
             </a>
-            <a *ngIf="project.repo" [href]="project.repo" target="_blank" 
-               class="btn btn-circle bg-base-100/20 hover:bg-base-100 text-white hover:text-base-content border-none backdrop-blur-sm transition-all scale-90 hover:scale-110" title="Repository">
-                <i class="fa-brands fa-github"></i>
+            <a *ngIf="project.repo" [href]="project.repo" target="_blank"
+              class="btn btn-circle btn-sm bg-white/20 hover:bg-white text-white hover:text-black border-none backdrop-blur-md transition-all scale-90 hover:scale-110"
+              title="Repository">
+              <i class="fa-brands fa-github text-lg"></i>
             </a>
-        </div>
-      </figure>
-      
-      <!-- Content -->
-      <div class="card-body p-5 flex flex-col flex-1 gap-4">
-        
-        <!-- Meta & Context Menu -->
-        <div class="flex justify-between items-start text-xs text-base-content/60">
-            <div class="flex items-center gap-2 mt-1">
-                <div class="badge badge-xs badge-ghost uppercase tracking-wider font-medium border-base-300 py-2 px-2">{{ project.projectType }}</div>
-                <div class="flex items-center gap-1">
-                    <i class="fa-regular fa-calendar"></i>
-                    <span>{{project.startDate | date:'MMM y'}}</span>
-                </div>
-            </div>
-            
-            <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn btn-ghost btn-circle btn-xs h-6 w-6 min-h-0 text-base-content/40 hover:text-base-content"><i class="fa-solid fa-ellipsis"></i></label>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-48 border border-base-200 text-sm">
-                    <li><a [routerLink]="['/projects/edit', project._id]"><i class="fa-solid fa-pen-to-square w-4"></i> Edit Details</a></li>
-                    <li><a class="text-error hover:bg-error/10" (click)="deleteProject(project._id!)"><i class="fa-solid fa-trash-can w-4"></i> Delete Project</a></li>
-                </ul>
-            </div>
-        </div>
+          </div>
+        </figure>
 
-        <!-- Title & Description -->
-        <div>
-            <h2 class="card-title text-lg font-bold leading-tight mb-2 group-hover:text-primary transition-colors">
-                <a [routerLink]="['/projects/edit', project._id]" class="line-clamp-1" [title]="project.title">{{project.title}}</a>
+        <!-- Content -->
+        <div class="p-5 flex flex-col flex-1 gap-3">
+
+          <!-- Meta -->
+          <div class="flex justify-between items-start text-xs text-text-tertiary">
+            <div class="flex items-center gap-2">
+              <span
+                class="px-2 py-0.5 rounded border border-border bg-surface text-text-secondary uppercase tracking-wider font-semibold text-[10px]">
+                {{ project.projectType }}
+              </span>
+              <span class="flex items-center gap-1">
+                <i class="fa-regular fa-calendar text-[10px]"></i>
+                {{project.startDate | date:'MMM y'}}
+              </span>
+            </div>
+          </div>
+
+          <!-- Title & Description -->
+          <div>
+            <h2
+              class="text-lg font-bold leading-tight mb-2 text-text-primary group-hover:text-primary transition-colors">
+              <a [routerLink]="['/projects/edit', project._id]" class="line-clamp-1 hover:underline"
+                [title]="project.title">{{project.title}}</a>
             </h2>
-            <p class="text-sm text-base-content/70 line-clamp-2 leading-relaxed">{{project.description}}</p>
-        </div>
-        
-        <!-- Tech Stack -->
-        <div class="flex flex-wrap gap-1.5 mt-auto">
-            <span *ngFor="let tech of project.technologies.slice(0, 3)" 
-                  class="px-2.5 py-1 rounded-md bg-base-200/50 text-xs font-medium text-base-content/70 border border-base-200">
-                {{tech}}
-            </span>
-            <span *ngIf="project.technologies.length > 3" class="px-2 py-1 text-xs text-base-content/50 font-medium">
-                +{{project.technologies.length - 3}}
-            </span>
-        </div>
+            <p class="text-sm text-text-secondary line-clamp-2 leading-relaxed h-10">{{project.description}}</p>
+          </div>
 
-        <div class="divider my-0 opacity-50"></div>
+          <!-- Tech Stack -->
+          <div class="flex flex-wrap gap-1.5 mt-auto pt-2">
+            <span *ngFor="let tech of project.technologies.slice(0, 3)"
+              class="px-2 py-0.5 rounded-md bg-surface-elevated/50 text-[11px] font-medium text-text-secondary border border-border/50">
+              {{tech}}
+            </span>
+            <span *ngIf="project.technologies.length > 3"
+              class="px-2 py-0.5 text-[10px] text-text-tertiary font-medium bg-surface rounded-md border border-border/30">
+              +{{project.technologies.length - 3}}
+            </span>
+          </div>
 
-        <!-- Footer Actions -->
-        <div class="flex justify-between items-center">
+          <div class="h-px w-full bg-border/50 my-2"></div>
+
+          <!-- Footer Actions -->
+          <div class="flex justify-between items-center">
             <!-- Stats -->
-            <div class="flex gap-4 text-xs font-medium text-base-content/50">
-                <div class="flex items-center gap-1.5" title="Total Views">
-                    <i class="fa-regular fa-eye"></i> {{ project.viewsCount || 0 }}
-                </div>
-                <div class="flex items-center gap-1.5" title="Total Likes">
-                    <i class="fa-regular fa-heart"></i> {{ project.likes || 0 }}
-                </div>
+            <div class="flex gap-3 text-xs font-medium text-text-tertiary">
+              <div class="flex items-center gap-1.5" title="Total Views">
+                <i class="fa-regular fa-eye"></i> {{ project.viewsCount || 0 }}
+              </div>
+              <div class="flex items-center gap-1.5" title="Total Likes">
+                <i class="fa-regular fa-heart"></i> {{ project.likes || 0 }}
+              </div>
             </div>
 
             <!-- Primary Actions (Edit/Delete) -->
             <div class="flex gap-2">
-                <a [routerLink]="['/projects/edit', project._id]" class="btn btn-sm btn-ghost hover:bg-primary/10 hover:text-primary transition-colors font-medium">
-                    Edit
-                </a>
-                <button (click)="deleteProject(project._id!)" class="btn btn-sm btn-ghost text-error hover:bg-error/10 hover:text-error transition-colors btn-square" title="Delete">
-                    <i class="fa-regular fa-trash-can"></i>
-                </button>
+              <a [routerLink]="['/projects/edit', project._id]"
+                class="btn btn-sm btn-ghost text-text-secondary hover:text-primary min-h-0 h-8 px-2">
+                Edit
+              </a>
+              <button (click)="deleteProject(project._id!)"
+                class="btn btn-sm btn-ghost text-text-secondary hover:text-red-500 min-h-0 h-8 px-2" title="Delete">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
             </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading() && pagination()" class="mt-8 border-t border-border/50 pt-6 mb-8">
+      <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
   </div>
 
-  <!-- Pagination -->
-  <div *ngIf="!isLoading() && pagination()" class="mt-10 border-t border-base-200 pt-6">
-    <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
-  </div>
 </div>

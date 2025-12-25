@@ -1,0 +1,377 @@
+<div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 mb-6 shrink-0">
+        <div>
+            <h1 class="text-3xl font-bold text-text-primary tracking-tight">Settings</h1>
+            <p class="text-text-secondary text-sm mt-1">Manage your profile, preferences, and application configuration.
+            </p>
+        </div>
+
+        <button (click)="onSubmit()" [disabled]="isLoading() || settingsForm.invalid || settingsForm.pristine"
+            class="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center gap-2 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="isLoading()" class="loading loading-spinner loading-xs"></span>
+            <i class="fa-regular fa-floppy-disk" *ngIf="!isLoading()"></i>
+            <span>{{ isLoading() ? 'Saving...' : 'Save Changes' }}</span>
+        </button>
+    </div>
+
+    <!-- Content Layout -->
+    <div class="flex-1 overflow-hidden flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-0">
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <div class="hidden lg:flex flex-col w-64 shrink-0 pr-2 space-y-6">
+
+            <!-- Profile Summary Card -->
+            <div
+                class="glass-panel p-4 rounded-2xl border border-border/50 bg-gradient-to-br from-surface to-surface-elevated flex flex-col items-center text-center">
+                <div
+                    class="w-20 h-20 rounded-full bg-surface-elevated border-4 border-surface shadow-lg mb-3 flex items-center justify-center text-3xl text-primary overflow-hidden relative group cursor-pointer">
+                    <!-- Placeholder or Image -->
+                    <i class="fa-solid fa-user-tie" *ngIf="!settingsForm.get('profileImage')?.value"></i>
+                    <img *ngIf="settingsForm.get('profileImage')?.value" [src]="settingsForm.get('profileImage')?.value"
+                        class="w-full h-full object-cover" />
+
+                    <!-- Hover Overlay -->
+                    <div
+                        class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium">
+                        Change
+                    </div>
+                </div>
+                <h3 class="font-bold text-text-primary text-lg leading-tight">{{ settingsForm.get('siteName')?.value ||
+                    'Admin' }}</h3>
+                <span class="text-xs font-medium text-primary px-2 py-0.5 rounded-full bg-primary/10 mt-1">Super
+                    Admin</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="space-y-1 overflow-y-auto custom-scrollbar">
+                <button *ngFor="let tab of tabs" (click)="activeTab.set(tab.id)"
+                    class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all duration-200 group relative overflow-hidden"
+                    [ngClass]="{
+                       'bg-primary text-white shadow-lg shadow-primary/25': activeTab() === tab.id,
+                       'text-text-secondary hover:bg-surface-elevated hover:text-text-primary': activeTab() !== tab.id
+                    }">
+
+                    <!-- Active Indicator Glow -->
+                    <div *ngIf="activeTab() === tab.id"
+                        class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none">
+                    </div>
+
+                    <i [class]="tab.icon" class="text-lg w-6 text-center transition-colors"
+                        [ngClass]="{'text-white': activeTab() === tab.id, 'text-text-tertiary group-hover:text-primary': activeTab() !== tab.id}"></i>
+                    <span class="font-medium text-sm z-10">{{ tab.label }}</span>
+                    <i class="fa-solid fa-chevron-right ml-auto text-xs opacity-50 z-10"
+                        *ngIf="activeTab() === tab.id"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation (Horizontal Scroll) -->
+        <div class="lg:hidden shrink-0 overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide flex gap-2">
+            <button *ngFor="let tab of tabs" (click)="activeTab.set(tab.id)"
+                class="px-4 py-2 rounded-lg flex items-center gap-2 whitespace-nowrap transition-colors border"
+                [ngClass]="{
+                'bg-primary text-white border-primary shadow-sm': activeTab() === tab.id,
+                'bg-surface text-text-secondary border-border hover:bg-surface-elevated': activeTab() !== tab.id
+            }">
+                <i [class]="tab.icon"></i>
+                <span class="text-sm font-medium">{{ tab.label }}</span>
+            </button>
+        </div>
+
+        <!-- Main Settings Panel (Scrollable) -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar pb-10">
+            <form [formGroup]="settingsForm" class="space-y-8 max-w-4xl animate-fade-in">
+
+                <!-- General Settings -->
+                <div *ngIf="activeTab() === 'general'" class="space-y-6">
+
+                    <!-- Profile & Branding -->
+                    <div class="glass-panel rounded-2xl border border-border/50 bg-surface overflow-hidden">
+                        <!-- Banner Area -->
+                        <div class="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 relative">
+                            <div class="absolute inset-0 bg-grid-white/10 opacity-30"></div>
+                        </div>
+
+                        <div class="px-6 sm:px-8 pb-8 relative">
+                            <!-- Avatar Upload -->
+                            <div
+                                class="w-24 h-24 rounded-full bg-surface border-4 border-surface -mt-12 mb-6 relative group cursor-pointer shadow-lg overflow-hidden">
+                                <i class="fa-solid fa-user-circle text-6xl text-text-tertiary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                                    *ngIf="!settingsForm.get('profileImage')?.value"></i>
+                                <img *ngIf="settingsForm.get('profileImage')?.value"
+                                    [src]="settingsForm.get('profileImage')?.value"
+                                    class="w-full h-full object-cover" />
+
+                                <!-- Overlay -->
+                                <div
+                                    class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white flex-col gap-1">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <span class="text-[10px] font-bold uppercase">Upload</span>
+                                </div>
+                                <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-1.5 md:col-span-2">
+                                    <label
+                                        class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Admin
+                                        Display Name</label>
+                                    <input type="text" formControlName="siteName"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all font-medium" />
+                                    <p class="text-xs text-text-tertiary ml-1">Displayed in the admin dashboard and
+                                        emails.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-border/50 bg-surface">
+                        <h2 class="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
+                            <i class="fa-regular fa-address-card text-primary"></i> Contact Information
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Site
+                                    Description / Bio</label>
+                                <textarea formControlName="siteDescription" rows="3"
+                                    class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all resize-none"></textarea>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Public
+                                    Email</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary"></i>
+                                    <input type="email" formControlName="email"
+                                        class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Phone
+                                    Number</label>
+                                <div class="relative">
+                                    <i
+                                        class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary"></i>
+                                    <input type="tel" formControlName="phone"
+                                        class="w-full pl-10 pr-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Social Media -->
+                <div *ngIf="activeTab() === 'social'" formGroupName="social" class="space-y-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-border/50 bg-surface">
+                        <h2 class="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-share-nodes text-primary"></i> Social Profiles
+                        </h2>
+                        <p class="text-sm text-text-secondary mb-6">Link your social media profiles to display them in
+                            the footer and contact sections.</p>
+
+                        <div class="space-y-5">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-[#24292e] text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-brands fa-github text-xl"></i>
+                                </div>
+                                <div class="flex-1 space-y-1.5">
+                                    <label
+                                        class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">GitHub
+                                        URL</label>
+                                    <input type="url" formControlName="github" placeholder="https://github.com/username"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-[#0077b5] text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-brands fa-linkedin text-xl"></i>
+                                </div>
+                                <div class="flex-1 space-y-1.5">
+                                    <label
+                                        class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">LinkedIn
+                                        URL</label>
+                                    <input type="url" formControlName="linkedin"
+                                        placeholder="https://linkedin.com/in/username"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-[#1da1f2] text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-brands fa-twitter text-xl"></i>
+                                </div>
+                                <div class="flex-1 space-y-1.5">
+                                    <label
+                                        class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Twitter
+                                        / X URL</label>
+                                    <input type="url" formControlName="twitter"
+                                        placeholder="https://twitter.com/username"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-[#E1306C] text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-brands fa-instagram text-xl"></i>
+                                </div>
+                                <div class="flex-1 space-y-1.5">
+                                    <label
+                                        class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Instagram
+                                        URL</label>
+                                    <input type="url" formControlName="instagram"
+                                        placeholder="https://instagram.com/username"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Toggles -->
+                <div *ngIf="activeTab() === 'features'" formGroupName="features" class="space-y-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-border/50 bg-surface">
+                        <h2 class="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-toggle-on text-primary"></i> Feature Management
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <!-- Blog Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-blog"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Blog System</div>
+                                        <div class="text-xs text-text-tertiary">Enable articles & posts</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="blog" class="toggle toggle-primary" />
+                            </label>
+
+                            <!-- Projects Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-briefcase"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Projects</div>
+                                        <div class="text-xs text-text-tertiary">Showcase portfolio items</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="projects" class="toggle toggle-secondary" />
+                            </label>
+
+                            <!-- Testimonials Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-quote-left"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Testimonials</div>
+                                        <div class="text-xs text-text-tertiary">Client reviews & ratings</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="testimonials" class="toggle toggle-success" />
+                            </label>
+
+                            <!-- Contact Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                                        <i class="fa-regular fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Contact Form</div>
+                                        <div class="text-xs text-text-tertiary">Allow users to message you</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="contact" class="toggle toggle-warning" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Settings -->
+                <div *ngIf="activeTab() === 'seo'" formGroupName="seo" class="space-y-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-border/50 bg-surface">
+                        <h2 class="text-lg font-bold text-text-primary mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-arrow-right text-primary"></i> SEO Configuration
+                        </h2>
+
+                        <div class="space-y-6">
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Default
+                                    Meta Title</label>
+                                <input type="text" formControlName="title"
+                                    class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all" />
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Meta
+                                    Keywords</label>
+                                <div
+                                    class="w-full p-2 rounded-xl bg-surface-elevated/50 border border-border/60 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all flex flex-wrap gap-2 min-h-[50px]">
+
+                                    <!-- Existing Tags -->
+                                    <div *ngFor="let keyword of keywordsControl.value; let i = index"
+                                        class="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-2 group animate-fade-in">
+                                        <span>{{ keyword }}</span>
+                                        <button type="button" (click)="removeKeyword(i)"
+                                            class="text-primary/60 hover:text-primary transition-colors">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Input -->
+                                    <input type="text" placeholder="Add keyword..." (keyup.enter)="addKeyword($event)"
+                                        (blur)="addKeyword($event)"
+                                        class="flex-1 bg-transparent outline-none text-text-primary min-w-[120px] text-sm py-1" />
+                                </div>
+                                <p class="text-xs text-text-tertiary ml-1">Press Enter to add tags.</p>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-xs font-semibold text-text-secondary uppercase tracking-wider ml-1">Default
+                                    Meta Description</label>
+                                <textarea formControlName="description" rows="3"
+                                    class="w-full px-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none text-text-primary transition-all"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>

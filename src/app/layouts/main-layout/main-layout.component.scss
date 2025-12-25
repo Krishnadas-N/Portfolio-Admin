@@ -1,29 +1,19 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
 .custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: theme('colors.base-300') transparent;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: theme('colors.base-300');
-  border-radius: 20px;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Ensure drawer side doesn't show double scrollbars */
-::ng-deep .drawer-side {
-  overflow-y: hidden;
-  max-height: 100vh;
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    @apply bg-zinc-200 dark:bg-zinc-800 rounded-full;
+    &:hover {
+      @apply bg-zinc-300 dark:bg-zinc-700;
+    }
+  }
 }

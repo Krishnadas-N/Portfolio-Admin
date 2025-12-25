@@ -1,284 +1,307 @@
-<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
-  
+<div class="container mx-auto p-6 max-w-7xl pb-20">
+
   <!-- Header Actions -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 bg-base-100/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-base-200 sm:border-none">
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sticky top-0 z-20 glass-header -mx-6 px-6 py-4 sm:mx-0 sm:px-0 sm:bg-transparent sm:backdrop-blur-none sm:border-none sm:relative transition-all pt-4">
     <div>
-      <h1 class="text-3xl font-bold text-base-content tracking-tight">{{ isEditMode ? 'Edit Project' : 'New Project' }}</h1>
-      <p class="text-base-content/60 text-sm mt-1">Create or update your portfolio project details.</p>
+      <h1 class="text-3xl font-bold text-text-primary tracking-tight">{{ isEditMode ? 'Edit Project' : 'New Project' }}
+      </h1>
+      <p class="text-text-secondary text-sm mt-1">Create or update your portfolio project details.</p>
     </div>
     <div class="flex gap-3 w-full sm:w-auto">
-      <button type="button" (click)="onCancel()" class="btn btn-ghost flex-1 sm:flex-none">Cancel</button>
-      <button type="button" (click)="onSubmit()" [disabled]="projectForm.invalid || isSubmitting" class="btn btn-primary flex-1 sm:flex-none shadow-lg shadow-primary/20">
-        <span *ngIf="isSubmitting" class="loading loading-spinner loading-xs"></span>
-        <i class="fa-regular fa-floppy-disk mr-2" *ngIf="!isSubmitting"></i>
+      <button type="button" (click)="onCancel()"
+        class="px-6 py-2.5 rounded-xl border border-border text-text-secondary hover:bg-surface hover:text-text-primary transition-all font-medium flex-1 sm:flex-none">Cancel</button>
+      <button type="button" (click)="onSubmit()" [disabled]="projectForm.invalid || isSubmitting"
+        class="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 disabled:opacity-70 disabled:cursor-not-allowed transition-all font-medium flex-1 sm:flex-none flex items-center justify-center gap-2">
+        <span *ngIf="isSubmitting"
+          class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        <i class="fa-regular fa-floppy-disk" *ngIf="!isSubmitting"></i>
         {{ isEditMode ? 'Save Changes' : 'Publish Project' }}
       </button>
-        </div>
-      </div>
+    </div>
+  </div>
 
   <form [formGroup]="projectForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    
+
     <!-- Left Column (Main Content) -->
     <div class="lg:col-span-2 space-y-8">
-      
-      <!-- General Info -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-              <i class="fa-regular fa-file-lines"></i>
-        </div>
-            General Information
-          </h2>
-          
-          <div class="space-y-4">
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Project Title</span></label>
-              <input type="text" formControlName="title" placeholder="e.g., AI-Powered Analytics Dashboard" 
-                     class="input input-bordered w-full focus:input-primary transition-all" 
-                     [class.input-error]="f['title'].touched && f['title'].invalid" />
-              <label class="label" *ngIf="f['title'].touched && f['title'].invalid">
-                <span class="label-text-alt text-error">Title is required (min 3 chars)</span>
-              </label>
-      </div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Description</span></label>
-              <textarea formControlName="description" class="textarea textarea-bordered h-48 focus:textarea-primary transition-all text-base leading-relaxed" 
-                        placeholder="Detailed description of the project features, challenges, and solutions..."
-                        [class.textarea-error]="f['description'].touched && f['description'].invalid"></textarea>
-              <label class="label" *ngIf="f['description'].touched && f['description'].invalid">
-                <span class="label-text-alt text-error">Description is required (min 10 chars)</span>
-              </label>
-            </div>
+      <!-- General Info -->
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-lg font-bold flex items-center gap-3 mb-6 text-text-primary">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <i class="fa-regular fa-file-lines text-lg"></i>
+          </div>
+          General Information
+        </h2>
+
+        <div class="space-y-6">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">Project Title</label>
+            <input type="text" formControlName="title" placeholder="e.g., AI-Powered Analytics Dashboard"
+              class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              [class.border-red-500]="f['title'].touched && f['title'].invalid" />
+            <span class="text-xs text-red-500" *ngIf="f['title'].touched && f['title'].invalid">
+              Title is required (min 3 chars)
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">Description</label>
+            <textarea formControlName="description"
+              class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base leading-relaxed h-48 resize-none"
+              placeholder="Detailed description of the project features, challenges, and solutions..."
+              [class.border-red-500]="f['description'].touched && f['description'].invalid"></textarea>
+            <span class="text-xs text-red-500" *ngIf="f['description'].touched && f['description'].invalid">
+              Description is required (min 10 chars)
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Tech Stack -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
-              <i class="fa-solid fa-code"></i>
-            </div>
-            Tech Stack
-          </h2>
-
-          <div class="grid grid-cols-1 gap-6">
-            <!-- Technologies -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">Technologies</span>
-                <span class="label-text-alt text-base-content/50">Core frameworks & tools</span>
-              </label>
-              <div class="relative">
-                <input #techInput type="text" placeholder="Type and press Enter to add..." 
-                       class="input input-bordered w-full pr-12"
-                       (keyup.enter)="addStringItem('technologies', techInput.value, techInput)" />
-                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
-                        (click)="addStringItem('technologies', techInput.value, techInput)">
-                  <i class="fa-solid fa-plus"></i>
-                </button>
-        </div>
-              <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
-                <div *ngFor="let tech of projectForm.get('technologies')?.value; let i = index" 
-                     class="badge badge-lg gap-2 pl-3 pr-1 py-3 bg-base-200 border-base-300">
-                  {{ tech }}
-                  <button type="button" (click)="removeStringItem('technologies', i)" 
-                          class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 text-base-content/50 hover:text-error">
-                    <i class="fa-solid fa-xmark text-[10px]"></i>
-                  </button>
-      </div>
-                <span *ngIf="!projectForm.get('technologies')?.value?.length" class="text-sm text-base-content/40 italic py-1">No technologies added yet</span>
-        </div>
-      </div>
-
-            <!-- Skills -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">Skills Learned</span>
-                <span class="label-text-alt text-base-content/50">Concepts & methodologies</span>
-              </label>
-              <div class="relative">
-                <input #skillInput type="text" placeholder="Type and press Enter to add..." 
-                       class="input input-bordered w-full pr-12"
-                       (keyup.enter)="addSkill(skillInput.value, skillInput)" />
-                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs btn-ghost btn-square" 
-                        (click)="addSkill(skillInput.value, skillInput)">
-                  <i class="fa-solid fa-plus"></i>
-                </button>
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-lg font-bold flex items-center gap-3 mb-6 text-text-primary">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500">
+            <i class="fa-solid fa-code text-lg"></i>
           </div>
-              <div class="flex flex-wrap gap-2 mt-3 min-h-[2rem]">
-                <div *ngFor="let skill of skills.controls; let i = index" 
-                     class="badge badge-lg badge-outline gap-2 pl-3 pr-1 py-3 border-primary/30 text-primary">
-                  {{ skill.value }}
-                  <button type="button" (click)="removeSkill(i)" 
-                          class="btn btn-circle btn-ghost btn-xs w-5 h-5 min-h-0 hover:bg-primary hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-[10px]"></i>
-                  </button>
-        </div>
-                <span *ngIf="!skills.length" class="text-sm text-base-content/40 italic py-1">No skills added yet</span>
-        </div>
-      </div>
-      </div>
+          Tech Stack
+        </h2>
+
+        <div class="grid grid-cols-1 gap-8">
+          <!-- Technologies -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              Technologies
+              <span class="text-xs text-text-tertiary font-normal">Core frameworks & tools</span>
+            </label>
+            <div class="relative">
+              <input #techInput type="text" placeholder="Type and press Enter to add..."
+                class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12"
+                (keyup.enter)="addStringItem('technologies', techInput.value, techInput)" />
+              <button type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-primary transition-colors"
+                (click)="addStringItem('technologies', techInput.value, techInput)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[2rem]">
+              <div *ngFor="let tech of projectForm.get('technologies')?.value; let i = index"
+                class="flex items-center gap-2 pl-3 pr-2 py-1.5 bg-surface-elevated border border-border rounded-lg text-sm text-text-secondary group">
+                {{ tech }}
+                <button type="button" (click)="removeStringItem('technologies', i)"
+                  class="w-5 h-5 flex items-center justify-center rounded hover:bg-red-500/10 text-text-tertiary hover:text-red-500 transition-colors">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>
+              <span *ngIf="!projectForm.get('technologies')?.value?.length"
+                class="text-sm text-text-tertiary italic py-1">No technologies added yet</span>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              Skills Learned
+              <span class="text-xs text-text-tertiary font-normal">Concepts & methodologies</span>
+            </label>
+            <div class="relative">
+              <input #skillInput type="text" placeholder="Type and press Enter to add..."
+                class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12"
+                (keyup.enter)="addSkill(skillInput.value, skillInput)" />
+              <button type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-primary transition-colors"
+                (click)="addSkill(skillInput.value, skillInput)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[2rem]">
+              <div *ngFor="let skill of skills.controls; let i = index"
+                class="flex items-center gap-2 pl-3 pr-2 py-1.5 bg-primary/5 border border-primary/20 rounded-lg text-sm text-primary group">
+                {{ skill.value }}
+                <button type="button" (click)="removeSkill(i)"
+                  class="w-5 h-5 flex items-center justify-center rounded hover:bg-primary/20 text-primary/60 hover:text-primary transition-colors">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>
+              <span *ngIf="!skills.length" class="text-sm text-text-tertiary italic py-1">No skills added yet</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Media -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-lg flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-              <i class="fa-regular fa-images"></i>
-        </div>
-            Media Gallery
-          </h2>
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-lg font-bold flex items-center gap-3 mb-6 text-text-primary">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <i class="fa-regular fa-images text-lg"></i>
+          </div>
+          Media Gallery
+        </h2>
 
-          <div class="space-y-6">
-            <!-- Image Upload -->
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Project Screenshots</span></label>
-              <div class="border-2 border-dashed border-base-300 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-base-200/30 transition-all cursor-pointer relative">
-                <input type="file" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                       (change)="onImageSelected($event)" />
-                <div class="flex flex-col items-center gap-2 text-base-content/60">
-                  <i class="fa-solid fa-cloud-arrow-up text-3xl mb-1"></i>
-                  <span class="font-medium">Drop images here or click to upload</span>
-                  <span class="text-xs">Supports JPG, PNG, WEBP</span>
-        </div>
-      </div>
+        <div class="space-y-8">
+          <!-- Image Upload -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary">Project Screenshots</label>
+            <div
+              class="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 hover:bg-surface-elevated/50 transition-all cursor-pointer relative group">
+              <input type="file" multiple accept="image/*"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                (change)="onImageSelected($event)" />
+              <div
+                class="flex flex-col items-center gap-3 text-text-tertiary group-hover:text-primary transition-colors">
+                <div
+                  class="w-12 h-12 rounded-full bg-surface border border-border flex items-center justify-center mb-1 shadow-sm group-hover:shadow-md transition-all">
+                  <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                </div>
+                <div>
+                  <span class="font-medium text-text-primary">Click to upload</span>
+                  <span class="text-text-secondary"> or drag and drop</span>
+                </div>
+                <span class="text-xs text-text-tertiary">SVG, PNG, JPG or WEBP (max. 5MB)</span>
+              </div>
+            </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4" *ngIf="images.length">
-                <div *ngFor="let img of images.controls; let i = index" class="relative group aspect-video bg-base-200 rounded-lg overflow-hidden border border-base-200 shadow-sm">
-                  <img [src]="img.value" class="w-full h-full object-cover" />
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button type="button" (click)="removeImage(i)" 
-                            class="btn btn-circle btn-sm btn-error text-white shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
-                      <i class="fa-solid fa-trash-can"></i>
-                    </button>
-        </div>
-      </div>
-        </div>
-      </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2" *ngIf="images.length">
+              <div *ngFor="let img of images.controls; let i = index"
+                class="relative group aspect-video bg-surface-elevated rounded-xl overflow-hidden border border-border shadow-sm">
+                <img [src]="img.value" class="w-full h-full object-cover" />
+                <div
+                  class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                  <button type="button" (click)="removeImage(i)"
+                    class="w-8 h-8 rounded-full bg-red-500 text-white shadow-lg flex items-center justify-center hover:bg-red-600 transition-colors transform scale-90 group-hover:scale-100">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            <!-- Video Upload -->
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Demo Video</span></label>
-              <div class="flex flex-col sm:flex-row gap-4">
-                <input type="file" accept="video/*" class="file-input file-input-bordered w-full"
-                       (change)="onVideoSelected($event)" />
-        </div>
-              <div *ngIf="projectForm.get('videoRepresentation')?.value" class="mt-4 relative rounded-lg overflow-hidden bg-black aspect-video w-full max-w-md border border-base-300 shadow-sm">
-                <video [src]="projectForm.get('videoRepresentation')?.value" controls class="w-full h-full"></video>
-                <button type="button" (click)="projectForm.get('videoRepresentation')?.setValue('')" 
-                        class="absolute top-2 right-2 btn btn-circle btn-xs btn-error text-white opacity-80 hover:opacity-100">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
+          <!-- Video Upload -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary">Demo Video</label>
+            <input type="file" accept="video/*"
+              class="w-full text-sm text-text-tertiary file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all cursor-pointer"
+              (change)="onVideoSelected($event)" />
+
+            <div *ngIf="projectForm.get('videoRepresentation')?.value"
+              class="mt-4 relative rounded-xl overflow-hidden bg-black aspect-video w-full max-w-md border border-border shadow-lg">
+              <video [src]="projectForm.get('videoRepresentation')?.value" controls class="w-full h-full"></video>
+              <button type="button" (click)="projectForm.get('videoRepresentation')?.setValue('')"
+                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-80 hover:opacity-100 shadow-sm transition-opacity">
+                <i class="fa-solid fa-xmark text-xs"></i>
+              </button>
+            </div>
           </div>
         </div>
-          </div>
-        </div>
       </div>
-    
     </div>
 
     <!-- Right Column (Sidebar) -->
-    <div class="space-y-8">
-      
+    <div class="space-y-8 h-fit lg:sticky lg:top-24">
+
       <!-- Project Details -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Project Details</h2>
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-6">Details</h2>
 
-          <div class="space-y-4">
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Type</span></label>
-              <select formControlName="projectType" class="select select-bordered w-full">
-                <option value="main">Main Project</option>
-                <option value="mini">Mini Project</option>
-              </select>
-            </div>
+        <div class="space-y-5">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">Type</label>
+            <select formControlName="projectType"
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm">
+              <option value="main">Main Project</option>
+              <option value="mini">Mini Project</option>
+            </select>
+          </div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Status</span></label>
-              <select formControlName="status" class="select select-bordered w-full">
-                <option value="Planning">Planning</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-                <option value="On Hold">On Hold</option>
-              </select>
-            </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">Status</label>
+            <select formControlName="status"
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer text-sm">
+              <option value="Planning">Planning</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="On Hold">On Hold</option>
+            </select>
+          </div>
 
-            <div class="divider my-2"></div>
+          <div class="h-px w-full bg-border"></div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">Start Date</span></label>
-              <input type="date" formControlName="startDate" class="input input-bordered w-full" />
-            </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">Start Date</label>
+            <input type="date" formControlName="startDate"
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm" />
+          </div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text font-medium">End Date</span></label>
-              <input type="date" formControlName="endDate" class="input input-bordered w-full" />
-            </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">End Date</label>
+            <input type="date" formControlName="endDate"
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm" />
           </div>
         </div>
       </div>
 
       <!-- Links -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">External Links</h2>
-          
-          <div class="space-y-4">
-            <div class="form-control">
-              <label class="label flex justify-between">
-                <span class="label-text font-medium">Live URL</span>
-                <i class="fa-solid fa-globe text-base-content/40"></i>
-              </label>
-              <input type="url" formControlName="url" placeholder="https://..." class="input input-bordered w-full text-sm" />
-        </div>
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-6">External Links</h2>
 
-            <div class="form-control">
-              <label class="label flex justify-between">
-                <span class="label-text font-medium">Repository</span>
-                <i class="fa-brands fa-github text-base-content/40"></i>
-              </label>
-              <input type="url" formControlName="githubUrl" placeholder="https://github.com/..." class="input input-bordered w-full text-sm" />
-        </div>
+        <div class="space-y-5">
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              Live URL
+              <i class="fa-solid fa-globe text-text-tertiary"></i>
+            </label>
+            <input type="url" formControlName="url" placeholder="https://..."
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              Repository
+              <i class="fa-brands fa-github text-text-tertiary"></i>
+            </label>
+            <input type="url" formControlName="githubUrl" placeholder="https://github.com/..."
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
         </div>
       </div>
-        </div>
 
       <!-- Visibility -->
-      <div class="card bg-base-100 shadow-sm border border-base-200">
-        <div class="card-body p-6">
-          <h2 class="card-title text-base mb-4 text-base-content/70 uppercase tracking-wide font-bold text-xs">Visibility</h2>
-          
-          <div class="space-y-2">
-            <div class="form-control">
-              <label class="label cursor-pointer p-0 hover:bg-base-200 rounded-lg p-2 -mx-2 transition-colors">
-                <div class="flex flex-col">
-                  <span class="label-text font-medium">Featured Project</span>
-                  <span class="label-text-alt text-base-content/50">Show on home page</span>
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-6">Visibility</h2>
+
+        <div class="space-y-4">
+          <label
+            class="flex items-center justify-between p-3 rounded-xl hover:bg-surface cursor-pointer ring-1 ring-transparent hover:ring-border transition-all">
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-text-primary">Featured Project</span>
+              <span class="text-xs text-text-tertiary">Show on home page</span>
+            </div>
+            <div class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="featured" class="sr-only peer">
+              <div
+                class="w-11 h-6 bg-surface-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary border border-border">
+              </div>
+            </div>
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-xl hover:bg-surface cursor-pointer ring-1 ring-transparent hover:ring-border transition-all">
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-text-primary">Archived</span>
+              <span class="text-xs text-text-tertiary">Hide from public view</span>
+            </div>
+            <div class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="archived" class="sr-only peer">
+              <div
+                class="w-11 h-6 bg-surface-elevated peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 border border-border">
+              </div>
+            </div>
+          </label>
         </div>
-                <input type="checkbox" formControlName="featured" class="toggle toggle-primary toggle-sm" />
-              </label>
       </div>
 
-            <div class="form-control">
-              <label class="label cursor-pointer p-0 hover:bg-base-200 rounded-lg p-2 -mx-2 transition-colors">
-                <div class="flex flex-col">
-                  <span class="label-text font-medium">Archived</span>
-                  <span class="label-text-alt text-base-content/50">Hide from public view</span>
-                </div>
-                <input type="checkbox" formControlName="archived" class="toggle toggle-warning toggle-sm" />
-              </label>
-        </div>
-      </div>
-      </div>
     </div>
 
-    </div>
   </form>
 </div>

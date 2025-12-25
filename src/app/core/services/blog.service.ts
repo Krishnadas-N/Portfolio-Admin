@@ -2,10 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { 
-  ApiResponse, 
-  Blog, 
-  BlogStats, 
+import {
+  ApiResponse,
+  Blog,
+  BlogStats,
   SearchParams,
   PaginatedResult
 } from '../models/api.models';
@@ -25,7 +25,7 @@ export class BlogService {
     if (params?.search) httpParams = httpParams.set('search', params.search);
     if (params?.category) httpParams = httpParams.set('category', params.category);
     if (params?.published !== undefined) httpParams = httpParams.set('published', params.published.toString());
-    
+
     return this.http.get<PaginatedResult<Blog[]>>(this.apiUrl, { params: httpParams });
   }
 
@@ -52,7 +52,7 @@ export class BlogService {
   // Publish/Unpublish blog
   publishBlog(id: string): Observable<ApiResponse<{ _id: string; published: boolean; publishedAt: string }>> {
     return this.http.patch<ApiResponse<{ _id: string; published: boolean; publishedAt: string }>>(
-      `${this.apiUrl}/${id}/publish`, 
+      `${this.apiUrl}/${id}/publish`,
       {}
     );
   }

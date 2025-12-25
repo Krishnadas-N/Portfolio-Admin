@@ -1,24 +1,30 @@
-<div class="container mx-auto p-4 lg:p-8 max-w-7xl">
-  
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 sticky top-0 z-30 bg-base-100/95 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-base-200/50 md:border-none transition-all duration-300">
+<div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
+
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 shrink-0">
     <div>
-      <h1 class="text-3xl font-bold text-base-content tracking-tight">Certifications</h1>
-      <p class="text-base-content/60 text-sm mt-1">Manage your professional certifications and achievements</p>
+      <h1 class="text-3xl font-bold text-text-primary tracking-tight">Certifications</h1>
+      <p class="text-text-secondary text-sm mt-1">Manage your professional certifications and achievements.</p>
     </div>
-    
+
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-      <div class="join w-full sm:w-auto shadow-sm">
-        <div class="relative w-full sm:w-64">
-          <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" 
-                 placeholder="Search certifications..." 
-                 class="input input-bordered join-item w-full pl-10 focus:input-primary transition-all bg-base-100 placeholder:text-base-content/40" />
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"></i>
-        </div>
-        <button (click)="onSearch()" class="btn btn-primary join-item px-6">Search</button>
+      <!-- Search Input -->
+      <div class="relative w-full sm:w-72 group">
+        <i
+          class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" (keyup.enter)="onSearch()"
+          placeholder="Search certifications..."
+          class="w-full pl-10 pr-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm" />
       </div>
-      
-      <a routerLink="/certifications/add" class="btn btn-primary shadow-lg shadow-primary/20 shrink-0 gap-2">
+
+      <button (click)="onSearch()"
+        class="px-5 py-2.5 rounded-xl bg-surface border border-border text-text-primary hover:bg-surface-elevated hover:border-primary/50 transition-all text-sm font-medium shadow-sm">
+        Search
+      </button>
+
+      <!-- Add Button -->
+      <a routerLink="/certifications/add"
+        class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center justify-center gap-2 transform active:scale-95">
         <i class="fa-solid fa-plus"></i>
         <span class="hidden sm:inline">Add New</span>
         <span class="sm:hidden">Add</span>
@@ -27,124 +33,155 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    <div *ngFor="let i of [1,2,3,4,5,6]" class="card bg-base-100 shadow-sm border border-base-200 h-[280px] animate-pulse">
-      <div class="card-body p-6 space-y-4">
+  <div *ngIf="isLoading()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div *ngFor="let i of [1,2,3,4,5,6,7,8]"
+      class="glass-panel rounded-2xl h-[280px] animate-pulse border border-border/50">
+      <div class="p-6 space-y-4">
         <div class="flex gap-4">
-           <div class="h-16 w-16 bg-base-200 rounded-xl shrink-0"></div>
-           <div class="flex-1 space-y-2">
-              <div class="h-5 bg-base-200 w-3/4 rounded"></div>
-              <div class="h-4 bg-base-200 w-1/2 rounded"></div>
-           </div>
+          <div class="h-16 w-16 bg-surface-elevated/50 rounded-xl shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-5 bg-surface-elevated/50 w-3/4 rounded"></div>
+            <div class="h-4 bg-surface-elevated/50 w-1/2 rounded"></div>
+          </div>
         </div>
         <div class="space-y-2 pt-4">
-          <div class="h-3 bg-base-200 w-full rounded"></div>
-          <div class="h-3 bg-base-200 w-5/6 rounded"></div>
-        </div>
-        <div class="flex gap-2 mt-auto pt-4 border-t border-base-200/50">
-          <div class="h-8 w-24 bg-base-200 rounded-full"></div>
+          <div class="h-3 bg-surface-elevated/50 w-full rounded"></div>
+          <div class="h-3 bg-surface-elevated/50 w-5/6 rounded"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error()" class="alert alert-error shadow-lg rounded-xl mb-6 bg-error/10 border-error/20 text-error-content">
-    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+  <div *ngIf="error()"
+    class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 flex items-start gap-3 mb-6 animate-fade-in">
+    <i class="fa-solid fa-circle-exclamation text-lg mt-0.5"></i>
     <div class="flex-1">
-      <h3 class="font-bold">Error loading certifications</h3>
-      <div class="text-xs opacity-80">{{ error() }}</div>
+      <h3 class="font-bold text-sm">Error loading certifications</h3>
+      <div class="text-xs mt-1 opacity-90">{{ error() }}</div>
     </div>
-    <button class="btn btn-sm btn-ghost hover:bg-error/20" (click)="loadCertifications()">Retry</button>
+    <button class="text-xs font-semibold hover:underline" (click)="loadCertifications()">Retry</button>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading() && !error() && certifications().length === 0" class="flex flex-col items-center justify-center py-24 bg-base-100 rounded-3xl border-2 border-dashed border-base-200 text-center">
-    <div class="w-24 h-24 bg-base-200/50 rounded-full flex items-center justify-center mb-6 text-base-content/20">
-      <i class="fa-solid fa-certificate text-4xl"></i>
+  <div *ngIf="!isLoading() && !error() && certifications().length === 0"
+    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4">
+    <div class="w-24 h-24 bg-surface-elevated/50 rounded-full flex items-center justify-center mb-6 text-text-tertiary">
+      <i class="fa-solid fa-certificate text-4xl opacity-50"></i>
     </div>
-    <h3 class="text-xl font-bold text-base-content">No certifications found</h3>
-    <p class="text-base-content/60 max-w-xs mt-2 mb-8">Showcase your achievements by adding your first certification.</p>
-    <a routerLink="/certifications/add" class="btn btn-primary shadow-lg shadow-primary/20">Add Certification</a>
+    <h3 class="text-xl font-bold text-text-primary">No certifications found</h3>
+    <p class="text-text-tertiary max-w-xs mt-2 mb-8">Showcase your professional achievements.</p>
+    <a routerLink="/certifications/add"
+      class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/20 text-sm font-medium transition-colors">Add
+      Certification</a>
   </div>
 
-  <!-- Certification Grid -->
-  <div *ngIf="!isLoading() && certifications().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-    <div *ngFor="let cert of certifications()" class="card bg-base-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-base-200/60 group flex flex-col h-full rounded-2xl overflow-hidden relative">
-      
-      <!-- Status Badge -->
-      <div class="absolute top-4 right-4 z-10">
-         <span class="badge gap-1 shadow-sm" [ngClass]="cert.isActive ? 'badge-success text-white' : 'badge-warning'">
-            <i class="fa-solid text-xs" [ngClass]="cert.isActive ? 'fa-check' : 'fa-eye-slash'"></i> 
+  <!-- Certification Grid (Scrollable) -->
+  <div *ngIf="!isLoading() && certifications().length > 0" class="flex-1 overflow-y-auto custom-scrollbar min-h-0 pb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+      <div *ngFor="let cert of certifications()"
+        class="glass-panel group flex flex-col h-full rounded-2xl overflow-hidden card-hover border border-border/50 bg-surface shadow-sm hover:shadow-md transition-all duration-300 relative">
+
+        <!-- Status Badge -->
+        <div class="absolute top-4 right-4 z-10">
+          <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border"
+            [ngClass]="cert.isActive ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-surface-elevated text-text-tertiary border-border'">
             {{ cert.isActive ? 'Active' : 'Inactive' }}
-         </span>
-      </div>
+          </span>
+        </div>
 
-      <div class="card-body p-6 flex flex-col h-full">
-        <!-- Header: Logo & Title -->
-        <div class="flex items-start gap-4 mb-4">
-           <div class="w-16 h-16 rounded-xl bg-base-200/50 border border-base-200 p-2 shrink-0 flex items-center justify-center overflow-hidden">
-              <img [src]="cert.image || 'assets/images/placeholder-cert.png'" [alt]="cert.issuer" class="w-full h-full object-contain" />
-           </div>
-           <div class="flex-1 min-w-0">
+        <div class="p-6 flex flex-col h-full flex-1">
+          <!-- Header: Logo & Title -->
+          <div class="flex items-start gap-4 mb-4">
+            <div
+              class="w-14 h-14 rounded-xl bg-surface-elevated/50 border border-border p-2 shrink-0 flex items-center justify-center overflow-hidden">
+              <img [src]="cert.image || 'assets/images/placeholder-cert.png'" [alt]="cert.issuer"
+                class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal opacity-90" />
+            </div>
+            <div class="flex-1 min-w-0 pt-0.5">
               <div class="flex gap-2 mb-1">
-                <span class="badge badge-xs badge-ghost uppercase tracking-wider" *ngIf="cert.category">{{ cert.category }}</span>
-                <span class="badge badge-xs badge-outline uppercase tracking-wider" *ngIf="cert.level">{{ cert.level }}</span>
+                <span
+                  class="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/5 px-1.5 rounded border border-primary/10"
+                  *ngIf="cert.category">{{ cert.category }}</span>
+                <span
+                  class="text-[10px] font-medium uppercase tracking-wider text-text-tertiary border border-border px-1.5 rounded"
+                  *ngIf="cert.level">{{ cert.level }}</span>
               </div>
-              <h3 class="font-bold text-lg text-base-content leading-tight mb-1 group-hover:text-primary transition-colors line-clamp-2" [title]="cert.name">
-                 {{ cert.name }}
+              <h3
+                class="font-bold text-base text-text-primary leading-tight mb-1 group-hover:text-primary transition-colors line-clamp-2"
+                [title]="cert.name">
+                {{ cert.name }}
               </h3>
-              <p class="text-sm text-base-content/60 font-medium truncate">{{ cert.issuer }}</p>
-           </div>
-        </div>
+              <p class="text-xs text-text-secondary font-medium truncate">{{ cert.issuer }}</p>
+            </div>
+          </div>
 
-        <!-- Dates & ID -->
-        <div class="space-y-2 text-xs text-base-content/70 mb-4 bg-base-200/30 p-3 rounded-lg border border-base-200/50">
-           <div class="flex justify-between items-center">
-              <span class="text-base-content/50">Issued</span>
+          <!-- Dates & ID -->
+          <div
+            class="flex flex-col gap-1.5 text-xs text-text-secondary mb-5 bg-surface-elevated/30 p-3 rounded-lg border border-border/40">
+            <div class="flex justify-between items-center">
+              <span class="text-text-tertiary">Issued</span>
               <span class="font-medium">{{ cert.issueDate | date:'mediumDate' }}</span>
-           </div>
-           <div class="flex justify-between items-center" *ngIf="cert.expiryDate">
-              <span class="text-base-content/50">Expires</span>
+            </div>
+            <!-- Optional Expiry -->
+            <div class="flex justify-between items-center" *ngIf="cert.expiryDate">
+              <span class="text-text-tertiary">Expires</span>
               <span class="font-medium">{{ cert.expiryDate | date:'mediumDate' }}</span>
-           </div>
-           <div class="flex justify-between items-center pt-2 border-t border-base-200/50 mt-2" *ngIf="cert.credentialId">
-              <span class="text-base-content/50">ID</span>
-              <span class="font-mono bg-base-100 px-1.5 py-0.5 rounded text-[10px] select-all">{{ cert.credentialId }}</span>
-           </div>
-        </div>
+            </div>
+            <!-- Optional ID -->
+            <div class="flex justify-between items-center pt-1.5 border-t border-border/30 mt-0.5"
+              *ngIf="cert.credentialId">
+              <span class="text-text-tertiary">ID</span>
+              <span class="font-mono bg-surface px-1.5 rounded text-[10px] border border-border/50 select-all">{{
+                cert.credentialId }}</span>
+            </div>
+          </div>
 
-        <!-- Skills -->
-        <div class="flex flex-wrap gap-1.5 mb-6">
-           <span *ngFor="let skill of cert.skills?.slice(0, 3)" class="badge badge-sm bg-base-200 border-base-200 text-base-content/70">
+          <!-- Skills -->
+          <div class="flex flex-wrap gap-1.5 mt-auto">
+            <span *ngFor="let skill of cert.skills?.slice(0, 3)"
+              class="text-[10px] font-medium text-text-secondary bg-surface border border-border px-2 py-0.5 rounded-md">
               {{ skill }}
-           </span>
-           <span *ngIf="cert.skills && cert.skills.length > 3" class="badge badge-sm badge-ghost opacity-60">
+            </span>
+            <span *ngIf="cert.skills && cert.skills.length > 3"
+              class="text-[10px] font-medium text-text-tertiary px-1 py-0.5">
               +{{ cert.skills.length - 3 }}
-           </span>
-        </div>
+            </span>
+          </div>
 
-        <!-- Footer Actions -->
-        <div class="mt-auto flex items-center justify-between pt-4 border-t border-base-200/50 gap-3">
-           <a *ngIf="cert.credentialUrl || cert.verificationUrl" [href]="cert.credentialUrl || cert.verificationUrl" target="_blank" class="btn btn-sm btn-ghost gap-2 text-primary hover:bg-primary/10">
+          <div class="h-px w-full bg-border/50 my-4"></div>
+
+          <!-- Footer Actions -->
+          <div class="flex items-center justify-between gap-3">
+            <a *ngIf="cert.credentialUrl || cert.verificationUrl" [href]="cert.credentialUrl || cert.verificationUrl"
+              target="_blank"
+              class="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-hover transition-colors">
               <i class="fa-solid fa-arrow-up-right-from-square"></i> Verify
-           </a>
-           
-           <div class="flex gap-2 ml-auto">
-              <a [routerLink]="['/certifications/edit', cert._id]" class="btn btn-sm btn-square btn-ghost hover:bg-base-200 hover:text-base-content" title="Edit">
-                 <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            <span *ngIf="!cert.credentialUrl && !cert.verificationUrl" class="text-xs text-text-tertiary italic">No
+              link</span>
+
+            <div class="flex gap-1 ml-auto">
+              <a [routerLink]="['/certifications/edit', cert._id]"
+                class="btn btn-ghost btn-xs w-7 h-7 min-h-0 px-0 text-text-tertiary hover:text-text-primary rounded-lg"
+                title="Edit">
+                <i class="fa-solid fa-pen-to-square"></i>
               </a>
-              <button (click)="deleteCertification(cert._id!)" class="btn btn-sm btn-square btn-ghost text-error hover:bg-error/10 hover:text-error" title="Delete">
-                 <i class="fa-regular fa-trash-can"></i>
+              <button (click)="deleteCertification(cert._id!)"
+                class="btn btn-ghost btn-xs w-7 h-7 min-h-0 px-0 text-text-tertiary hover:text-red-500 rounded-lg"
+                title="Delete">
+                <i class="fa-regular fa-trash-can"></i>
               </button>
-           </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading() && pagination()" class="mt-8 border-t border-border/50 pt-6 mb-8">
+      <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
   </div>
 
-  <!-- Pagination -->
-  <div *ngIf="!isLoading() && pagination()" class="mt-10 border-t border-base-200 pt-8">
-    <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
-  </div>
 </div>
