@@ -110,7 +110,8 @@
                                     <i class="fa-solid fa-camera"></i>
                                     <span class="text-[10px] font-bold uppercase">Upload</span>
                                 </div>
-                                <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                <input type="file" (change)="onFileSelected($event, 'settings')"
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -167,6 +168,180 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Admin Profile -->
+                <div *ngIf="activeTab() === 'profile'" class="space-y-8 animate-fade-in relative">
+
+                    <!-- Main Profile Card -->
+                    <div class="glass-panel rounded-2xl border border-border/50 bg-surface overflow-hidden"
+                        [formGroup]="profileForm">
+
+                        <!-- Header / Banner -->
+                        <div class="relative h-48 bg-gradient-to-r from-primary/80 to-secondary/80 overflow-hidden">
+                            <div class="absolute inset-0 bg-grid-white/10 opacity-30"></div>
+                            <div class="absolute top-6 right-6 z-10">
+                                <button (click)="onProfileSubmit()"
+                                    [disabled]="isLoading() || profileForm.invalid || profileForm.pristine"
+                                    class="px-5 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/20 shadow-lg transition-all text-sm font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i class="fa-regular fa-floppy-disk"></i>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="px-8 pb-8">
+                            <div class="flex flex-col lg:flex-row gap-8">
+
+                                <!-- Left Sidebar: Avatar & Status -->
+                                <div class="shrink-0 flex flex-col items-center lg:items-start -mt-20">
+                                    <!-- Avatar -->
+                                    <div class="relative group mb-6">
+                                        <div
+                                            class="w-40 h-40 rounded-full border-[6px] border-surface bg-surface-elevated shadow-2xl overflow-hidden relative">
+                                            <img *ngIf="profileForm.get('profileImage')?.value"
+                                                [src]="profileForm.get('profileImage')?.value"
+                                                class="w-full h-full object-cover">
+                                            <div *ngIf="!profileForm.get('profileImage')?.value"
+                                                class="w-full h-full flex items-center justify-center bg-surface-elevated text-text-tertiary text-5xl">
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+
+                                            <!-- Hover Overlay -->
+                                            <div
+                                                class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer z-10 backdrop-blur-[2px]">
+                                                <i class="fa-solid fa-camera text-2xl mb-2"></i>
+                                                <span class="text-xs font-bold uppercase tracking-wider">Change</span>
+                                            </div>
+                                            <input type="file" (change)="onFileSelected($event, 'profile')"
+                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                                title="Change Avatar" />
+                                        </div>
+                                        <div class="absolute bottom-4 right-4 w-7 h-7 bg-emerald-500 rounded-full border-4 border-surface shadow-md"
+                                            title="Active Status"></div>
+                                    </div>
+
+                                    <!-- Status Cards (Desktop: Stacked, Mobile: Grid) -->
+                                    <div class="w-full grid grid-cols-2 lg:grid-cols-1 gap-3 lg:w-64">
+                                        <div
+                                            class="bg-surface-elevated/50 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                            <div
+                                                class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-lg">
+                                                <i class="fa-solid fa-crown"></i>
+                                            </div>
+                                            <div>
+                                                <div
+                                                    class="text-[10px] uppercase font-bold text-text-tertiary tracking-wider">
+                                                    Role</div>
+                                                <div class="font-bold text-text-primary capitalize">{{
+                                                    profileForm.get('role')?.value || 'Super Admin' }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="bg-surface-elevated/50 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                            <div
+                                                class="w-10 h-10 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center text-lg">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </div>
+                                            <div>
+                                                <div
+                                                    class="text-[10px] uppercase font-bold text-text-tertiary tracking-wider">
+                                                    Last Login</div>
+                                                <div class="font-bold text-text-primary text-sm">{{
+                                                    (profileForm.get('lastLogin')?.value | date:'mediumDate') || 'Today'
+                                                    }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Content: Form Fields -->
+                                <div class="flex-1 space-y-8 pt-4 lg:pt-8 w-full">
+
+                                    <!-- Personal Info Section -->
+                                    <div>
+                                        <h3
+                                            class="text-lg font-bold text-text-primary mb-4 flex items-center gap-2 pb-2 border-b border-border/40">
+                                            <span class="text-primary"><i class="fa-regular fa-id-card"></i></span>
+                                            Personal Information
+                                        </h3>
+                                        <div class="grid grid-cols-1  gap-6">
+                                            <div class="space-y-1.5">
+                                                <label
+                                                    class="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Username</label>
+                                                <div class="relative group">
+                                                    <i
+                                                        class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+                                                    <input type="text" formControlName="username"
+                                                        class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-text-primary transition-all font-medium placeholder:text-text-tertiary/50" />
+                                                </div>
+                                            </div>
+
+                                            <div class="space-y-1.5">
+                                                <label
+                                                    class="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Email
+                                                    Address</label>
+                                                <div class="relative group">
+                                                    <i
+                                                        class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors"></i>
+                                                    <input type="email" formControlName="email"
+                                                        class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-elevated/50 border border-border/60 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-text-primary transition-all font-medium placeholder:text-text-tertiary/50" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Section (Separate Card) -->
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-border/50 bg-surface"
+                        [formGroup]="passwordForm">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                            <div>
+                                <h3 class="text-lg font-bold text-text-primary flex items-center gap-2">
+                                    <div class="p-2 rounded-lg bg-red-500/10 text-red-500">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    Security & Password
+                                </h3>
+                                <p class="text-sm text-text-secondary mt-1 ml-11 max-w-md">Ensure your account uses a
+                                    strong, unique password to prevent unauthorized access.</p>
+                            </div>
+                            <button (click)="onProfileSubmit()"
+                                [disabled]="isLoading() || passwordForm.invalid || passwordForm.pristine"
+                                class="px-5 py-2.5 rounded-xl bg-surface-elevated hover:bg-surface-elevated-hover text-text-primary border border-border hover:border-border-hover shadow-sm transition-all text-sm font-bold flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-key text-red-500 group-hover:rotate-45 transition-transform"></i>
+                                <span>Update Password</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-surface-elevated/30 rounded-2xl p-6 border border-border/40">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">New
+                                        Password</label>
+                                    <input type="password" formControlName="newPassword" placeholder="••••••••"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface border border-border/60 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-text-primary transition-all" />
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label
+                                        class="text-xs font-bold text-text-secondary uppercase tracking-wider ml-1">Confirm
+                                        Password</label>
+                                    <input type="password" formControlName="confirmPassword" placeholder="••••••••"
+                                        class="w-full px-4 py-3 rounded-xl bg-surface border border-border/60 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none text-text-primary transition-all" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
 
@@ -314,6 +489,53 @@
                                 </div>
                                 <input type="checkbox" formControlName="contact" class="toggle toggle-warning" />
                             </label>
+                            <!-- Analytics Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Analytics</div>
+                                        <div class="text-xs text-text-tertiary">Track user behavior</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="analytics" class="toggle toggle-info" />
+                            </label>
+
+                            <!-- Chat Bot Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">AI Chat Bot</div>
+                                        <div class="text-xs text-text-tertiary">Automated assistance</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="chatBot" class="toggle toggle-primary" />
+                            </label>
+
+                            <!-- Newsletter Card -->
+                            <label
+                                class="relative flex items-center justify-between p-4 rounded-xl border border-border/60 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-red-500/10 text-red-600 flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-text-primary text-sm">Newsletter</div>
+                                        <div class="text-xs text-text-tertiary">Email subscriptions</div>
+                                    </div>
+                                </div>
+                                <input type="checkbox" formControlName="newsletter" class="toggle toggle-error" />
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -372,9 +594,7 @@
                         </div>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
-
 </div>

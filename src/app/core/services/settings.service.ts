@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { 
-  ApiResponse, 
+import {
+  ApiResponse,
   PortfolioSettings,
   AdminProfile,
   User,
@@ -20,7 +20,7 @@ export class SettingsService {
   private apiUrl = `${environment.apiUrl}/settings`;
 
   // ==================== Portfolio Settings ====================
-  
+
   // Get portfolio settings
   getPortfolioSettings(): Observable<ApiResponse<PortfolioSettings>> {
     return this.http.get<ApiResponse<PortfolioSettings>>(`${this.apiUrl}/portfolio`);
@@ -32,7 +32,7 @@ export class SettingsService {
   }
 
   // ==================== Admin Profile ====================
-  
+
   // Get admin profile
   getProfile(): Observable<ApiResponse<AdminProfile>> {
     return this.http.get<ApiResponse<AdminProfile>>(`${this.apiUrl}/profile`);
@@ -49,7 +49,7 @@ export class SettingsService {
   }
 
   // ==================== User Management ====================
-  
+
   // Get all users
   getUsers(params?: UsersParams): Observable<ApiResponse<UsersResponse>> {
     let httpParams = new HttpParams();
@@ -58,7 +58,7 @@ export class SettingsService {
     if (params?.role) httpParams = httpParams.set('role', params.role);
     if (params?.status) httpParams = httpParams.set('status', params.status);
     if (params?.search) httpParams = httpParams.set('search', params.search);
-    
+
     return this.http.get<ApiResponse<UsersResponse>>(`${this.apiUrl}/users`, { params: httpParams });
   }
 

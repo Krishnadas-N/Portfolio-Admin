@@ -1,192 +1,420 @@
-<div class="flex flex-col gap-6">
-  
-  <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>  
+<div class="flex flex-col gap-6 h-full">
+
+  <!-- Page Header & Tabs -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+    <div>
       <h1 class="text-2xl font-bold text-base-content tracking-tight">Dashboard</h1>
       <p class="text-sm text-base-content/60 mt-1">Overview of your portfolio performance and activity</p>
-            </div>
-    <div class="flex gap-3">
-      <button class="btn btn-ghost btn-sm border-base-300">
-        <i class="fa-solid fa-download mr-2"></i>
-        Export
-      </button>
-      <button class="btn btn-primary btn-sm shadow-lg shadow-primary/20">
-        <i class="fa-solid fa-plus mr-2"></i>
-        New Project
-      </button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div role="tablist" class="tabs tabs-boxed bg-base-200/50 p-1 rounded-xl">
+      <a role="tab" class="tab rounded-lg transition-all duration-200" [class.tab-active]="activeTab() === 'overview'"
+        [class.bg-white]="activeTab() === 'overview'" [class.shadow-sm]="activeTab() === 'overview'"
+        (click)="setActiveTab('overview')">Overview</a>
+      <a role="tab" class="tab rounded-lg transition-all duration-200" [class.tab-active]="activeTab() === 'analytics'"
+        [class.bg-white]="activeTab() === 'analytics'" [class.shadow-sm]="activeTab() === 'analytics'"
+        (click)="setActiveTab('analytics')">Analytics</a>
+      <a role="tab" class="tab rounded-lg transition-all duration-200" [class.tab-active]="activeTab() === 'visitors'"
+        [class.bg-white]="activeTab() === 'visitors'" [class.shadow-sm]="activeTab() === 'visitors'"
+        (click)="setActiveTab('visitors')">Visitors</a>
+      <a role="tab" class="tab rounded-lg transition-all duration-200" [class.tab-active]="activeTab() === 'logs'"
+        [class.bg-white]="activeTab() === 'logs'" [class.shadow-sm]="activeTab() === 'logs'"
+        (click)="setActiveTab('logs')">System Logs</a>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="flex items-center justify-center flex-1 h-64">
+    <span class="loading loading-spinner loading-lg text-primary"></span>
+  </div>
+
+  <div *ngIf="!isLoading()" class="flex-1 overflow-y-auto min-h-0 pb-6 pr-2 custom-scrollbar">
+
+    <!-- OVERVIEW TAB -->
+    <div *ngIf="activeTab() === 'overview'" class="flex flex-col gap-6 animate-fade-in">
+      <!-- Main Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <!-- Visitors -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-primary/20 transition-colors">
+          <div
+            class="stat-figure text-primary bg-primary/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-users text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Total Visitors</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalVisitors || 0 }}
+          </div>
+          <div class="stat-desc font-medium mt-1 flex items-center gap-1"
+            [ngClass]="(stats()?.growth?.visitors?.monthly || '0').startsWith('-') ? 'text-error' : 'text-success'">
+            <i class="fa-solid"
+              [ngClass]="(stats()?.growth?.visitors?.monthly || '0').startsWith('-') ? 'fa-arrow-trend-down' : 'fa-arrow-trend-up'"></i>
+            <span>{{ stats()?.growth?.visitors?.monthly || '0' }}% from last month</span>
           </div>
         </div>
 
-  <!-- Stats Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-    
-    <!-- Visitors Card -->
-    <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl">
-      <div class="stat-figure text-primary bg-primary/10 w-12 h-12 flex items-center justify-center rounded-xl">
-        <i class="fa-solid fa-users text-xl"></i>
+        <!-- Contacts (New) -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-info/20 transition-colors">
+          <div
+            class="stat-figure text-info bg-info/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-address-book text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Contacts</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalContacts || 0 }}
+          </div>
+          <div class="stat-desc text-info font-medium mt-1">Total inquiries</div>
+        </div>
+
+        <!-- Projects -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-success/20 transition-colors">
+          <div
+            class="stat-figure text-success bg-success/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-project-diagram text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Projects</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalProjects || 0 }}
+          </div>
+          <div class="stat-desc text-success font-medium mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-check"></i>
+            <span>Active & Completed</span>
+          </div>
+        </div>
+
+        <!-- Blogs -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-warning/20 transition-colors">
+          <div
+            class="stat-figure text-warning bg-warning/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-newspaper text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Blog Posts</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalBlogs || 0 }}
+          </div>
+          <div class="stat-desc text-base-content/40 mt-1">Total published posts</div>
+        </div>
+      </div>
+
+      <!-- Secondary Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Newsletter Subscribers -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-secondary/20 transition-colors">
+          <div
+            class="stat-figure text-secondary bg-secondary/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-envelope text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Newsletter
+            Subscribers</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{
+            stats()?.overview?.totalNewsletterSubscribers || 0 }}</div>
+          <div class="stat-desc text-secondary font-medium mt-1">Active subscribers</div>
+        </div>
+
+        <!-- Campaigns -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-secondary/20 transition-colors">
+          <div
+            class="stat-figure text-secondary bg-secondary/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-paper-plane text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Campaigns Sent</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{
+            stats()?.overview?.totalNewsletterCampaigns || 0 }}</div>
+          <div class="stat-desc text-secondary font-medium mt-1">Total campaigns</div>
+        </div>
+
+        <!-- Comments -->
+        <div
+          class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl group hover:border-error/20 transition-colors">
+          <div
+            class="stat-figure text-error bg-error/10 w-12 h-12 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-comments text-xl"></i>
+          </div>
+          <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Comments</div>
+          <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalComments || 0 }}
+          </div>
+          <div class="stat-desc font-medium mt-1 flex items-center gap-1"
+            [ngClass]="(stats()?.growth?.comments?.monthly || '0').startsWith('-') ? 'text-error' : 'text-success'">
+            <i class="fa-solid"
+              [ngClass]="(stats()?.growth?.comments?.monthly || '0').startsWith('-') ? 'fa-arrow-trend-down' : 'fa-arrow-trend-up'"></i>
+            <span>{{ stats()?.growth?.comments?.monthly || '0' }}% growth</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popular Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Top Projects -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200">
+              <h3 class="font-bold text-lg text-base-content">Top Projects</h3>
+            </div>
+            <div class="p-2">
+              <div *ngFor="let project of stats()?.topContent?.projects"
+                class="flex items-center justify-between p-3 hover:bg-base-200/50 rounded-xl transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-sm">
+                    <i class="fa-solid fa-cube"></i>
+                  </div>
+                  <span class="font-medium text-sm truncate">{{ project.title }}</span>
                 </div>
-      <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Total Visitors</div>
-      <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalVisitors || 0 }}</div>
-      <div class="stat-desc font-medium mt-1 flex items-center gap-1"
-           [ngClass]="(stats()?.growth?.visitors?.monthly || '0').startsWith('-') ? 'text-error' : 'text-success'">
-        <i class="fa-solid" [ngClass]="(stats()?.growth?.visitors?.monthly || '0').startsWith('-') ? 'fa-arrow-trend-down' : 'fa-arrow-trend-up'"></i>
-        <span>{{ stats()?.growth?.visitors?.monthly || '0' }}% from last month</span>
+                <div class="flex gap-3 text-xs font-mono opacity-60">
+                  <span title="Views"><i class="fa-solid fa-eye mr-1"></i>{{ project.viewsCount }}</span>
+                  <span title="Likes"><i class="fa-solid fa-heart mr-1"></i>{{ project.likes }}</span>
                 </div>
               </div>
-
-    <!-- Projects Card -->
-    <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl">
-      <div class="stat-figure text-success bg-success/10 w-12 h-12 flex items-center justify-center rounded-xl">
-        <i class="fa-solid fa-project-diagram text-xl"></i>
-                </div>
-      <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Projects</div>
-      <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalProjects || 0 }}</div>
-      <div class="stat-desc text-success font-medium mt-1 flex items-center gap-1">
-        <i class="fa-solid fa-plus"></i>
-        <span>Active & Completed</span>
-                </div>
+              <div *ngIf="!stats()?.topContent?.projects?.length" class="text-center py-4 text-sm opacity-50">No data
               </div>
-
-    <!-- Blogs Card -->
-    <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl">
-      <div class="stat-figure text-warning bg-warning/10 w-12 h-12 flex items-center justify-center rounded-xl">
-        <i class="fa-solid fa-newspaper text-xl"></i>
-                </div>
-      <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Blog Posts</div>
-      <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalBlogs || 0 }}</div>
-      <div class="stat-desc text-base-content/40 mt-1">Total published posts</div>
-                </div>
-
-    <!-- Comments Card -->
-    <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl">
-      <div class="stat-figure text-error bg-error/10 w-12 h-12 flex items-center justify-center rounded-xl">
-        <i class="fa-solid fa-comments text-xl"></i>
-              </div>
-      <div class="stat-title text-base-content/60 font-medium text-xs uppercase tracking-wide">Comments</div>
-      <div class="stat-value text-3xl font-bold mt-1 text-base-content">{{ stats()?.overview?.totalComments || 0 }}</div>
-      <div class="stat-desc font-medium mt-1 flex items-center gap-1"
-           [ngClass]="(stats()?.growth?.comments?.monthly || '0').startsWith('-') ? 'text-error' : 'text-success'">
-        <i class="fa-solid" [ngClass]="(stats()?.growth?.comments?.monthly || '0').startsWith('-') ? 'fa-arrow-trend-down' : 'fa-arrow-trend-up'"></i>
-        <span>{{ stats()?.growth?.comments?.monthly || '0' }}% from last month</span>
-          </div>
-        </div>
-      </div>
-
-  <!-- Content Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    
-    <!-- Recent Projects -->
-    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
-      <div class="card-body p-0">
-        <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
-          <h3 class="font-bold text-lg text-base-content">Recent Projects</h3>
-          <button class="btn btn-ghost btn-xs text-primary hover:bg-primary/10">View all</button>
-    </div>
-        
-        <div class="p-3 space-y-1">
-          <div *ngFor="let project of stats()?.recent?.projects" 
-               class="flex items-center gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
-            <div class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50">
-               <i class="fa-solid fa-cube"></i>
-        </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors">{{ project.title }}</p>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span class="text-xs text-base-content/50 capitalize">{{ project.status }}</span>
-                <span class="w-1 h-1 rounded-full bg-base-300"></span>
-                <span class="text-xs text-base-content/50">{{ project.createdAt | date:'MMM d' }}</span>
-                      </div>
-                    </div>
-            <div class="badge badge-sm" [ngClass]="{
-              'badge-success badge-outline': project.status === 'Completed',
-              'badge-warning badge-outline': project.status === 'In Progress',
-              'badge-ghost badge-outline': project.status === 'Planned'
-            }">{{ project.viewsCount || 0 }} views</div>
-                      </div>
-
-          <div *ngIf="!stats()?.recent?.projects?.length" class="flex flex-col items-center justify-center py-12 text-base-content/40">
-            <i class="fa-solid fa-box-open text-3xl mb-2 opacity-50"></i>
-            <p class="text-sm">No recent projects found.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Blogs -->
-    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
-      <div class="card-body p-0">
-        <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
-          <h3 class="font-bold text-lg text-base-content">Recent Blogs</h3>
-          <button class="btn btn-ghost btn-xs text-primary hover:bg-primary/10">View all</button>
             </div>
-        
-        <div class="p-3 space-y-1">
-          <div *ngFor="let blog of stats()?.recent?.blogs" 
-               class="flex items-center gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
-            <div class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50">
-               <i class="fa-solid fa-align-left"></i>
           </div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors">{{ blog.title }}</p>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span class="text-xs text-base-content/50 capitalize">{{ blog.status }}</span>
-                <span class="w-1 h-1 rounded-full bg-base-300"></span>
-                <span class="text-xs text-base-content/50">{{ blog.createdAt | date:'MMM d' }}</span>
         </div>
-      </div>
-            <div class="badge badge-sm badge-ghost badge-outline">{{ blog.viewsCount || 0 }} views</div>
-    </div>
 
-          <div *ngIf="!stats()?.recent?.blogs?.length" class="flex flex-col items-center justify-center py-12 text-base-content/40">
-            <i class="fa-regular fa-file-lines text-3xl mb-2 opacity-50"></i>
-            <p class="text-sm">No recent blogs found.</p>
+        <!-- Top Blogs -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200">
+              <h3 class="font-bold text-lg text-base-content">Top Blogs</h3>
+            </div>
+            <div class="p-2">
+              <div *ngFor="let blog of stats()?.topContent?.blogs"
+                class="flex items-center justify-between p-3 hover:bg-base-200/50 rounded-xl transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div
+                    class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary text-sm">
+                    <i class="fa-solid fa-feather"></i>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-medium text-sm truncate">{{ blog.title }}</span>
+                    <span class="text-[10px] opacity-50 truncate">{{ blog.category }}</span>
+                  </div>
+                </div>
+                <div class="flex gap-3 text-xs font-mono opacity-60">
+                  <span title="Views"><i class="fa-solid fa-eye mr-1"></i>{{ blog.viewsCount }}</span>
+                  <span title="Likes"><i class="fa-solid fa-heart mr-1"></i>{{ blog.likes }}</span>
+                </div>
+              </div>
+              <div *ngIf="!stats()?.topContent?.blogs?.length" class="text-center py-4 text-sm opacity-50">No data</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Pages -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200">
+              <h3 class="font-bold text-lg text-base-content">Top Pages</h3>
+            </div>
+            <div class="p-2">
+              <div *ngFor="let page of stats()?.topContent?.pages"
+                class="flex items-center justify-between p-3 hover:bg-base-200/50 rounded-xl transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent text-sm">
+                    <i class="fa-solid fa-link"></i>
+                  </div>
+                  <span class="font-medium text-sm truncate">{{ page._id }}</span>
+                </div>
+                <div class="text-xs font-mono opacity-60">
+                  <span title="Views"><i class="fa-solid fa-eye mr-1"></i>{{ page.totalViews }}</span>
+                </div>
+              </div>
+              <div *ngIf="!stats()?.topContent?.pages?.length" class="text-center py-4 text-sm opacity-50">No data</div>
             </div>
           </div>
         </div>
       </div>
 
+
+
+      <!-- Recent Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Messages (Contacts) -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+              <h3 class="font-bold text-lg text-base-content">Recent Messages</h3>
+            </div>
+            <div class="p-3 space-y-1">
+              <div *ngFor="let contact of stats()?.recent?.contacts"
+                class="flex items-center gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50">
+                  <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors truncate">
+                    {{ contact.subject || 'No Subject' }}</p>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-xs text-base-content/60">{{ contact.name }}</span>
+                    <span class="w-1 h-1 rounded-full bg-base-300"></span>
+                    <span class="text-xs text-base-content/50">{{ contact.createdAt | date:'MMM d' }}</span>
+                  </div>
+                </div>
+                <div class="badge badge-sm" [ngClass]="{
+                    'badge-primary': contact.status === 'new',
+                    'badge-ghost': contact.status !== 'new'
+                }">{{ contact.status }}</div>
+              </div>
+              <div *ngIf="!stats()?.recent?.contacts?.length"
+                class="flex flex-col items-center justify-center py-8 text-base-content/40">
+                <p class="text-sm">No recent messages.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Projects -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+              <h3 class="font-bold text-lg text-base-content">Recent Projects</h3>
+            </div>
+            <div class="p-3 space-y-1">
+              <div *ngFor="let project of stats()?.recent?.projects"
+                class="flex items-center gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50">
+                  <i class="fa-solid fa-cube"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors">{{
+                    project.title }}</p>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-xs text-base-content/50 capitalize">{{ project.status }}</span>
+                    <span class="w-1 h-1 rounded-full bg-base-300"></span>
+                    <span class="text-xs text-base-content/50">{{ project.createdAt | date:'MMM d' }}</span>
+                  </div>
+                </div>
+                <div class="badge badge-sm badge-ghost badge-outline">{{ project.viewsCount || 0 }} views</div>
+              </div>
+              <div *ngIf="!stats()?.recent?.projects?.length"
+                class="flex flex-col items-center justify-center py-8 text-base-content/40">
+                <p class="text-sm">No recent projects.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Blogs -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+              <h3 class="font-bold text-lg text-base-content">Recent Blogs</h3>
+            </div>
+            <div class="p-3 space-y-1">
+              <div *ngFor="let blog of stats()?.recent?.blogs"
+                class="flex items-center gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50">
+                  <i class="fa-solid fa-newspaper"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors">{{
+                    blog.title }}</p>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-xs text-base-content/50 capitalize">{{ blog.status }}</span>
+                    <span class="w-1 h-1 rounded-full bg-base-300"></span>
+                    <span class="text-xs text-base-content/50">{{ blog.createdAt | date:'MMM d' }}</span>
+                  </div>
+                </div>
+                <div class="badge badge-sm badge-ghost badge-outline">{{ blog.viewsCount || 0 }} views</div>
+              </div>
+              <div *ngIf="!stats()?.recent?.blogs?.length"
+                class="flex flex-col items-center justify-center py-8 text-base-content/40">
+                <p class="text-sm">No recent blogs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Comments -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl h-full">
+          <div class="card-body p-0">
+            <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+              <h3 class="font-bold text-lg text-base-content">Recent Comments</h3>
+            </div>
+            <div class="p-3 space-y-1">
+              <div *ngFor="let comment of stats()?.recent?.comments"
+                class="flex items-start gap-4 p-3 hover:bg-base-200/50 rounded-xl transition-all cursor-pointer group">
+                <div
+                  class="w-10 h-10 rounded-lg bg-base-200 flex items-center justify-center group-hover:bg-base-300 transition-colors text-base-content/50 mt-1">
+                  <i class="fa-solid fa-comment"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <p class="font-semibold text-sm text-base-content group-hover:text-primary transition-colors">{{
+                      comment.author.name }}</p>
+                    <span class="text-[10px] text-base-content/40">{{ comment.createdAt | date:'MMM d' }}</span>
+                  </div>
+                  <p class="text-xs text-base-content/60 truncate mt-1">{{ comment.content }}</p>
+                  <div class="mt-2">
+                    <div class="badge badge-xs" [ngClass]="{
+                        'badge-warning': comment.status === 'pending',
+                        'badge-success': comment.status === 'approved',
+                        'badge-error': comment.status === 'rejected'
+                    }">{{ comment.status }}</div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!stats()?.recent?.comments?.length"
+                class="flex flex-col items-center justify-center py-8 text-base-content/40">
+                <p class="text-sm">No recent comments.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-  <!-- Recent Visitors Table -->
-  <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
-    <div class="card-body p-0">
-      <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
-        <h3 class="font-bold text-lg text-base-content">Recent Visitors</h3>
+    <!-- ANALYTICS TAB -->
+    <div *ngIf="activeTab() === 'analytics'" class="flex flex-col gap-6 animate-fade-in">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-1">Avg Page Views</div>
+          <div class="text-2xl font-bold">{{ analytics()?.metrics?.avgPageViews | number:'1.0-1' }}</div>
         </div>
-      <div class="overflow-x-auto">
-        <table class="table table-zebra">
-          <!-- head -->
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-1">Avg Unique Visitors</div>
+          <div class="text-2xl font-bold">{{ analytics()?.metrics?.avgUniqueVisitors | number:'1.0-1' }}</div>
+        </div>
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-1">Avg Bounce Rate</div>
+          <div class="text-2xl font-bold">{{ analytics()?.metrics?.avgBounceRate || 0 }}%</div>
+        </div>
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-1">Avg Session Dur.</div>
+          <div class="text-2xl font-bold">{{ analytics()?.metrics?.avgSessionDuration || 0 }}s</div>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+        <div class="card-body">
+          <h3 class="font-bold text-lg mb-4">Traffic Details (Last 30 Days)</h3>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra table-sm">
               <thead>
-                <tr> 
-              <th>IP Address</th>
-              <th>Device</th>
-              <th>Browser</th>
-              <th>Landing Page</th>
-              <th>Last Visit</th>
-              <th>Visits</th>
+                <tr>
+                  <th>Date</th>
+                  <th>Page Views</th>
+                  <th>Unique Visitors</th>
+                  <th>Bounce Rate</th>
+                  <th>Session Duration</th>
                 </tr>
               </thead>
               <tbody>
-            <tr *ngFor="let visitor of stats()?.recent?.visitors">
-              <td class="font-mono text-xs">{{ visitor.ipAddress }}</td>
-              <td>
-                <div class="flex items-center gap-2">
-                  <i class="fa-solid" [ngClass]="{
-                    'fa-desktop': visitor.device.type === 'desktop',
-                    'fa-mobile-screen': visitor.device.type === 'mobile',
-                    'fa-tablet-screen': visitor.device.type === 'tablet'
-                  }"></i>
-                  <span class="capitalize">{{ visitor.device.type }}</span>
-                    </div>
-                  </td>
-              <td>{{ visitor.device.browser }} ({{ visitor.device.os }})</td>
-              <td><span class="badge badge-ghost badge-sm">{{ visitor.landingPage }}</span></td>
-              <td>{{ visitor.lastVisit | date:'short' }}</td>
-              <td>{{ visitor.visitCount }}</td>
+                <tr *ngFor="let day of analytics()?.analytics">
+                  <td>{{ day.date | date:'mediumDate' }}</td>
+                  <td class="font-medium">{{ day.pageViews }}</td>
+                  <td>{{ day.uniqueVisitors }}</td>
+                  <td>{{ day.bounceRate }}%</td>
+                  <td>{{ day.sessionDuration }}s</td>
                 </tr>
-            <tr *ngIf="!stats()?.recent?.visitors?.length">
-              <td colspan="6" class="text-center py-8 text-base-content/40">No recent visitors data available</td>
+                <tr *ngIf="!analytics()?.analytics?.length">
+                  <td colspan="5" class="text-center py-6 text-base-content/40">No analytics data available</td>
                 </tr>
               </tbody>
             </table>
@@ -194,4 +422,175 @@
         </div>
       </div>
 
+      <!-- Demographics (Reused from dashboard data) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" *ngIf="stats()?.demographics">
+        <!-- Devices -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 p-6">
+          <h3 class="font-bold text-lg mb-4">Device Usage</h3>
+          <div class="space-y-3">
+            <div *ngFor="let device of stats()?.demographics?.devices" class="flex items-center gap-3">
+              <span class="text-sm font-medium w-20 shrink-0 capitalize">{{ device._id || 'Unknown' }}</span>
+              <div class="flex-1 bg-base-200 rounded-full h-2 overflow-hidden">
+                <div class="bg-primary h-full rounded-full"
+                  [style.width.%]="(device.count / (stats()?.overview?.totalVisitors || 1)) * 100"></div>
+              </div>
+              <span class="text-xs text-base-content/60 w-8 text-right">{{ device.count }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Countries -->
+        <div class="card bg-base-100 shadow-sm border border-base-200 p-6">
+          <h3 class="font-bold text-lg mb-4">Top Countries</h3>
+          <div class="space-y-3">
+            <div *ngFor="let country of stats()?.demographics?.countries?.slice(0, 5)" class="flex items-center gap-3">
+              <span class="text-sm font-medium w-6 shrink-0">{{ country._id || 'N/A' }}</span>
+              <div class="flex-1 bg-base-200 rounded-full h-2 overflow-hidden">
+                <div class="bg-secondary h-full rounded-full"
+                  [style.width.%]="(country.count / (stats()?.overview?.totalVisitors || 1)) * 100"></div>
+              </div>
+              <span class="text-xs text-base-content/60 w-8 text-right">{{ country.count }}</span>
+            </div>
+            <div *ngIf="!stats()?.demographics?.countries?.length"
+              class="text-center text-sm text-base-content/50 py-4">No
+              country data</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISITORS TAB -->
+    <div *ngIf="activeTab() === 'visitors'" class="flex flex-col gap-6 animate-fade-in">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="stat-figure text-primary">
+            <i class="fa-solid fa-users text-2xl"></i>
+          </div>
+          <div class="stat-title text-xs font-bold uppercase tracking-wider">Total Visitors</div>
+          <div class="text-2xl font-bold">{{ visitors()?.stats?.totalVisitors || 0 }}</div>
+        </div>
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="stat-figure text-success">
+            <i class="fa-solid fa-user-plus text-2xl"></i>
+          </div>
+          <div class="stat-title text-xs font-bold uppercase tracking-wider">New Visitors</div>
+          <div class="text-2xl font-bold">{{ (visitors()?.stats?.totalVisitors || 0) -
+            (visitors()?.stats?.returningVisitors || 0) }}</div>
+        </div>
+        <div class="stat bg-base-100 shadow-sm border border-base-200 rounded-2xl p-4">
+          <div class="stat-figure text-info">
+            <i class="fa-solid fa-rotate-left text-2xl"></i>
+          </div>
+          <div class="stat-title text-xs font-bold uppercase tracking-wider">Returning Visitors</div>
+          <div class="text-2xl font-bold">{{ visitors()?.stats?.returningVisitors || 0 }}</div>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+        <div class="card-body p-0">
+          <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+            <h3 class="font-bold text-lg text-base-content">Recent Visitors Log</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra">
+              <thead>
+                <tr>
+                  <th>IP</th>
+                  <th>Location</th>
+                  <th>Device</th>
+                  <th>Visits</th>
+                  <th>Last Visit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let visitor of visitors()?.visitors">
+                  <td class="font-mono text-xs">{{ visitor.ipAddress }}</td>
+                  <td>
+                    <div class="flex items-center gap-1">
+                      <i class="fa-solid fa-location-dot text-error/70 text-xs"></i>
+                      <span class="text-sm font-medium">
+                        {{ visitor.location?.city || 'Unknown' }}, {{ visitor.location?.country || 'Unknown' }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex flex-col text-xs">
+                      <span class="font-semibold">{{ visitor.device.browser }}</span>
+                      <span class="text-base-content/60">{{ visitor.device.os }}</span>
+                    </div>
+                  </td>
+                  <td>{{ visitor.visitCount }}</td>
+                  <td>{{ visitor.lastVisit | date:'short' }}</td>
+                </tr>
+                <tr *ngIf="!visitors()?.visitors?.length">
+                  <td colspan="5" class="text-center py-8 text-base-content/40">No detailed visitor logs available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="p-4 border-t border-base-200 flex justify-center" *ngIf="visitors()?.pagination as pag">
+            <div class="join">
+              <button class="join-item btn btn-sm" [disabled]="pag.current === 1">«</button>
+              <button class="join-item btn btn-sm">Page {{ pag.current }} of {{ pag.pages }}</button>
+              <button class="join-item btn btn-sm" [disabled]="pag.current === pag.pages">»</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS TAB -->
+    <div *ngIf="activeTab() === 'logs'" class="flex flex-col gap-6 animate-fade-in">
+      <div class="card bg-base-100 shadow-sm border border-base-200 rounded-2xl">
+        <div class="card-body p-0">
+          <div class="px-6 py-4 border-b border-base-200 flex items-center justify-between">
+            <h3 class="font-bold text-lg text-base-content">System Logs</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost btn-xs text-primary hover:bg-primary/10" (click)="loadLogs()">
+                <i class="fa-solid fa-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra table-sm">
+              <thead>
+                <tr>
+                  <th class="w-48">Timestamp</th>
+                  <th class="w-24">Level</th>
+                  <th>Message</th>
+                  <th class="w-1/4">Raw</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let log of logs()">
+                  <td class="font-mono text-xs whitespace-nowrap opacity-70">
+                    {{ log.timestamp || 'N/A' }}
+                  </td>
+                  <td>
+                    <div class="badge badge-sm font-semibold capitalize min-w-[60px]"
+                      [class.badge-info]="log.level === 'info'" [class.badge-warning]="log.level === 'warn'"
+                      [class.badge-error]="log.level === 'error'"
+                      [class.badge-ghost]="!log.level || log.level === 'debug'">
+                      {{ log.level || 'Log' }}
+                    </div>
+                  </td>
+                  <td class="text-sm font-medium">{{ log.message }}</td>
+                  <td class="text-xs font-mono text-base-content/50 max-w-xs truncate" title="{{ log.raw }}">
+                    {{ log.raw }}
+                  </td>
+                </tr>
+                <tr *ngIf="!logs().length">
+                  <td colspan="4" class="text-center py-12 text-base-content/40">
+                    <i class="fa-solid fa-clipboard-list text-3xl mb-2 opacity-50 block"></i>
+                    No system logs found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

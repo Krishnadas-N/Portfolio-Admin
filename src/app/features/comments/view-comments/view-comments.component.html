@@ -1,0 +1,185 @@
+<div class="container mx-auto p-4 lg:p-8 max-w-[1920px] animate-fade-in">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-text-primary mb-2">Comments</h1>
+            <p class="text-text-tertiary">Manage user comments and feedback across your portfolio</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center cursor-pointer hover:border-warning/50 transition-colors"
+            (click)="setStatusFilter('pending')" [class.border-warning]="activeStatus() === 'pending'">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Pending</span>
+            <span class="text-2xl font-bold text-warning">{{ stats()?.pending || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center cursor-pointer hover:border-success/50 transition-colors"
+            (click)="setStatusFilter('approved')" [class.border-success]="activeStatus() === 'approved'">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Approved</span>
+            <span class="text-2xl font-bold text-success">{{ stats()?.approved || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center cursor-pointer hover:border-error/50 transition-colors"
+            (click)="setStatusFilter('rejected')" [class.border-error]="activeStatus() === 'rejected'">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Rejected</span>
+            <span class="text-2xl font-bold text-error">{{ stats()?.rejected || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center cursor-pointer hover:border-text-tertiary/50 transition-colors"
+            (click)="setStatusFilter('spam')" [class.border-text-tertiary]="activeStatus() === 'spam'">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Spam</span>
+            <span class="text-2xl font-bold text-text-tertiary">{{ stats()?.spam || 0 }}</span>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <button class="btn btn-sm rounded-full" [class.btn-primary]="!activeStatus()" [class.btn-ghost]="activeStatus()"
+            (click)="setStatusFilter(undefined)">
+            All Comments
+        </button>
+        <button class="btn btn-sm rounded-full" [class.btn-warning]="activeStatus() === 'pending'"
+            [class.btn-ghost]="activeStatus() !== 'pending'" (click)="setStatusFilter('pending')">
+            Pending
+        </button>
+        <button class="btn btn-sm rounded-full" [class.btn-success]="activeStatus() === 'approved'"
+            [class.btn-ghost]="activeStatus() !== 'approved'" (click)="setStatusFilter('approved')">
+            Approved
+        </button>
+        <button class="btn btn-sm rounded-full" [class.btn-error]="activeStatus() === 'rejected'"
+            [class.btn-ghost]="activeStatus() !== 'rejected'" (click)="setStatusFilter('rejected')">
+            Rejected
+        </button>
+        <button class="btn btn-sm rounded-full" [class.btn-neutral]="activeStatus() === 'spam'"
+            [class.btn-ghost]="activeStatus() !== 'spam'" (click)="setStatusFilter('spam')">
+            Spam
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading()" class="flex justify-center p-12">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && comments().length === 0"
+        class="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-2xl border border-border/50 bg-surface">
+        <div class="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center mb-4">
+            <i class="fa-regular fa-comments text-2xl text-text-tertiary"></i>
+        </div>
+        <h3 class="text-lg font-bold text-text-primary mb-1">No comments found</h3>
+        <p class="text-text-tertiary">There are no comments matching your filters.</p>
+    </div>
+
+    <!-- List -->
+    <div *ngIf="!isLoading() && comments().length > 0" class="space-y-4">
+        <div *ngFor="let comment of comments()"
+            class="glass-panel p-6 rounded-2xl border border-border/50 bg-surface flex flex-col md:flex-row gap-6 relative group hover:shadow-lg transition-all">
+
+            <!-- Avatar -->
+            <div class="flex-shrink-0">
+                <div class="avatar">
+                    <div class="w-12 h-12 rounded-full ring-2 ring-primary/10">
+                        <img [src]="comment.author.avatar || getAvatar(comment.author.name)"
+                            [alt]="comment.author.name" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+                    <div>
+                        <h3 class="font-bold text-text-primary flex items-center gap-2">
+                            {{ comment.author.name }}
+                            <span *ngIf="comment.isVerified" class="text-blue-500 text-xs" title="Verified"><i
+                                    class="fa-solid fa-circle-check"></i></span>
+                        </h3>
+                        <div class="text-xs text-text-tertiary flex items-center gap-2 flex-wrap">
+                            <span>{{ comment.author.email }}</span>
+                            <span *ngIf="comment.author.website">•</span>
+                            <a *ngIf="comment.author.website" [href]="comment.author.website" target="_blank"
+                                class="hover:text-primary hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-globe"></i> Website
+                            </a>
+                            <span class="hidden sm:inline">•</span>
+                            <span class="w-full sm:w-auto mt-1 sm:mt-0">{{ comment.createdAt | date:'medium' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="badge badge-sm font-bold uppercase tracking-wide"
+                        [class.badge-warning]="comment.status === 'pending'"
+                        [class.badge-success]="comment.status === 'approved'"
+                        [class.badge-error]="comment.status === 'rejected'"
+                        [class.badge-neutral]="comment.status === 'spam'">
+                        {{ comment.status }}
+                    </div>
+                </div>
+
+                <div
+                    class="p-3 bg-surface-elevated/30 rounded-xl mb-3 border border-border/50 text-sm text-text-secondary relative">
+                    <i class="fa-solid fa-quote-left absolute top-2 left-2 text-primary/10 text-xl"></i>
+                    <p class="pl-4 relative z-0">{{ comment.content }}</p>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs">
+                    <!-- Associated Post -->
+                    <div class="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded-lg text-text-secondary"
+                        *ngIf="comment.postId">
+                        <i class="fa-regular fa-file-lines" *ngIf="comment.postType === 'blog'"></i>
+                        <i class="fa-solid fa-cube" *ngIf="comment.postType === 'project'"></i>
+                        <span class="font-medium">
+                            {{ getPostTitle(comment) }}
+                        </span>
+                    </div>
+
+                    <!-- Likes & Replies -->
+                    <div class="flex items-center gap-3 text-text-tertiary">
+                        <div class="flex items-center gap-1" title="Likes">
+                            <i class="fa-regular fa-heart"></i> {{ comment.likes }}
+                        </div>
+                        <div class="flex items-center gap-1" title="Replies" *ngIf="comment.replies?.length">
+                            <i class="fa-regular fa-comments"></i> {{ comment.replies.length }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div
+                class="flex md:flex-col gap-2 border-t md:border-t-0 md:border-l border-border/50 pt-4 md:pt-0 md:pl-6 justify-end">
+                <button *ngIf="comment.status !== 'approved'" (click)="updateStatus(comment._id, 'approved')"
+                    class="btn btn-sm btn-success text-white shadow-lg shadow-success/20 w-full md:w-auto"
+                    title="Approve">
+                    <i class="fa-solid fa-check"></i>
+                    <span class="md:hidden">Approve</span>
+                </button>
+
+                <button *ngIf="comment.status === 'pending' || comment.status === 'approved'"
+                    (click)="updateStatus(comment._id, 'rejected')"
+                    class="btn btn-sm btn-ghost text-error hover:bg-error/10 w-full md:w-auto" title="Reject">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span class="md:hidden">Reject</span>
+                </button>
+
+                <button *ngIf="comment.status !== 'spam'" (click)="updateStatus(comment._id, 'spam')"
+                    class="btn btn-sm btn-ghost text-text-tertiary hover:text-text-primary w-full md:w-auto"
+                    title="Mark as Spam">
+                    <i class="fa-solid fa-ban"></i>
+                    <span class="md:hidden">Spam</span>
+                </button>
+
+                <button (click)="deleteComment(comment._id)"
+                    class="btn btn-sm btn-ghost text-text-tertiary hover:text-error w-full md:w-auto mt-auto"
+                    title="Delete">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <span class="md:hidden">Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading() && pagination()" class="mt-8 border-t border-border/50 pt-6 mb-8">
+        <app-pagination [pagination]="pagination()!" (pageChange)="onPageChange($event)"></app-pagination>
+    </div>
+</div>

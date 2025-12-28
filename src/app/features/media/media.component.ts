@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../core/services/admin.service';
+import { MediaService } from '../../core/services/media.service';
 import { MediaFile, MediaStatistics } from '../../core/models/api.models';
 import { ToastService } from '../../core/services/toast.service';
 
@@ -20,12 +20,13 @@ import { ToastService } from '../../core/services/toast.service';
   `]
 })
 export class MediaComponent implements OnInit {
-  private adminService = inject(AdminService);
+  private mediaService = inject(MediaService);
   private toastService = inject(ToastService);
 
   // Data Signals
   files = signal<MediaFile[]>([]);
   stats = signal<MediaStatistics | null>(null);
+  isLoading = signal(false);
 
   // UI Signals
   searchQuery = signal('');
@@ -48,61 +49,78 @@ export class MediaComponent implements OnInit {
     });
   });
 
+  isAllSelected = computed(() => {
+    const files = this.filteredFiles();
+    const selected = this.selectedFiles();
+    return files.length > 0 && files.every(f => selected.has(f.key || f.Key || ''));
+  });
+
   ngOnInit() {
     this.loadFiles();
     this.loadStats();
   }
 
   loadFiles(append: boolean = false) {
-    this.adminService.getMediaFiles(this.currentPage).subscribe((res: any) => {
-      let rawFiles: any[] = [];
+    if (!append) this.isLoading.set(true);
 
-      // Handle different response structures
-      if (res.success) {
-        if (Array.isArray(res.data)) {
-          // Case 1: res.data is the array of files (as seen in recent user log)
-          rawFiles = res.data;
-        } else if (res.data && Array.isArray(res.data.recentUploads)) {
-          // Case 2: res.data.recentUploads is the array
-          rawFiles = res.data.recentUploads;
-        } else if (res.data && Array.isArray(res.data.files)) {
-          // Case 3: res.data.files is the array (legacy/old structure)
-          rawFiles = res.data.files;
-        }
-      }
+    // Pass searchQuery as prefix
+    this.mediaService.getMediaFiles(this.currentPage, 20, this.searchQuery()).subscribe({
+      next: (res: any) => {
+        let rawFiles: any[] = [];
 
-      if (rawFiles.length > 0) {
-        // Map to MediaFile - construct URL if missing and map lowercase fields to UpperCase for UI
-        const mappedFiles: MediaFile[] = rawFiles.map((f: any) => {
-          let url = f.url;
-          if (!url && f.key) {
-            // Fallback to construction if URL missing
-            url = `https://res.cloudinary.com/dpjkuvq1r/image/upload/${f.key}`;
+        // Handle different response structures
+        if (res.success) {
+          if (Array.isArray(res.data)) {
+            // Case 1: res.data is the array of files (as seen in recent user log)
+            rawFiles = res.data;
+          } else if (res.data && Array.isArray(res.data.recentUploads)) {
+            // Case 2: res.data.recentUploads is the array
+            rawFiles = res.data.recentUploads;
+          } else if (res.data && Array.isArray(res.data.files)) {
+            // Case 3: res.data.files is the array (legacy/old structure)
+            rawFiles = res.data.files;
           }
-
-          return {
-            key: f.key || f.Key,
-            url: url,
-            provider: f.provider || 'cloudinary',
-            Size: f.size || f.Size, // Map lowercase size to Size
-            LastModified: f.lastModified || f.LastModified // Map lowercase lastModified to LastModified
-          } as MediaFile;
-        });
-
-        if (append) {
-          this.files.update(current => [...current, ...mappedFiles]);
-        } else {
-          this.files.set(mappedFiles);
         }
-      } else if (!append) {
-        // If no files found and not appending, clear the list
-        this.files.set([]);
+
+        if (rawFiles.length > 0) {
+          // Map to MediaFile - construct URL if missing and map lowercase fields to UpperCase for UI
+          const mappedFiles: MediaFile[] = rawFiles.map((f: any) => {
+            let url = f.url;
+            if (!url && f.key) {
+              // Fallback to construction if URL missing
+              url = `https://res.cloudinary.com/dpjkuvq1r/image/upload/${f.key}`;
+            }
+
+            return {
+              key: f.key || f.Key,
+              url: url,
+              provider: f.provider || 'cloudinary',
+              Size: f.size || f.Size, // Map lowercase size to Size
+              LastModified: f.lastModified || f.LastModified // Map lowercase lastModified to LastModified
+            } as MediaFile;
+          });
+
+          if (append) {
+            this.files.update(current => [...current, ...mappedFiles]);
+          } else {
+            this.files.set(mappedFiles);
+          }
+        } else if (!append) {
+          // If no files found and not appending, clear the list
+          this.files.set([]);
+        }
+        if (!append) this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load media files', err);
+        if (!append) this.isLoading.set(false);
+        this.toastService.error('Failed to load media');
       }
     });
   }
 
   loadStats() {
-    this.adminService.getMediaStats().subscribe((res: any) => {
+    this.mediaService.getMediaStats().subscribe((res: any) => {
       if (res.success) {
         // Map new stats structure to conform to potential UI usages if needed
         // The UI uses 'fileCount' and 'totalSize'
@@ -121,33 +139,57 @@ export class MediaComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    const files = event.target.files;
-    if (files.length > 0) {
-      let completed = 0;
-      let errors = 0;
-      const total = files.length;
+    const files: FileList = event.target.files;
+    if (files.length === 0) return;
 
-      // Show toast for start? "Uploading x files..."
-      this.toastService.info(`Uploading ${total} file(s)...`);
+    this.toastService.info(`Uploading ${files.length} file(s)...`);
 
-      for (let i = 0; i < files.length; i++) {
-        this.adminService.uploadImage(files[i]).subscribe({
-          next: (res: any) => {
-            if (res.success) {
-              // Individual success toast? Maybe too noisy for many files.
-              // We'll just count success.
-            }
-            completed++;
-            this.checkUploadCompletion(completed, total, errors);
-          },
-          error: (err) => {
-            console.error('Upload failed', err);
-            errors++;
-            completed++;
-            this.checkUploadCompletion(completed, total, errors);
+    // Check if we can use batch upload (all images) or need generic upload
+    const allImages = Array.from(files).every(f => f.type.startsWith('image/'));
+
+    if (allImages) {
+      // Use batch image endpoint
+      this.mediaService.uploadImages(Array.from(files)).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.success(`Successfully uploaded ${files.length} images`);
+            this.currentPage = 1;
+            this.loadFiles();
+            this.loadStats();
           }
-        });
-      }
+        },
+        error: (err) => {
+          console.error('Batch upload failed', err);
+          this.toastService.error('Failed to upload images');
+        }
+      });
+    } else {
+      // Use mixed bundle endpoint
+      // Group files
+      const images: File[] = [];
+      const videos: File[] = [];
+      const documents: File[] = [];
+
+      Array.from(files).forEach(f => {
+        if (f.type.startsWith('image/')) images.push(f);
+        else if (f.type.startsWith('video/')) videos.push(f);
+        else documents.push(f);
+      });
+
+      this.mediaService.uploadMixedBundle({ images, videos, documents }).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.success(`Successfully uploaded ${files.length} files`);
+            this.currentPage = 1;
+            this.loadFiles();
+            this.loadStats();
+          }
+        },
+        error: (err) => {
+          console.error('Mixed upload failed', err);
+          this.toastService.error('Failed to upload files');
+        }
+      });
     }
   }
 
@@ -194,9 +236,22 @@ export class MediaComponent implements OnInit {
     });
   }
 
+  toggleSelectAll() {
+    if (this.isAllSelected()) {
+      this.selectedFiles.set(new Set());
+    } else {
+      const newSet = new Set<string>();
+      this.filteredFiles().forEach(f => {
+        const key = f.key || f.Key || '';
+        if (key) newSet.add(key);
+      });
+      this.selectedFiles.set(newSet);
+    }
+  }
+
   deleteFile(key: string) {
     if (confirm('Delete this file permanently?')) {
-      this.adminService.deleteMediaFile(key).subscribe(() => {
+      this.mediaService.deleteMediaFile(key).subscribe(() => {
         this.files.update(files => files.filter(f => (f.key || f.Key) !== key));
         this.toastService.success('File deleted successfully');
         this.loadStats();
@@ -212,7 +267,7 @@ export class MediaComponent implements OnInit {
       // Naive parallel deletion. In production, use backend batch delete or limit concurrency.
       let processed = 0;
       keys.forEach(key => {
-        this.adminService.deleteMediaFile(key).subscribe(() => {
+        this.mediaService.deleteMediaFile(key).subscribe(() => {
           this.files.update(files => files.filter(f => (f.key || f.Key) !== key));
           processed++;
           if (processed === keys.length) {

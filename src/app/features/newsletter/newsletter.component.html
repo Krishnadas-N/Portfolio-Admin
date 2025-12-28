@@ -1,0 +1,481 @@
+<div class="h-full flex flex-col space-y-4 p-4 md:p-6 overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+        <div>
+            <h1 class="text-2xl font-bold text-text-primary">Newsletter</h1>
+            <p class="text-sm text-text-secondary">Manage subscribers and email campaigns</p>
+        </div>
+
+        <div class="flex gap-2">
+            <button *ngIf="activeTab() === 'subscribers'" class="btn btn-outline gap-2" (click)="exportSubscribers()">
+                <i class="fa-solid fa-file-export"></i>
+                Export
+            </button>
+            <button *ngIf="activeTab() === 'subscribers'" class="btn btn-primary gap-2" (click)="openSubscribeModal()">
+                <i class="fa-solid fa-user-plus"></i>
+                Add Subscriber
+            </button>
+            <button *ngIf="activeTab() === 'campaigns'" class="btn btn-primary gap-2" (click)="openCampaignModal()">
+                <i class="fa-solid fa-plus"></i>
+                New Campaign
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div role="tablist" class="tabs tabs-boxed bg-base-200/50 p-1 rounded-xl w-fit shrink-0">
+        <a role="tab" class="tab rounded-lg transition-all duration-200"
+            [class.tab-active]="activeTab() === 'subscribers'" [class.bg-white]="activeTab() === 'subscribers'"
+            [class.shadow-sm]="activeTab() === 'subscribers'" (click)="setActiveTab('subscribers')">Subscribers</a>
+        <a role="tab" class="tab rounded-lg transition-all duration-200"
+            [class.tab-active]="activeTab() === 'campaigns'" [class.bg-white]="activeTab() === 'campaigns'"
+            [class.shadow-sm]="activeTab() === 'campaigns'" (click)="setActiveTab('campaigns')">Campaigns</a>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-1 overflow-hidden relative bg-surface border border-border/50 rounded-2xl shadow-sm flex flex-col">
+
+        <!-- Loading Overlay -->
+        <div *ngIf="isLoading()"
+            class="absolute inset-0 bg-surface/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+
+        <!-- SUBSCRIBERS TAB -->
+        <div *ngIf="activeTab() === 'subscribers'" class="flex flex-col h-full">
+            <!-- Toolbar -->
+            <div class="p-4 border-b border-border/50 flex gap-4">
+                <div class="relative flex-1 max-w-md">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary"></i>
+                    <input type="text" [ngModel]="subscriberParams().search" (ngModelChange)="onSearch($event)"
+                        placeholder="Search subscribers..."
+                        class="input input-sm w-full pl-9 bg-background focus:outline-none focus:border-primary/50 transition-all border border-border/50 rounded-lg">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="flex-1 overflow-auto">
+                <table class="table table-pin-rows">
+                    <thead>
+                        <tr class="bg-base-200/30 text-text-tertiary text-xs uppercase font-bold tracking-wider">
+                            <th>Subscriber</th>
+                            <th>Status</th>
+                            <th>Preferences</th>
+                            <th>Source & Context</th>
+                            <th>Timeline</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let sub of subscribers()"
+                            class="hover:bg-base-200/30 transition-colors border-border/50 group text-sm">
+
+                            <!-- Subscriber -->
+                            <td class="max-w-[180px]">
+                                <div class="font-bold text-text-primary truncate"
+                                    [title]="sub.firstName + ' ' + sub.lastName">
+                                    {{ sub.firstName }} {{ sub.lastName }}
+                                </div>
+                                <div class="text-xs text-text-tertiary truncate font-mono" *ngIf="sub.firstName"
+                                    [title]="sub.email">
+                                    {{ sub.email }}
+                                </div>
+                                <div class="font-bold text-text-primary truncate font-mono" *ngIf="!sub.firstName"
+                                    [title]="sub.email">
+                                    {{ sub.email }}
+                                </div>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <div class="badge badge-sm gap-1 pl-1.5 pr-2 cursor-pointer hover:scale-105 transition-transform font-medium"
+                                    (click)="toggleSubscriberStatus(sub)" [ngClass]="{
+                                        'badge-success': sub.status === 'subscribed',
+                                        'badge-warning': sub.status === 'pending',
+                                        'badge-error': sub.status === 'unsubscribed',
+                                        'bg-success/10': sub.status === 'subscribed',
+                                        'text-success': sub.status === 'subscribed',
+                                        'bg-warning/10': sub.status === 'pending',
+                                        'text-warning-content': sub.status === 'pending',
+                                        'bg-error/10': sub.status === 'unsubscribed',
+                                        'text-error': sub.status === 'unsubscribed'
+                                    }" title="Click to update status">
+                                    <div class="w-1.5 h-1.5 rounded-full"
+                                        [class.bg-success]="sub.status === 'subscribed'"
+                                        [class.bg-warning]="sub.status === 'pending'"
+                                        [class.bg-error]="sub.status === 'unsubscribed'"></div>
+                                    {{ sub.status | titlecase }}
+                                </div>
+                            </td>
+
+                            <!-- Preferences -->
+                            <td>
+                                <div class="flex flex-col gap-1.5">
+                                    <div class="flex items-center gap-2 text-xs">
+                                        <span
+                                            class="text-text-tertiary text-[10px] uppercase font-bold tracking-wide">Freq:</span>
+                                        <div class="badge badge-xs text-[10px] border-border/50"
+                                            [class.badge-neutral]="sub.preferences?.frequency"
+                                            [class.badge-ghost]="!sub.preferences?.frequency">
+                                            {{ sub.preferences?.frequency || 'Default' | titlecase }}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1 max-w-[200px]"
+                                        *ngIf="sub.preferences?.categories?.length; else noCats">
+                                        <span *ngFor="let cat of sub.preferences?.categories"
+                                            class="badge badge-xs badge-outline text-[10px] text-primary border-primary/20 bg-primary/5">
+                                            {{ cat }}
+                                        </span>
+                                    </div>
+                                    <ng-template #noCats>
+                                        <span class="text-[10px] text-text-tertiary italic pl-1">No topics</span>
+                                    </ng-template>
+                                </div>
+                            </td>
+
+                            <!-- Source & Context -->
+                            <td>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-medium text-text-secondary">{{ sub.source || 'Unknown' |
+                                            titlecase }}</span>
+                                        <!-- Tech Info Tooltip -->
+                                        <div class="tooltip tooltip-right" *ngIf="sub.ipAddress || sub.userAgent"
+                                            [attr.data-tip]="(sub.ipAddress || 'No IP') + (sub.userAgent ? ' • ' + sub.userAgent : '')">
+                                            <i
+                                                class="fa-solid fa-server text-[10px] text-text-tertiary hover:text-primary cursor-help"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1" *ngIf="sub.tags?.length">
+                                        <span *ngFor="let tag of sub.tags"
+                                            class="badge badge-xs badge-ghost text-[10px] text-text-secondary bg-base-200 border-none">
+                                            #{{ tag }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Timeline -->
+                            <td>
+                                <div class="flex flex-col gap-1 text-xs text-text-tertiary">
+                                    <div class="flex items-center gap-2" title="Subscribed Date">
+                                        <i class="fa-solid fa-user-plus w-3 text-center text-success/70"></i>
+                                        <span>{{ sub.subscribedAt | date:'mediumDate' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2" *ngIf="sub.unsubscribedAt"
+                                        title="Unsubscribed Date">
+                                        <i class="fa-solid fa-user-minus w-3 text-center text-error/70"></i>
+                                        <span>{{ sub.unsubscribedAt | date:'mediumDate' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 opacity-60" title="Last Updated">
+                                        <i class="fa-solid fa-clock-rotate-left w-3 text-center"></i>
+                                        <span>{{ sub.updatedAt | date:'shortTime' }}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Actions -->
+                            <!-- Actions -->
+                            <td class="text-right">
+                                <div class="dropdown dropdown-end dropdown-left">
+                                    <div tabindex="0" role="button"
+                                        class="btn btn-ghost btn-xs btn-square text-text-tertiary">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </div>
+                                    <ul tabindex="0"
+                                        class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-48 border border-border/50 text-xs text-left">
+                                        <li>
+                                            <a (click)="copyEmail(sub.email)" class="hover:bg-base-200">
+                                                <i class="fa-regular fa-copy w-4"></i> Copy Email
+                                            </a>
+                                        </li>
+                                        <li *ngIf="sub.status === 'subscribed'">
+                                            <a (click)="toggleSubscription(sub.email)"
+                                                class="text-error hover:bg-error/10">
+                                                <i class="fa-solid fa-user-xmark w-4"></i> Unsubscribe
+                                            </a>
+                                        </li>
+                                        <li *ngIf="sub.status !== 'subscribed'">
+                                            <a (click)="toggleSubscription(sub.email)"
+                                                class="text-success hover:bg-success/10">
+                                                <i class="fa-solid fa-user-check w-4"></i> Reactivate
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Empty State -->
+                        <tr *ngIf="subscribers().length === 0 && !isLoading()">
+                            <td colspan="6" class="text-center py-12">
+                                <div class="flex flex-col items-center gap-3 text-text-tertiary">
+                                    <div class="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center">
+                                        <i class="fa-solid fa-users-slash text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">No subscribers found</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-4 border-t border-border/50 flex justify-center" *ngIf="subscribersPagination().total > 0">
+                <div class="join">
+                    <button class="join-item btn btn-sm" [disabled]="subscribersPagination().current === 1"
+                        (click)="changeSubscriberPage(subscribersPagination().current - 1)">«</button>
+                    <button class="join-item btn btn-sm bg-base-100 pointer-events-none">
+                        Page {{ subscribersPagination().current }} of {{ subscribersPagination().pages }}
+                    </button>
+                    <button class="join-item btn btn-sm"
+                        [disabled]="subscribersPagination().current === subscribersPagination().pages"
+                        (click)="changeSubscriberPage(subscribersPagination().current + 1)">»</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAMPAIGNS TAB -->
+        <div *ngIf="activeTab() === 'campaigns'" class="flex flex-col h-full bg-base-100/50">
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div *ngFor="let camp of campaigns()"
+                        class="card bg-surface border border-border/50 shadow-sm hover:shadow-md transition-all group cursor-pointer relative">
+
+                        <!-- Edit Button (Hover) -->
+                        <button
+                            class="btn btn-xs btn-circle btn-ghost absolute top-2 right-8 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-base-100"
+                            (click)="$event.stopPropagation(); openCampaignModal(camp)" title="Edit Campaign">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+
+                        <div class="card-body p-5">
+                            <div class="flex justify-between items-start gap-3 mb-2">
+                                <h3
+                                    class="font-bold text-lg text-text-primary line-clamp-2 group-hover:text-primary transition-colors pr-12">
+                                    {{ camp.subject }}
+                                </h3>
+
+                                <!-- Status Actions Dropdown -->
+                                <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
+                                    <div tabindex="0" role="button"
+                                        class="badge badge-sm font-medium shrink-0 cursor-pointer hover:scale-105 transition-transform"
+                                        [class.badge-primary]="camp.status === 'sent'"
+                                        [class.badge-warning]="camp.status === 'scheduled'"
+                                        [class.badge-ghost]="camp.status === 'draft'">
+                                        {{ camp.status | titlecase }} <i
+                                            class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                                    </div>
+                                    <ul tabindex="0"
+                                        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32 border border-border/50 text-xs text-left">
+                                        <li *ngIf="camp.status !== 'draft'"><a
+                                                (click)="updateCampaignStatus(camp._id, 'draft')">Set Draft</a></li>
+                                        <li *ngIf="camp.status !== 'scheduled'"><a
+                                                (click)="updateCampaignStatus(camp._id, 'scheduled')">Set Scheduled</a>
+                                        </li>
+                                        <li *ngIf="camp.status !== 'sent'"><a
+                                                (click)="updateCampaignStatus(camp._id, 'sent')"
+                                                class="text-primary">Mark Sent</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-text-tertiary font-mono mb-4">
+                                <ng-container *ngIf="camp.status === 'sent'">
+                                    Sent {{ camp.sentAt | date:'medium' }}
+                                </ng-container>
+                                <ng-container *ngIf="camp.status === 'scheduled'">
+                                    Scheduled for {{ camp.scheduledAt | date:'medium' }}
+                                </ng-container>
+                                <ng-container *ngIf="camp.status === 'draft'">
+                                    Last edited {{ camp.updatedAt | date:'medium' }}
+                                </ng-container>
+                            </p>
+
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-1 mb-4" *ngIf="camp.tags && camp.tags.length">
+                                <span *ngFor="let tag of camp.tags" class="badge badge-xs badge-ghost text-[10px]">{{
+                                    tag }}</span>
+                            </div>
+
+                            <!-- Stats -->
+                            <div class="grid grid-cols-4 gap-2 mt-auto pt-4 border-t border-border/50 text-center">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Total</span>
+                                    <span class="text-lg font-bold text-text-primary">{{ camp.recipients?.total || 0
+                                        }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Sent</span>
+                                    <span class="text-lg font-bold text-text-primary">{{ camp.recipients?.sent || 0
+                                        }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Open</span>
+                                    <span class="text-lg font-bold text-text-primary">{{ camp.recipients?.opened || 0
+                                        }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-[10px] text-text-tertiary uppercase tracking-wider font-semibold">Click</span>
+                                    <span class="text-lg font-bold text-text-primary">{{ camp.recipients?.clicked || 0
+                                        }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add New Card (Empty State / Action) -->
+                    <div *ngIf="campaigns().length === 0 && !isLoading()"
+                        class="col-span-full h-64 flex flex-col items-center justify-center text-text-tertiary border-2 border-dashed border-border/50 rounded-2xl">
+                        <div class="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-paper-plane text-2xl opacity-50"></i>
+                        </div>
+                        <p class="font-medium">No campaigns yet</p>
+                        <button class="btn btn-sm btn-primary mt-4" (click)="openCampaignModal()">Create your first
+                            campaign</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Subscribe Modal -->
+<dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isSubscribeModalOpen()">
+    <div class="modal-box bg-surface border border-border/50">
+        <h3 class="font-bold text-lg text-text-primary">Add New Subscriber</h3>
+        <p class="py-4 text-text-secondary">Manually add a subscriber to your newsletter list.</p>
+
+        <div class="form-control w-full space-y-4">
+            <div>
+                <label class="label">
+                    <span class="label-text text-text-secondary">Email Address <span class="text-error">*</span></span>
+                </label>
+                <input type="email" placeholder="john.doe@example.com"
+                    class="input input-bordered w-full bg-background text-text-primary"
+                    [ngModel]="subscriberForm().email" (ngModelChange)="updateSubscriberForm('email', $event)" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="label">
+                        <span class="label-text text-text-secondary">First Name</span>
+                    </label>
+                    <input type="text" placeholder="John"
+                        class="input input-bordered w-full bg-background text-text-primary"
+                        [ngModel]="subscriberForm().firstName"
+                        (ngModelChange)="updateSubscriberForm('firstName', $event)" />
+                </div>
+                <div>
+                    <label class="label">
+                        <span class="label-text text-text-secondary">Last Name</span>
+                    </label>
+                    <input type="text" placeholder="Doe"
+                        class="input input-bordered w-full bg-background text-text-primary"
+                        [ngModel]="subscriberForm().lastName"
+                        (ngModelChange)="updateSubscriberForm('lastName', $event)" />
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <button class="btn btn-ghost text-text-secondary hover:text-text-primary"
+                (click)="closeSubscribeModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveSubscriber()"
+                [disabled]="!subscriberForm().email">Subscribe</button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button (click)="closeSubscribeModal()">close</button>
+    </form>
+</dialog>
+
+<!-- Campaign Modal -->
+<dialog class="modal modal-bottom sm:modal-middle" [class.modal-open]="isCampaignModalOpen()">
+    <div class="modal-box bg-surface border border-border/50 w-11/12 max-w-2xl">
+        <h3 class="font-bold text-lg text-text-primary">
+            {{ editingCampaignId() ? 'Edit Campaign' : 'Create New Campaign' }}
+        </h3>
+        <p class="py-4 text-text-secondary">
+            {{ editingCampaignId() ? 'Update the details of your campaign.' : 'Draft a new email campaign.' }}
+        </p>
+
+        <div class="form-control w-full space-y-4">
+            <!-- Row 1: Title & Scheduled At -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="label">
+                        <span class="label-text text-text-secondary">Internal Title <span
+                                class="text-error">*</span></span>
+                    </label>
+                    <input type="text" placeholder="e.g. Monthly Update - Oct 2024"
+                        class="input input-bordered w-full bg-background text-text-primary"
+                        [ngModel]="campaignForm().title" (ngModelChange)="updateCampaignForm('title', $event)" />
+                </div>
+                <div>
+                    <label class="label">
+                        <span class="label-text text-text-secondary">Schedule Send (Optional)</span>
+                    </label>
+                    <input type="datetime-local" class="input input-bordered w-full bg-background text-text-primary"
+                        [ngModel]="campaignForm().scheduledAt"
+                        (ngModelChange)="updateCampaignForm('scheduledAt', $event)" />
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div>
+                <label class="label">
+                    <span class="label-text text-text-secondary">Email Subject <span class="text-error">*</span></span>
+                </label>
+                <input type="text" placeholder="e.g. Check out our latest updates!"
+                    class="input input-bordered w-full bg-background text-text-primary"
+                    [ngModel]="campaignForm().subject" (ngModelChange)="updateCampaignForm('subject', $event)" />
+            </div>
+
+            <!-- Tags -->
+            <div>
+                <label class="label">
+                    <span class="label-text text-text-secondary">Tags (comma separated)</span>
+                </label>
+                <input type="text" placeholder="e.g. newsletter, promotion, weekly"
+                    class="input input-bordered w-full bg-background text-text-primary" [ngModel]="campaignForm().tags"
+                    (ngModelChange)="updateCampaignForm('tags', $event)" />
+            </div>
+
+            <!-- Content -->
+            <div>
+                <label class="label">
+                    <span class="label-text text-text-secondary">Content</span>
+                </label>
+                <textarea class="textarea textarea-bordered h-32 w-full bg-background text-text-primary"
+                    placeholder="Type your email content here..." [ngModel]="campaignForm().content"
+                    (ngModelChange)="updateCampaignForm('content', $event)"></textarea>
+                <div class="label">
+                    <span class="label-text-alt text-text-tertiary">HTML content will be auto-generated from this text
+                        for now.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <button class="btn btn-ghost text-text-secondary hover:text-text-primary"
+                (click)="closeCampaignModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveCampaign()"
+                [disabled]="!campaignForm().title || !campaignForm().subject">
+                {{ editingCampaignId() ? 'Update Campaign' : 'Create Draft' }}
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button (click)="closeCampaignModal()">close</button>
+    </form>
+</dialog>

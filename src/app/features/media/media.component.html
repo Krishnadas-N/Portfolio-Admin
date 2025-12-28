@@ -51,13 +51,25 @@
         <div class="flex items-center gap-2">
 
             <!-- Selection Mode Actions -->
-            <ng-container *ngIf="selectedFiles().size > 0">
-                <span class="text-xs font-medium text-text-secondary mr-2">{{ selectedFiles().size }} selected</span>
-                <button (click)="deleteSelected()" class="btn btn-sm btn-error btn-outline gap-2">
-                    <i class="fa-solid fa-trash-can"></i>
-                    Delete
+            <ng-container *ngIf="isSelectMode()">
+                <button (click)="toggleSelectAll()" class="btn btn-sm btn-ghost gap-2"
+                    [class.text-primary]="isAllSelected()" title="Select All">
+                    <i class="fa-regular" [class.fa-square-check]="isAllSelected()"
+                        [class.fa-square]="!isAllSelected()"></i>
+                    <span class="hidden sm:inline">Select All</span>
                 </button>
+
                 <div class="h-4 w-px bg-border mx-2"></div>
+
+                <ng-container *ngIf="selectedFiles().size > 0">
+                    <span class="text-xs font-medium text-text-secondary mr-2">{{ selectedFiles().size }}
+                        selected</span>
+                    <button (click)="deleteSelected()" class="btn btn-sm btn-error btn-outline gap-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Delete
+                    </button>
+                    <div class="h-4 w-px bg-border mx-2"></div>
+                </ng-container>
             </ng-container>
 
             <button (click)="toggleSelectMode()" [class.btn-active]="isSelectMode()"
@@ -83,8 +95,13 @@
     <!-- Content Area (Scrollable) -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-1 min-h-0 relative">
 
+        <!-- Loading State -->
+        <div *ngIf="isLoading()" class="h-full flex flex-col items-center justify-center min-h-[300px]">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+
         <!-- Grid View -->
-        <div *ngIf="viewMode() === 'grid'"
+        <div *ngIf="!isLoading() && viewMode() === 'grid' && filteredFiles().length > 0"
             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             <div *ngFor="let file of filteredFiles()" (click)="onFileClick(file)"
                 class="group relative aspect-square bg-surface border border-border/50 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all duration-300">
@@ -130,7 +147,7 @@
         </div>
 
         <!-- List View -->
-        <div *ngIf="viewMode() === 'list'" class="flex flex-col gap-2">
+        <div *ngIf="!isLoading() && viewMode() === 'list' && filteredFiles().length > 0" class="flex flex-col gap-2">
             <div *ngFor="let file of filteredFiles()" (click)="onFileClick(file)"
                 class="flex items-center gap-4 p-3 rounded-xl bg-surface border border-border/50 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer group">
 
@@ -180,7 +197,7 @@
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="filteredFiles().length === 0"
+        <div *ngIf="!isLoading() && filteredFiles().length === 0"
             class="h-64 flex flex-col items-center justify-center text-text-tertiary">
             <div class="w-20 h-20 bg-surface-elevated rounded-full flex items-center justify-center mb-4">
                 <i class="fa-regular fa-image text-3xl opacity-50"></i>

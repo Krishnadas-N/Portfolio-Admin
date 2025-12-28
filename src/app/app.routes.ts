@@ -54,6 +54,22 @@ export const routes: Routes = [
             {
                 path: 'media',
                 loadComponent: () => import('./features/media/media.component').then(m => m.MediaComponent)
+            },
+            {
+                path: 'contacts',
+                loadChildren: () => import('./features/contacts/contact.routes').then(m => m.CONTACT_ROUTES)
+            },
+            {
+                path: 'testimonials',
+                loadChildren: () => import('./features/testimonials/testimonial.routes').then(m => m.TESTIMONIAL_ROUTES)
+            },
+            {
+                path: 'newsletter',
+                loadComponent: () => import('./features/newsletter/newsletter.component').then(m => m.NewsletterComponent)
+            },
+            {
+                path: 'comments',
+                loadComponent: () => import('./features/comments/view-comments/view-comments.component').then(m => m.ViewCommentsComponent)
             }
         ]
     },

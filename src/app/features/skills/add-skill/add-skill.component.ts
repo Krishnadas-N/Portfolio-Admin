@@ -96,17 +96,17 @@ export class AddSkillComponent implements OnInit {
         this.toastService.warning('Image size too large (Max 2MB)');
         return;
       }
-      this.mediaService.uploadFiles([file]).subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-            const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
+      this.mediaService.uploadMixedBundle({ images: [file] }).subscribe({
+        next: (res: any) => {
+          if (res.success && res.data && res.data.images && res.data.images.length > 0) {
+            const uploadedUrl = res.data.images[0].original?.url || res.data.images[0].url;
             if (uploadedUrl) {
               this.skillForm.patchValue({ icon: uploadedUrl });
               this.toastService.success('Icon uploaded');
             }
           }
         },
-        error: (err) => this.toastService.error('Icon upload failed')
+        error: (err: any) => this.toastService.error('Icon upload failed')
       });
     }
   }

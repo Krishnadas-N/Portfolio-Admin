@@ -47,15 +47,15 @@ export class AddProjectComponent implements OnInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       technologies: [[]],
-      license: ['', [Validators.required]],
+      license: [''],
       tags: [[]],
       projectType: ['main', [Validators.required]],
       seoKeywords: [[]],
       additionalResources: [[]],
       relatedProjects: [[]],
       collaborators: [[]],
-      url: ['', [Validators.pattern('https?://.+')]],
-      githubUrl: ['', [Validators.pattern('https?://.+')]],
+      link: ['', [Validators.pattern('https?://.+')]],
+      repo: ['', [Validators.pattern('https?://.+')]],
       startDate: ['', [Validators.required]],
       endDate: [''],
       status: ['Planning', [Validators.required]],
@@ -65,6 +65,7 @@ export class AddProjectComponent implements OnInit {
       videoRepresentation: [''],
       images: this.fb.array([]),
       skills: this.fb.array([]),
+      deploymentDetails: this.fb.array([]),
       viewsCount: [0],
       likes: [0],
       documentationLink: ['', [Validators.pattern('https?://.+')]]
@@ -113,6 +114,27 @@ export class AddProjectComponent implements OnInit {
       project.skills.forEach(skill => skillsArray.push(this.fb.control(skill)));
     }
 
+    const deploymentArray = this.projectForm.get('deploymentDetails') as FormArray;
+    deploymentArray.clear();
+    if (project.deploymentDetails) {
+      project.deploymentDetails.forEach(deploy => {
+        deploymentArray.push(this.fb.group({
+          platform: [deploy.platform, Validators.required],
+          url: [deploy.url, [Validators.required, Validators.pattern('https?://.+')]]
+        }));
+      });
+    }
+
+    // Handle tags and seoKeywords as arrays, update main form control with value array if using string arrays logic in backend/frontend
+    // Or if handling as FormArray like skills:
+    // For this specific case from previous edits, tags/seoKeywords seem to be handled as simple string arrays in the form value (technologies: [[]]),
+    // but the `addStringItem` method updates the array value directly on the control.
+    // So usually simple patchValue works for these unless they are FormArrays.
+    // However, to be safe and consistent with `technologies`, we just patch the array value.
+
+    // NOTE: In initForm, 'tags' is [[]] which means it's a FormControl holding an array.
+    // So simple patchValue handles it.
+
     const formatDate = (date: Date | string | undefined) => {
       if (!date) return '';
       return new Date(date).toISOString().split('T')[0];
@@ -129,6 +151,9 @@ export class AddProjectComponent implements OnInit {
   get f() { return this.projectForm.controls; }
   get images() { return this.projectForm.get('images') as FormArray; }
   get skills() { return this.projectForm.get('skills') as FormArray; }
+  get deploymentDetails() { return this.projectForm.get('deploymentDetails') as FormArray; }
+  get tags() { return this.projectForm.get('tags') as FormArray; } // Treat as string array
+  get seoKeywords() { return this.projectForm.get('seoKeywords') as FormArray; } // Treat as string array
 
   // --- Array Manipulation ---
 
@@ -168,6 +193,18 @@ export class AddProjectComponent implements OnInit {
     this.skills.removeAt(index);
   }
 
+  // Deployment Details Management
+  addDeploymentDetail() {
+    this.deploymentDetails.push(this.fb.group({
+      platform: ['', Validators.required],
+      url: ['', [Validators.required, Validators.pattern('https?://.+')]]
+    }));
+  }
+
+  removeDeploymentDetail(index: number) {
+    this.deploymentDetails.removeAt(index);
+  }
+
   // Media
   onImageSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;
@@ -191,7 +228,7 @@ export class AddProjectComponent implements OnInit {
               this.toastService.success(`${responseData.data.length} images uploaded`);
             } else if (Array.isArray(responseData)) {
               responseData.forEach((f: any) => {
-                this.images.push(this.fb.control(f.url));
+                this.images.push(this.fb.control(f.original.url));
               });
               this.toastService.success(`${responseData.length} images uploaded`);
             }
@@ -215,25 +252,45 @@ export class AddProjectComponent implements OnInit {
         return;
       }
 
-      this.mediaService.uploadFiles([file]).subscribe({
+      this.isLoading = true; // Show listing/loading state
+      this.mediaService.uploadMixedBundle({ videos: [file] }, 'projects').subscribe({
         next: (res) => {
-          const responseData = res.data as any;
-          if (res.success && responseData && responseData.data && responseData.data.length > 0) {
+          this.isLoading = false;
+          if (res.success && res.data && res.data.videos && res.data.videos.length > 0) {
+            const video = res.data.videos[0];
+            // Handle both possible structures (direct or nested in original)
+            const url = video.original?.url || video.url;
+
             this.projectForm.patchValue({
-              videoRepresentation: responseData.data[0].url
+              videoRepresentation: url
             });
-            this.toastService.success('Video uploaded');
+            this.toastService.success('Video uploaded successfully');
+          } else {
+            this.toastService.error('Video upload returned no data');
           }
         },
-        error: (err) => this.toastService.error('Video upload failed')
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Video upload error', err);
+          this.toastService.error(err.error?.message || 'Video upload failed');
+        }
       });
     }
   }
 
   onSubmit() {
     if (this.projectForm.invalid) {
-      this.toastService.warning('Please check form inputs');
       this.projectForm.markAllAsTouched();
+
+      const invalidControls: string[] = [];
+      Object.keys(this.projectForm.controls).forEach(key => {
+        const control = this.projectForm.get(key);
+        if (control?.invalid) {
+          invalidControls.push(key);
+        }
+      });
+
+      this.toastService.warning(`Please check the following fields: ${invalidControls.join(', ')}`);
       return;
     }
 

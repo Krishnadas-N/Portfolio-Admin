@@ -9,10 +9,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { finalize } from 'rxjs/operators';
 import { Blog } from '../../../core/models/api.models';
 
+import { NgSelectModule } from '@ng-select/ng-select';
+
 @Component({
   selector: 'app-add-blog',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgxEditorModule],
+  imports: [CommonModule, ReactiveFormsModule, NgxEditorModule, NgSelectModule],
   templateUrl: './add-blog.component.html',
   styleUrl: './add-blog.component.scss',
 })
@@ -46,6 +48,9 @@ export class AddBlogComponent implements OnInit, OnDestroy {
   blogId: string | null = null;
   editorInitialized = false;
 
+  // List of available blogs for "Related Posts" selection
+  relatedBlogs = signal<Blog[]>([]);
+
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.platformId = platformId;
   }
@@ -57,6 +62,7 @@ export class AddBlogComponent implements OnInit, OnDestroy {
     }
 
     this.initForm();
+    this.loadRelatedCandidates();
 
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -67,18 +73,53 @@ export class AddBlogComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadRelatedCandidates() {
+    // Fetch blogs to populate the "Related Posts" dropdown.
+    // Fetching 100 most recent for now.
+    this.blogService.getBlogs({ page: 1, limit: 100 }).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          // Filter out current blog if in edit mode is handled in template or we can filter here if we had the ID early.
+          // Since we might not have ID yet, we'll store all.
+          this.relatedBlogs.set(res.data);
+        }
+      }
+    });
+  }
+
   private initForm(): void {
     this.blogForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+      slug: ['', [Validators.pattern('^[a-z0-9-]+$')]], // Auto-generated but editable
       content: ['', Validators.required],
       excerpt: ['', [Validators.required, Validators.maxLength(300)]],
-      author: ['Admin', [Validators.required]], // Default or fetch from user
+      author: ['Admin', [Validators.required]],
       tags: this.fb.array([]),
-      coverImage: ['', [Validators.pattern('https?://.+')]],
+      featuredImage: ['', [Validators.pattern('https?://.+')]],
       category: ['', [Validators.required]],
-      status: ['published', [Validators.required]], // 'published' or 'draft'
+      status: ['draft', [Validators.required]],
+      publishedAt: [''],
+      seoTitle: ['', [Validators.maxLength(70)]],
+      seoDescription: ['', [Validators.maxLength(160)]],
+      relatedPosts: [[]],
+      readingTime: [0, [Validators.min(0)]],
       featured: [false]
     });
+
+    // Auto-generate slug from title if slug is untouched
+    this.blogForm.get('title')?.valueChanges.subscribe(title => {
+      if (title && !this.isEditMode && !this.blogForm.get('slug')?.dirty) {
+        this.blogForm.patchValue({
+          slug: this.generateSlug(title)
+        });
+      }
+    });
+  }
+
+  generateSlug(title: string): string {
+    return title.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   get f() { return this.blogForm.controls; }
@@ -106,12 +147,18 @@ export class AddBlogComponent implements OnInit, OnDestroy {
   patchForm(blog: Blog) {
     this.blogForm.patchValue({
       title: blog.title,
+      slug: blog.slug,
       content: blog.content,
       excerpt: blog.excerpt,
       author: blog.author?.name || 'Admin',
-      coverImage: blog.coverImage,
+      featuredImage: blog.featuredImage, // Updated from coverImage
       category: blog.category,
       status: blog.status,
+      publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().split('T')[0] : '',
+      seoTitle: blog.seoTitle,
+      seoDescription: blog.seoDescription,
+      relatedPosts: blog.relatedPosts ? blog.relatedPosts.map(p => (typeof p === 'object' ? p._id : p)) : [],
+      readingTime: blog.readingTime || 0,
       featured: blog.isFeatured || false
     });
 
@@ -141,17 +188,17 @@ export class AddBlogComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.mediaService.uploadFiles([file]).subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-            const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
+      this.mediaService.uploadMixedBundle({ images: [file] }).subscribe({
+        next: (res: any) => {
+          if (res.success && res.data && res.data.images && res.data.images.length > 0) {
+            const uploadedUrl = res.data.images[0].original?.url || res.data.images[0].url;
             if (uploadedUrl) {
-              this.blogForm.patchValue({ coverImage: uploadedUrl });
+              this.blogForm.patchValue({ featuredImage: uploadedUrl });
               this.toastService.success('Cover image uploaded');
             }
           }
         },
-        error: (err) => this.toastService.error('Failed to upload image')
+        error: (err: any) => this.toastService.error('Failed to upload image')
       });
     }
   }

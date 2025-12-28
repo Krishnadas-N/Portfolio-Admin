@@ -84,7 +84,7 @@
 
         <!-- Image Area -->
         <figure class="relative aspect-video overflow-hidden bg-surface-elevated shrink-0">
-          <img [src]="blog.coverImage || 'assets/images/placeholder-blog.jpg'" alt="Blog Cover"
+          <img [src]="blog.featuredImage || 'assets/images/placeholder-blog.jpg'" alt="Blog Cover"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
 
           <!-- Category Badge -->
@@ -99,7 +99,11 @@
           <div class="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end pointer-events-none">
             <span
               class="px-2.5 py-1 rounded-md shadow-sm font-bold uppercase text-[10px] tracking-wide backdrop-blur-md border border-white/10"
-              [ngClass]="blog.status === 'published' ? 'bg-emerald-500/90 text-white' : 'bg-surface/90 text-text-secondary'">
+              [ngClass]="{
+                'bg-emerald-500/90 text-white': blog.status === 'published',
+                'bg-amber-500/90 text-white': blog.status === 'archived',
+                'bg-surface/90 text-text-secondary': blog.status === 'draft'
+              }">
               {{blog.status}}
             </span>
             <span *ngIf="blog.isFeatured"
@@ -152,10 +156,14 @@
           <!-- Footer Info & Actions -->
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-              <div class="text-xs">
+              <div class="text-xs flex items-center gap-3">
                 <p class="text-text-tertiary font-medium flex items-center gap-1">
                   <i class="fa-regular fa-calendar"></i>
                   {{blog.createdAt | date:'MMM d, y'}}
+                </p>
+                <p class="text-text-tertiary font-medium flex items-center gap-1" *ngIf="blog.readingTime">
+                  <i class="fa-regular fa-clock"></i>
+                  {{blog.readingTime}} min
                 </p>
               </div>
             </div>

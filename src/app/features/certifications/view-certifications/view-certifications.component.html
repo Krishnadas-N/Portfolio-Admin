@@ -1,5 +1,41 @@
 <div class="h-full flex flex-col p-6 max-w-[1920px] mx-auto w-full overflow-hidden">
 
+  <!-- Stats Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 shrink-0" *ngIf="stats()">
+    <div
+      class="glass-panel p-6 rounded-2xl border border-border/50 bg-surface shadow-sm relative overflow-hidden group">
+      <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+        <i class="fa-solid fa-certificate text-5xl text-primary"></i>
+      </div>
+      <div class="relative z-10">
+        <p class="text-sm font-medium text-text-secondary uppercase tracking-wider mb-1">Total Certifications</p>
+        <h2 class="text-3xl font-bold text-text-primary">{{ stats()?.total || 0 }}</h2>
+      </div>
+    </div>
+
+    <div
+      class="glass-panel p-6 rounded-2xl border border-border/50 bg-surface shadow-sm relative overflow-hidden group">
+      <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+        <i class="fa-solid fa-circle-check text-5xl text-emerald-500"></i>
+      </div>
+      <div class="relative z-10">
+        <p class="text-sm font-medium text-text-secondary uppercase tracking-wider mb-1">Active</p>
+        <h2 class="text-3xl font-bold text-text-primary">{{ stats()?.active || 0 }}</h2>
+      </div>
+    </div>
+
+    <div
+      class="glass-panel p-6 rounded-2xl border border-border/50 bg-surface shadow-sm relative overflow-hidden group">
+      <div class="absolute right-0 top-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+        <i class="fa-solid fa-clock-rotate-left text-5xl text-amber-500"></i>
+      </div>
+      <div class="relative z-10">
+        <p class="text-sm font-medium text-text-secondary uppercase tracking-wider mb-1">Expired / Inactive</p>
+        <h2 class="text-3xl font-bold text-text-primary">{{ stats()?.expired || 0 }}</h2>
+      </div>
+    </div>
+  </div>
+
   <!-- Header Section -->
   <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-8 shrink-0">
     <div>
@@ -65,7 +101,7 @@
 
   <!-- Empty State -->
   <div *ngIf="!isLoading() && !error() && certifications().length === 0"
-    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4">
+    class="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl border border-dashed border-border text-center m-4 p-6">
     <div class="w-24 h-24 bg-surface-elevated/50 rounded-full flex items-center justify-center mb-6 text-text-tertiary">
       <i class="fa-solid fa-certificate text-4xl opacity-50"></i>
     </div>
@@ -84,10 +120,11 @@
 
         <!-- Status Badge -->
         <div class="absolute top-4 right-4 z-10">
-          <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border"
+          <button (click)="toggleStatus(cert._id, cert.isActive)"
+            class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-all hover:opacity-80 disabled:opacity-50"
             [ngClass]="cert.isActive ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-surface-elevated text-text-tertiary border-border'">
             {{ cert.isActive ? 'Active' : 'Inactive' }}
-          </span>
+          </button>
         </div>
 
         <div class="p-6 flex flex-col h-full flex-1">
@@ -95,7 +132,7 @@
           <div class="flex items-start gap-4 mb-4">
             <div
               class="w-14 h-14 rounded-xl bg-surface-elevated/50 border border-border p-2 shrink-0 flex items-center justify-center overflow-hidden">
-              <img [src]="cert.image || 'assets/images/placeholder-cert.png'" [alt]="cert.issuer"
+              <img [src]="cert.badgeImage || 'assets/images/placeholder-cert.png'" [alt]="cert.issuer"
                 class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal opacity-90" />
             </div>
             <div class="flex-1 min-w-0 pt-0.5">

@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { 
-  ApiResponse, 
-  DashboardData, 
+import {
+  ApiResponse,
+  DashboardData,
   AnalyticsData,
   AnalyticsParams,
   VisitorsResponse,
@@ -34,7 +34,7 @@ export class DashboardService {
     if (params?.startDate) httpParams = httpParams.set('startDate', params.startDate);
     if (params?.endDate) httpParams = httpParams.set('endDate', params.endDate);
     if (params?.period) httpParams = httpParams.set('period', params.period);
-    
+
     return this.http.get<ApiResponse<AnalyticsData>>(`${this.apiUrl}/analytics`, { params: httpParams });
   }
 
@@ -45,7 +45,7 @@ export class DashboardService {
     if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
     if (params?.startDate) httpParams = httpParams.set('startDate', params.startDate);
     if (params?.endDate) httpParams = httpParams.set('endDate', params.endDate);
-    
+
     return this.http.get<ApiResponse<VisitorsResponse>>(`${this.apiUrl}/visitors`, { params: httpParams });
   }
 
@@ -55,14 +55,10 @@ export class DashboardService {
   }
 
   // Get system logs (Super Admin only)
-  getLogs(params?: LogsParams): Observable<PaginatedResponse<{ logs: SystemLog[] }>> {
+  getLogs(params?: LogsParams): Observable<ApiResponse<SystemLog[]>> {
     let httpParams = new HttpParams();
-    if (params?.page) httpParams = httpParams.set('page', params.page.toString());
     if (params?.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    if (params?.level) httpParams = httpParams.set('level', params.level);
-    if (params?.startDate) httpParams = httpParams.set('startDate', params.startDate);
-    if (params?.endDate) httpParams = httpParams.set('endDate', params.endDate);
-    
-    return this.http.get<PaginatedResponse<{ logs: SystemLog[] }>>(`${this.apiUrl}/logs`, { params: httpParams });
+
+    return this.http.get<ApiResponse<SystemLog[]>>(`${this.apiUrl}/logs`, { params: httpParams });
   }
 }

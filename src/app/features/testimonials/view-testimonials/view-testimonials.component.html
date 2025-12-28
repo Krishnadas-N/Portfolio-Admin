@@ -1,0 +1,147 @@
+<div class="container mx-auto p-4 lg:p-8 max-w-7xl animate-fade-in">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-text-primary mb-2">Testimonials</h1>
+            <p class="text-text-tertiary">Manage client reviews and feedback</p>
+        </div>
+        <a routerLink="/testimonials/add" class="btn btn-primary shadow-lg shadow-primary/20 gap-2">
+            <i class="fa-solid fa-plus"></i> Add Testimonial
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Total</span>
+            <span class="text-2xl font-bold text-text-primary">{{ stats()?.overview?.totalTestimonials || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Active</span>
+            <span class="text-2xl font-bold text-success">{{ stats()?.overview?.activeTestimonials || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Featured</span>
+            <span class="text-2xl font-bold text-secondary">{{ stats()?.overview?.featuredTestimonials || 0 }}</span>
+        </div>
+        <div class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Avg Rating</span>
+            <span class="text-2xl font-bold text-warning">{{ (stats()?.overview?.averageRating || 0) | number:'1.1-1'
+                }}</span>
+        </div>
+        <div
+            class="glass-panel p-4 rounded-2xl border border-border/50 bg-surface flex flex-col items-center col-span-2 lg:col-span-1">
+            <span class="text-xs font-bold uppercase text-text-tertiary tracking-wider">Companies</span>
+            <span class="text-2xl font-bold text-info">{{ stats()?.overview?.uniqueCompanies || 0 }}</span>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="flex justify-center p-12">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && testimonials().length === 0"
+        class="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-2xl border border-border/50 bg-surface">
+        <div class="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center mb-4">
+            <i class="fa-regular fa-comments text-2xl text-text-tertiary"></i>
+        </div>
+        <h3 class="text-lg font-bold text-text-primary mb-1">No testimonials yet</h3>
+        <p class="text-text-tertiary mb-4">Add your first client testimonial to showcase your work.</p>
+        <a routerLink="/testimonials/add" class="btn btn-primary btn-sm">Add Testimonial</a>
+    </div>
+
+    <!-- List -->
+    <div *ngIf="!isLoading() && testimonials().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let t of testimonials()"
+            class="glass-panel p-6 rounded-2xl border border-border/50 bg-surface flex flex-col group relative overflow-hidden transition-all hover:-translate-y-1 hover:shadow-lg hover:border-primary/30">
+
+            <!-- Top Action Bar (Absolute) -->
+            <div
+                class="absolute top-4 right-4 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-surface/80 backdrop-blur-sm rounded-lg p-1 shadow-sm border border-border/50">
+                <a [routerLink]="['/testimonials/edit', t._id]"
+                    class="btn btn-ghost btn-xs btn-square text-text-secondary hover:text-primary">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                <button (click)="deleteTestimonial(t._id)"
+                    class="btn btn-ghost btn-xs btn-square text-text-secondary hover:text-error">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </div>
+
+            <!-- Header: User Info -->
+            <div class="flex items-center gap-4 mb-4">
+                <div class="avatar placeholder">
+                    <div class="w-12 h-12 rounded-full bg-surface-elevated text-text-secondary overflow-hidden">
+                        <img *ngIf="t.clientImage" [src]="t.clientImage" [alt]="t.clientName" class="object-cover" />
+                        <span *ngIf="!t.clientImage" class="text-lg font-bold">{{ t.clientName.charAt(0) }}</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-text-primary leading-tight">{{ t.clientName }}</h3>
+                    <p class="text-xs text-text-tertiary">{{ t.clientPosition }} &#64; {{ t.clientCompany }}</p>
+                </div>
+            </div>
+
+            <!-- Rating & Project -->
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-1 text-warning text-sm">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="fa-solid fa-star"
+                        [class.text-surface-elevated]="star > t.rating"></i>
+                    <span class="text-text-tertiary text-xs ml-1">({{ t.rating }}/5)</span>
+                </div>
+                <div *ngIf="t.project" class="badge badge-sm badge-ghost gap-1 max-w-[50%]">
+                    <i class="fa-solid fa-cube text-[10px]"></i>
+                    <span class="truncate">{{ t.project.title }}</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 mb-4 relative">
+                <i class="fa-solid fa-quote-left absolute -top-1 -left-1 text-primary/10 text-4xl -z-10"></i>
+                <p class="text-sm text-text-secondary line-clamp-4 italic relative z-0 pl-2">"{{ t.content }}"</p>
+            </div>
+
+            <!-- Contact/Social Links (New) -->
+            <div class="flex items-center gap-3 mb-4 text-sm" *ngIf="t.clientEmail || t.clientLinkedIn">
+                <a *ngIf="t.clientEmail" [href]="'mailto:' + t.clientEmail"
+                    class="flex items-center gap-1.5 text-text-tertiary hover:text-primary transition-colors"
+                    title="Email Client">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span class="text-xs truncate max-w-[150px]">{{ t.clientEmail }}</span>
+                </a>
+                <a *ngIf="t.clientLinkedIn" [href]="t.clientLinkedIn" target="_blank"
+                    class="flex items-center gap-1.5 text-text-tertiary hover:text-blue-600 transition-colors"
+                    title="LinkedIn Profile">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+            </div>
+
+            <!-- Footer: Toggles -->
+            <div class="pt-4 mt-auto border-t border-border/50 flex items-center justify-between gap-2">
+
+                <!-- Verify Button -->
+                <button (click)="verifyTestimonial(t._id)" class="btn btn-xs rounded-full gap-1 border-none"
+                    [ngClass]="t.verified ? 'bg-success/10 text-success hover:bg-success/20' : 'bg-surface-elevated text-text-tertiary hover:text-text-primary'">
+                    <i class="fa-solid fa-check-circle"></i>
+                    {{ t.verified ? 'Verified' : 'Verify' }}
+                </button>
+
+                <!-- Feature Toggle -->
+                <button (click)="toggleFeatured(t._id)" class="btn btn-ghost btn-xs btn-circle"
+                    [ngClass]="t.isFeatured ? 'text-secondary bg-secondary/10' : 'text-text-tertiary hover:bg-surface-elevated'"
+                    title="Toggle Feature">
+                    <i class="fa-solid fa-heart" [class.fa-regular]="!t.isFeatured"></i>
+                </button>
+
+                <!-- Active Toggle -->
+                <div class="tooltip" [attr.data-tip]="t.isActive ? 'Active' : 'Hidden'">
+                    <input type="checkbox" class="toggle toggle-xs toggle-primary" [checked]="t.isActive"
+                        (change)="toggleActive(t._id)" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

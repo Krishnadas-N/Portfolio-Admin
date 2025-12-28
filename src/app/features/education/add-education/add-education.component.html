@@ -11,7 +11,7 @@
     <div class="flex gap-3 w-full sm:w-auto">
       <button type="button" (click)="onCancel()"
         class="px-5 py-2.5 rounded-xl border border-border text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-all text-sm font-medium">Cancel</button>
-      <button type="button" (click)="onSubmit()" [disabled]="educationForm.invalid || isSubmitting()"
+      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting()"
         class="px-5 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all text-sm font-medium flex items-center justify-center gap-2 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
         <span *ngIf="isSubmitting()" class="loading loading-spinner loading-xs"></span>
         <i class="fa-regular fa-floppy-disk" *ngIf="!isSubmitting()"></i>
@@ -288,7 +288,7 @@
                   </div>
 
                   <!-- Preview -->
-                  <div *ngIf="educationForm.get('logo')?.value"
+                  <div *ngIf="educationForm.get('logo')?.value && !isUploading()"
                     class="w-full h-full p-4 flex items-center justify-center">
                     <img [src]="educationForm.get('logo')?.value"
                       class="max-w-full max-h-full object-contain drop-shadow-sm" />
@@ -296,6 +296,14 @@
                       class="absolute top-2 right-2 btn btn-circle btn-xs btn-error text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20">
                       <i class="fa-solid fa-xmark"></i>
                     </button>
+                  </div>
+
+                  <!-- Loading State -->
+                  <div *ngIf="isUploading()"
+                    class="absolute inset-0 bg-surface/80 flex flex-col items-center justify-center z-20 backdrop-blur-sm rounded-xl">
+                    <span
+                      class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></span>
+                    <span class="text-xs font-medium text-text-secondary">Uploading...</span>
                   </div>
                 </div>
                 <div class="space-y-1.5 mt-2">

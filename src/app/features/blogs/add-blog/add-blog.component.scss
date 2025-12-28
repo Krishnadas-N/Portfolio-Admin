@@ -72,4 +72,119 @@
             }
         }
     }
+
+    ::ng-deep {
+        .custom-select.ng-select {
+            .ng-select-container {
+                background-color: rgba(var(--color-surface-elevated), 0.5) !important;
+                border: 1px solid rgba(var(--color-border), 0.6) !important;
+                border-radius: 0.75rem !important; // rounded-xl
+                min-height: 50px;
+                padding-left: 0.5rem;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    border-color: rgba(var(--color-primary), 0.3) !important;
+                }
+
+                .ng-value-container {
+                    padding-left: 10px; // Space for the search icon we might add
+
+                    .ng-placeholder {
+                        color: rgb(var(--color-text-tertiary));
+                        font-size: 0.875rem; // text-sm
+                    }
+
+                    .ng-input {
+                        >input {
+                            color: rgb(var(--color-text-primary));
+                            font-size: 0.875rem;
+                            font-family: inherit;
+                        }
+                    }
+                }
+            }
+
+            // Focused state
+            &.ng-select-opened,
+            &.ng-select-focused {
+                .ng-select-container {
+                    border-color: rgb(var(--color-primary)) !important;
+                    box-shadow: 0 0 0 1px rgba(var(--color-primary), 0.2);
+                }
+            }
+
+            // Hide the default dropdown arrow ("search option only")
+            .ng-arrow-wrapper {
+                display: none;
+            }
+
+            // Selected tags
+            .ng-value {
+                background-color: rgba(var(--color-primary), 0.1) !important;
+                color: rgb(var(--color-primary)) !important;
+                border-radius: 0.5rem !important; // rounded-lg
+                margin-right: 0.5rem !important;
+                border: 1px solid rgba(var(--color-primary), 0.2);
+
+                .ng-value-label {
+                    font-size: 0.75rem; // text-xs
+                    font-weight: 500;
+                    padding: 0.25rem 0.5rem;
+                }
+
+                .ng-value-icon {
+                    border-left: 1px solid rgba(var(--color-primary), 0.2) !important;
+                    color: rgb(var(--color-primary));
+
+                    &:hover {
+                        background-color: rgba(var(--color-primary), 0.2) !important;
+                    }
+                }
+            }
+
+            // Dropdown panel
+            .ng-dropdown-panel {
+                background-color: rgb(var(--color-surface)) !important; // Ensure opaque background
+                border: 1px solid rgba(var(--color-border), 0.5);
+                border-radius: 0.75rem;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important; // Stronger shadow
+                margin-top: 4px;
+                overflow: hidden;
+                z-index: 9999 !important; // Force on top
+
+                // Ensure the items container has background too
+                .ng-dropdown-panel-items {
+                    background-color: rgb(var(--color-surface)) !important;
+
+                    .ng-option {
+                        background-color: transparent;
+                        color: rgb(var(--color-text-primary)) !important; // Force text color
+                        padding: 0.75rem 1rem;
+                        font-size: 0.875rem;
+                        transition: background-color 0.2s;
+                        border-bottom: 1px solid rgba(var(--color-border), 0.3); // Separator
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        // Hover State
+                        &:hover,
+                        &.ng-option-marked {
+                            background-color: rgba(var(--color-surface-elevated), 1) !important; // Solid color on hover
+                            color: rgb(var(--color-text-primary)) !important;
+                        }
+
+                        // Selected State
+                        &.ng-option-selected {
+                            background-color: rgba(var(--color-primary), 0.15) !important;
+                            color: rgb(var(--color-primary)) !important;
+                            font-weight: 600;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

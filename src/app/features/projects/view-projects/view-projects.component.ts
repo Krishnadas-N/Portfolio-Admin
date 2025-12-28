@@ -8,15 +8,15 @@ import { PaginationComponent } from '../../../shared/components/pagination/pagin
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-view-projects',
-  standalone: true,
-  imports: [CommonModule, RouterLink, PaginationComponent, FormsModule],
-  templateUrl: './view-projects.component.html',
-  styleUrl: './view-projects.component.scss'
+    selector: 'app-view-projects',
+    standalone: true,
+    imports: [CommonModule, RouterLink, PaginationComponent, FormsModule],
+    templateUrl: './view-projects.component.html',
+    styleUrl: './view-projects.component.scss'
 })
 export class ViewProjectsComponent implements OnInit {
     private projectService = inject(ProjectService);
-    
+
     projects = signal<Project[]>([]);
     pagination = signal<Pagination | null>(null);
     isLoading = signal<boolean>(false);
@@ -32,10 +32,17 @@ export class ViewProjectsComponent implements OnInit {
         this.projectService.getProjects({ page, search: this.searchTerm() }).pipe(
             finalize(() => this.isLoading.set(false))
         ).subscribe({
-            next: (res) => {
-                if (res.success && res.data) {
+            next: (res: any) => {
+                // If it's a PaginatedResult structure (with data and pagination at root)
+                if (res.data) {
                     this.projects.set(res.data);
-                    this.pagination.set(res.pagination);
+                    if (res.pagination) {
+                        this.pagination.set(res.pagination);
+                    }
+                }
+                // Fallback for ApiResponse<T[]> structure without root pagination (if API differs)
+                else if (Array.isArray(res)) {
+                    this.projects.set(res);
                 }
             },
             error: (err) => {

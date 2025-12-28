@@ -118,7 +118,7 @@
                 <!-- Logo -->
                 <div
                   class="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-xl bg-surface-elevated border border-border p-2 flex items-center justify-center overflow-hidden">
-                  <img [src]="exp.logo || 'assets/images/placeholder-company.png'" [alt]="exp.company"
+                  <img [src]="exp.companyLogo || 'assets/images/placeholder-company.png'" [alt]="exp.company"
                     class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal opacity-90" />
                 </div>
 
@@ -129,7 +129,12 @@
                     {{ exp.position }}
                   </h3>
                   <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                    <span class="text-lg font-medium text-text-secondary">{{ exp.company }}</span>
+                    <a *ngIf="exp.companyWebsite" [href]="exp.companyWebsite" target="_blank" rel="noopener noreferrer"
+                      class="text-lg font-medium text-text-secondary hover:text-primary hover:underline underline-offset-2 transition-colors inline-flex items-center gap-1.5">
+                      {{ exp.company }} <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
+                    </a>
+                    <span *ngIf="!exp.companyWebsite" class="text-lg font-medium text-text-secondary">{{ exp.company
+                      }}</span>
 
                     <!-- Mobile Date (Inline) -->
                     <span
@@ -138,12 +143,25 @@
                       }}
                     </span>
                   </div>
-                  <div class="flex items-center gap-3 mt-2 text-xs font-medium text-text-tertiary">
+                  <div class="flex flex-wrap items-center gap-3 mt-2 text-xs font-medium text-text-tertiary">
                     <span class="flex items-center gap-1.5" *ngIf="exp.location">
                       <i class="fa-solid fa-location-dot"></i> {{ exp.location }}
                     </span>
-                    <span class="w-1 h-1 rounded-full bg-current opacity-30"></span>
-                    <span>{{ exp.employmentType || 'Full-time' }}</span>
+
+                    <ng-container *ngIf="exp.employmentType">
+                      <span class="w-1 h-1 rounded-full bg-current opacity-30"></span>
+                      <span>{{ exp.employmentType }}</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="exp.industry">
+                      <span class="w-1 h-1 rounded-full bg-current opacity-30"></span>
+                      <span><i class="fa-solid fa-industry mr-1"></i>{{ exp.industry }}</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="exp.teamSize">
+                      <span class="w-1 h-1 rounded-full bg-current opacity-30"></span>
+                      <span><i class="fa-solid fa-users mr-1"></i>{{ exp.teamSize }} people</span>
+                    </ng-container>
                   </div>
                 </div>
               </div>
@@ -155,6 +173,18 @@
               <div class="text-sm md:text-[15px] leading-relaxed text-text-secondary whitespace-pre-wrap"
                 *ngIf="exp.description">
                 {{ exp.description }}
+              </div>
+
+              <!-- Achievements -->
+              <div *ngIf="exp.achievements?.length" class="space-y-3">
+                <h4 class="text-xs font-bold text-text-tertiary uppercase tracking-wider">Key Achievements</h4>
+                <ul class="space-y-2">
+                  <li *ngFor="let achieve of exp.achievements"
+                    class="flex items-start gap-2.5 text-sm text-text-secondary">
+                    <i class="fa-solid fa-trophy text-amber-500 text-xs mt-1 shrink-0"></i>
+                    <span>{{ achieve }}</span>
+                  </li>
+                </ul>
               </div>
 
               <!-- Skills -->

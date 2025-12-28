@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { BlogService } from '../../../core/services/blog.service';
@@ -21,6 +21,17 @@ export class BlogDetailsComponent implements OnInit {
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
 
+  // Safely retrieve related posts ensuring they are Blog objects
+  relatedPosts = computed(() => {
+    const currentBlog = this.blog();
+    if (!currentBlog || !currentBlog.relatedPosts) return [];
+
+    // Filter and type guard to ensure we only return Blog objects, not string IDs
+    return currentBlog.relatedPosts.filter((post): post is Blog => {
+      return typeof post !== 'string' && post !== null && typeof post === 'object';
+    });
+  });
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -39,7 +50,7 @@ export class BlogDetailsComponent implements OnInit {
         if (res.success && res.data) {
           this.blog.set(res.data);
         } else {
-            this.error.set('Blog not found');
+          this.error.set('Blog not found');
         }
       },
       error: (err) => {
@@ -54,9 +65,9 @@ export class BlogDetailsComponent implements OnInit {
     if (id && confirm('Are you sure you want to delete this blog post?')) {
       this.blogService.deleteBlog(id).subscribe({
         next: (res) => {
-            if (res.success) {
-                this.router.navigate(['/blogs']);
-            }
+          if (res.success) {
+            this.router.navigate(['/blogs']);
+          }
         },
         error: (err) => console.error(err)
       });

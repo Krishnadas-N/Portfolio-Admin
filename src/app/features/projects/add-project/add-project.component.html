@@ -11,7 +11,7 @@
     <div class="flex gap-3 w-full sm:w-auto">
       <button type="button" (click)="onCancel()"
         class="px-6 py-2.5 rounded-xl border border-border text-text-secondary hover:bg-surface hover:text-text-primary transition-all font-medium flex-1 sm:flex-none">Cancel</button>
-      <button type="button" (click)="onSubmit()" [disabled]="projectForm.invalid || isSubmitting"
+      <button type="button" (click)="onSubmit()" [disabled]="isSubmitting"
         class="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary-hover shadow-lg shadow-primary/25 disabled:opacity-70 disabled:cursor-not-allowed transition-all font-medium flex-1 sm:flex-none flex items-center justify-center gap-2">
         <span *ngIf="isSubmitting"
           class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -130,6 +130,78 @@
         </div>
       </div>
 
+      <!-- Tags & SEO -->
+      <div class="glass-panel rounded-2xl p-6">
+        <h2 class="text-lg font-bold flex items-center gap-3 mb-6 text-text-primary">
+          <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+            <i class="fa-solid fa-tags text-lg"></i>
+          </div>
+          Tags & Optimization
+        </h2>
+
+        <div class="grid grid-cols-1 gap-8">
+          <!-- Tags -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              Project Tags
+              <span class="text-xs text-text-tertiary font-normal">For categorization</span>
+            </label>
+            <div class="relative">
+              <input #tagInput type="text" placeholder="Add tag..."
+                class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12"
+                (keyup.enter)="addStringItem('tags', tagInput.value, tagInput)" />
+              <button type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-primary transition-colors"
+                (click)="addStringItem('tags', tagInput.value, tagInput)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[2rem]">
+              <div *ngFor="let tag of projectForm.get('tags')?.value; let i = index"
+                class="flex items-center gap-2 pl-3 pr-2 py-1.5 bg-surface-elevated border border-border rounded-lg text-sm text-text-secondary group">
+                #{{ tag }}
+                <button type="button" (click)="removeStringItem('tags', i)"
+                  class="w-5 h-5 flex items-center justify-center rounded hover:bg-red-500/10 text-text-tertiary hover:text-red-500 transition-colors">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>
+              <span *ngIf="!projectForm.get('tags')?.value?.length" class="text-sm text-text-tertiary italic py-1">No
+                tags added</span>
+            </div>
+          </div>
+
+          <!-- SEO Keywords -->
+          <div class="flex flex-col gap-3">
+            <label class="text-sm font-medium text-text-secondary flex justify-between">
+              SEO Keywords
+              <span class="text-xs text-text-tertiary font-normal">For search engines</span>
+            </label>
+            <div class="relative">
+              <input #seoInput type="text" placeholder="Add keyword..."
+                class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12"
+                (keyup.enter)="addStringItem('seoKeywords', seoInput.value, seoInput)" />
+              <button type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-elevated text-text-tertiary hover:text-primary transition-colors"
+                (click)="addStringItem('seoKeywords', seoInput.value, seoInput)">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-2 min-h-[2rem]">
+              <div *ngFor="let kw of projectForm.get('seoKeywords')?.value; let i = index"
+                class="flex items-center gap-2 pl-3 pr-2 py-1.5 bg-orange-500/5 border border-orange-500/20 rounded-lg text-sm text-orange-500 group">
+                {{ kw }}
+                <button type="button" (click)="removeStringItem('seoKeywords', i)"
+                  class="w-5 h-5 flex items-center justify-center rounded hover:bg-orange-500/20 text-orange-500/60 hover:text-orange-500 transition-colors">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>
+              <span *ngIf="!projectForm.get('seoKeywords')?.value?.length"
+                class="text-sm text-text-tertiary italic py-1">No keywords added</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Media -->
       <div class="glass-panel rounded-2xl p-6">
         <h2 class="text-lg font-bold flex items-center gap-3 mb-6 text-text-primary">
@@ -225,6 +297,12 @@
             </select>
           </div>
 
+          <div class="flex flex-col gap-2">
+            <label class="text-sm font-medium text-text-secondary">License</label>
+            <input type="text" formControlName="license" placeholder="e.g. MIT, Apache 2.0"
+              class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm" />
+          </div>
+
           <div class="h-px w-full bg-border"></div>
 
           <div class="flex flex-col gap-2">
@@ -241,6 +319,21 @@
         </div>
       </div>
 
+      <!-- Project Stats (Read Only) -->
+      <div class="glass-panel rounded-2xl p-6" *ngIf="isEditMode">
+        <h2 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-6">Stats</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col items-center p-3 bg-surface border border-border rounded-xl">
+            <span class="text-2xl font-bold text-text-primary">{{ f['viewsCount'].value || 0 }}</span>
+            <span class="text-xs text-text-secondary">Views</span>
+          </div>
+          <div class="flex flex-col items-center p-3 bg-surface border border-border rounded-xl">
+            <span class="text-2xl font-bold text-text-primary">{{ f['likes'].value || 0 }}</span>
+            <span class="text-xs text-text-secondary">Likes</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Links -->
       <div class="glass-panel rounded-2xl p-6">
         <h2 class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-6">External Links</h2>
@@ -251,7 +344,7 @@
               Live URL
               <i class="fa-solid fa-globe text-text-tertiary"></i>
             </label>
-            <input type="url" formControlName="url" placeholder="https://..."
+            <input type="url" formControlName="link" placeholder="https://..."
               class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
           </div>
 
@@ -260,8 +353,39 @@
               Repository
               <i class="fa-brands fa-github text-text-tertiary"></i>
             </label>
-            <input type="url" formControlName="githubUrl" placeholder="https://github.com/..."
+            <input type="url" formControlName="repo" placeholder="https://github.com/..."
               class="w-full px-4 py-2.5 bg-surface border border-border rounded-xl text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Deployment Details -->
+      <div class="glass-panel rounded-2xl p-6">
+        <h2
+          class="text-xs font-bold text-text-tertiary uppercase tracking-wider mb-4 flex justify-between items-center">
+          Deployments
+          <button type="button" (click)="addDeploymentDetail()"
+            class="text-primary hover:text-primary-hover text-[10px] font-bold">
+            <i class="fa-solid fa-plus"></i> ADD
+          </button>
+        </h2>
+        <div class="space-y-4" formArrayName="deploymentDetails">
+          <div *ngFor="let deploy of deploymentDetails.controls; let i=index" [formGroupName]="i"
+            class="p-3 bg-surface border border-border rounded-xl relative group">
+            <button type="button" (click)="removeDeploymentDetail(i)"
+              class="absolute top-2 right-2 text-text-tertiary hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+            <div class="space-y-2">
+              <input type="text" formControlName="platform" placeholder="Platform (e.g. AWS)"
+                class="w-full bg-transparent border-b border-border text-sm pb-1 focus:outline-none focus:border-primary text-text-primary px-1">
+              <input type="url" formControlName="url" placeholder="URL"
+                class="w-full bg-transparent border-b border-border text-xs pb-1 focus:outline-none focus:border-primary text-text-secondary px-1">
+            </div>
+          </div>
+          <div *ngIf="deploymentDetails.controls.length === 0"
+            class="text-xs text-text-tertiary italic text-center py-2">
+            No deployments added
           </div>
         </div>
       </div>

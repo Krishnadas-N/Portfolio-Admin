@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } fr
 import { Router, ActivatedRoute } from '@angular/router';
 import { CertificationService } from '../../../core/services/certification.service';
 import { MediaService } from '../../../core/services/media.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { uniqueTagsValidator } from '../../../shared/utils/validators';
 import { finalize } from 'rxjs/operators';
 import { Certification } from '../../../core/models/api.models';
@@ -16,6 +17,7 @@ import { Certification } from '../../../core/models/api.models';
   styleUrl: './add-certification.component.scss',
 })
 export class AddCertificationComponent implements OnInit {
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
   private certificationService = inject(CertificationService);
   private mediaService = inject(MediaService);
@@ -26,6 +28,7 @@ export class AddCertificationComponent implements OnInit {
   isEditMode = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
   isLoading = signal<boolean>(false);
+  isUploading = signal<boolean>(false);
   certificationId: string | null = null;
 
   ngOnInit() {
@@ -39,6 +42,8 @@ export class AddCertificationComponent implements OnInit {
     });
   }
 
+
+
   private initForm() {
     this.certificationForm = this.fb.group({
       name: ['', Validators.required],
@@ -50,7 +55,7 @@ export class AddCertificationComponent implements OnInit {
       category: [''],
       level: ['intermediate'],
       skills: this.fb.array([], [uniqueTagsValidator]),
-      image: [''],
+      badgeImage: [''],
       isActive: [true]
     });
   }
@@ -82,7 +87,7 @@ export class AddCertificationComponent implements OnInit {
       credentialUrl: cert.credentialUrl,
       category: cert.category,
       level: cert.level,
-      image: cert.image,
+      badgeImage: cert.badgeImage,
       isActive: cert.isActive ?? true
     });
 
@@ -107,22 +112,41 @@ export class AddCertificationComponent implements OnInit {
   onImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.mediaService.uploadFiles([file]).subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-             const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
-             if (uploadedUrl) {
-               this.certificationForm.patchValue({ image: uploadedUrl });
-             }
+      this.isUploading.set(true);
+      this.mediaService.uploadMixedBundle({ images: [file] })
+        .pipe(finalize(() => this.isUploading.set(false)))
+        .subscribe({
+          next: (res: any) => {
+            if (res.success && res.data && res.data.images && res.data.images.length > 0) {
+              const uploadedUrl = res.data.images[0].original?.url || res.data.images[0].url;
+              if (uploadedUrl) {
+                this.certificationForm.patchValue({ badgeImage: uploadedUrl });
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Image upload failed', err);
+            this.toastService.error('Failed to upload image');
           }
-        },
-        error: (err) => console.error('Image upload failed', err)
-      });
+        });
     }
   }
 
   onSubmit() {
-    if (this.certificationForm.invalid) return;
+    if (this.certificationForm.invalid) {
+      this.certificationForm.markAllAsTouched();
+
+      const invalidControls: string[] = [];
+      Object.keys(this.certificationForm.controls).forEach(key => {
+        const control = this.certificationForm.get(key);
+        if (control?.invalid) {
+          invalidControls.push(key);
+        }
+      });
+
+      this.toastService.warning(`Please check the following fields: ${invalidControls.join(', ')}`);
+      return;
+    }
 
     this.isSubmitting.set(true);
     const formData = this.certificationForm.value;
@@ -136,10 +160,16 @@ export class AddCertificationComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         if (res.success) {
+          this.toastService.success(this.isEditMode() ? 'Certification updated' : 'Certification added');
           this.router.navigate(['/certifications']);
+        } else {
+          this.toastService.error(res.message || 'Operation failed');
         }
       },
-      error: (err) => console.error('Error saving certification', err)
+      error: (err) => {
+        console.error('Error saving certification', err);
+        this.toastService.error(err.error?.message || 'Failed to save certification');
+      }
     });
   }
 

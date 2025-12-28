@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { EducationService } from '../../../core/services/education.service';
 import { MediaService } from '../../../core/services/media.service';
 import { CompanyLogoService } from '../../../core/services/company-logo.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { TagsComponent } from '../../../shared/components';
 import { uniqueTagsValidator } from '../../../shared/utils/validators';
 import { finalize, debounceTime, switchMap } from 'rxjs/operators';
@@ -23,6 +24,7 @@ export class AddEducationComponent implements OnInit {
   private educationService = inject(EducationService);
   private mediaService = inject(MediaService);
   private companyLogoService = inject(CompanyLogoService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -30,15 +32,16 @@ export class AddEducationComponent implements OnInit {
   isEditMode = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
   isLoading = signal<boolean>(false);
+  isUploading = signal<boolean>(false);
   educationId: string | null = null;
-  
+
   instituteSuggestions: CompanyDetails[] = [];
   showSuggestions = false;
 
   ngOnInit() {
     this.initForm();
     this.setupInstituteSuggestions();
-    
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode.set(true);
@@ -57,7 +60,7 @@ export class AddEducationComponent implements OnInit {
       endDate: [''],
       current: [false],
       grade: [''], // Will map to gpa
-      description: ['', [Validators.maxLength(500)]],
+      description: ['', [Validators.maxLength(1000)]],
       location: [''],
       website: [''],
       logo: [''],
@@ -162,32 +165,58 @@ export class AddEducationComponent implements OnInit {
   onLogoSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.mediaService.uploadFiles([file]).subscribe({
-        next: (res) => {
-          if (res.success && res.data) {
-             const uploadedUrl = (res.data as any)[0]?.url || (res.data as any).data?.[0]?.url;
-             if (uploadedUrl) {
-               this.educationForm.patchValue({ logo: uploadedUrl });
-             }
+      this.isUploading.set(true);
+      this.mediaService.uploadMixedBundle({ images: [file] })
+        .pipe(finalize(() => this.isUploading.set(false)))
+        .subscribe({
+          next: (res: any) => {
+            if (res.success && res.data && res.data.images && res.data.images.length > 0) {
+              const uploadedUrl = res.data.images[0].original?.url || res.data.images[0].url;
+              if (uploadedUrl) {
+                this.educationForm.patchValue({ logo: uploadedUrl });
+                this.toastService.success('Logo uploaded');
+              }
+            }
+          },
+          error: (err: any) => {
+            console.error('Logo upload failed', err);
+            this.toastService.error('Upload failed');
           }
-        },
-        error: (err) => console.error('Logo upload failed', err)
-      });
+        });
     }
   }
 
   onSubmit() {
-    if (this.educationForm.invalid) return;
+    console.log(this.educationForm.value);
+    if (this.educationForm.invalid) {
+      const invalidControls: string[] = [];
+      Object.keys(this.educationForm.controls).forEach(key => {
+        const control = this.educationForm.get(key);
+        if (control?.invalid) {
+          invalidControls.push(key);
+          console.log(`Validation error in ${key}:`, control.errors);
+        }
+      });
+
+      this.educationForm.markAllAsTouched();
+      this.toastService.error(`Please fix validation errors in: ${invalidControls.join(', ')}`);
+      return;
+    }
 
     this.isSubmitting.set(true);
     const formData = this.educationForm.value;
-    
+
     // Map form values to model
     const eduData: Partial<Education> = {
-        ...formData,
-        isCurrent: formData.current,
-        gpa: formData.grade ? parseFloat(formData.grade) : undefined
+      ...formData,
+      isCurrent: formData.current,
+      gpa: formData.grade ? parseFloat(formData.grade) : undefined
     };
+
+    if (eduData.isCurrent) {
+      delete eduData.endDate;
+    }
+
     delete (eduData as any).current;
     delete (eduData as any).grade;
 
@@ -203,7 +232,11 @@ export class AddEducationComponent implements OnInit {
           this.router.navigate(['/education']);
         }
       },
-      error: (err) => console.error('Error saving education', err)
+      error: (err) => {
+        console.error('Error saving education', err);
+        const backendMessage = err.error?.errors?.[0]?.msg || err.error?.message || 'Failed to save education';
+        this.toastService.error(backendMessage);
+      }
     });
   }
 

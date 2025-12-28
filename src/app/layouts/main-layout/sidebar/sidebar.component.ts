@@ -22,7 +22,11 @@ export class SidebarComponent {
     { type: 'link', title: 'Dashboard', icon: 'fa-solid fa-chart-line', path: '/dashboard' },
     { type: 'header', title: 'Management' },
     // { type: 'link', title: 'Users', icon: 'fa-solid fa-users', path: '/users' },
+    { type: 'link', title: 'Messages', icon: 'fa-solid fa-envelope', path: '/contacts' },
+    { type: 'link', title: 'Testimonials', icon: 'fa-solid fa-comment-dots', path: '/testimonials' },
+    { type: 'link', title: 'Comments', icon: 'fa-regular fa-comments', path: '/comments' },
     { type: 'link', title: 'Media Library', icon: 'fa-solid fa-images', path: '/media' },
+    { type: 'link', title: 'Newsletter', icon: 'fa-solid fa-paper-plane', path: '/newsletter' },
     { type: 'header', title: 'Content' },
     {
       type: 'group', title: 'Portfolio', icon: 'fa-solid fa-briefcase',

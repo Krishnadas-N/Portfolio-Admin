@@ -158,7 +158,14 @@ export interface DashboardDemographics {
 }
 
 export interface DashboardRecent {
-  contacts: any[]; // Empty in example, assuming array
+  contacts: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    subject: string;
+    status: string;
+    createdAt: string;
+  }>;
   projects: Array<{
     _id: string;
     title: string;
@@ -186,7 +193,16 @@ export interface DashboardRecent {
       browser: string;
     };
   }>;
-  comments: any[];
+  comments: Array<{
+    _id: string;
+    content: string;
+    status: string;
+    createdAt: string;
+    author: {
+      name: string;
+      email: string;
+    };
+  }>;
 }
 
 export interface DashboardData {
@@ -282,19 +298,22 @@ export interface VisitorsResponse {
     total: number;
   };
   stats: {
-    totalUnique: number;
-    returning: number;
-    new: number;
+    _id: any;
+    totalVisitors: number;
+    returningVisitors: number;
+    avgSessionDuration: number;
+    avgVisitCount: number;
   };
 }
 
 export interface Visitor {
   _id: string;
-  ip: string;
-  location: {
+  ipAddress: string;
+  location?: {
     country: string;
     city: string;
   };
+  landingPage?: string;
   device: {
     type: string;
     browser: string;
@@ -319,6 +338,7 @@ export interface SystemLog {
   message: string;
   timestamp: string;
   meta?: any;
+  raw?: string;
 }
 
 // ==================== Content Models - Projects ====================
@@ -356,7 +376,7 @@ export interface Blog {
   };
   tags: string[];
   category: string;
-  status: 'draft' | 'published';
+  status: 'draft' | 'published' | 'archived';
   publishedAt?: string;
   viewsCount: number;
   likes: number;
@@ -365,8 +385,8 @@ export interface Blog {
   seoDescription?: string;
   readingTime?: number;
   isFeatured: boolean;
-  relatedPosts: any[];
-  coverImage?: string; // Kept as optional for UI compatibility if missing in API
+  relatedPosts: Blog[] | string[]; // Can be populated or just IDs
+  featuredImage?: string;
   __v?: number;
   createdAt: string;
   updatedAt: string;
@@ -393,16 +413,16 @@ export interface Experience {
   location: string;
   startDate: string;
   endDate?: string;
-  isCurrent?: boolean; // Changed to match JSON
+  isCurrent?: boolean;
   description: string;
   responsibilities: string[];
   achievements: string[];
   skills: string[];
   companyWebsite?: string;
-  employmentType?: string;
+  employmentType?: string; // 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship'
   industry?: string;
   teamSize?: number;
-  logo?: string;
+  companyLogo?: string; // Maps to companyLogo in backend if needed, or kept as is
   createdAt?: string;
   updatedAt?: string;
 }
@@ -488,7 +508,7 @@ export interface Certification {
   credentialId?: string;
   credentialUrl?: string;
   verificationUrl?: string;
-  image?: string;
+  badgeImage?: string;
   skills?: string[];
   category?: string;
   level?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
@@ -509,24 +529,31 @@ export interface Testimonial {
   clientName: string;
   clientPosition: string;
   clientCompany: string;
+  clientImage?: string;
   content: string;
   rating: number;
-  clientPhoto?: string;
-  project?: string;
-  platform?: string;
-  linkedIn?: string;
-  isVerified?: boolean;
-  featured?: boolean;
-  isHidden?: boolean;
+  project?: string | any;
+  isActive: boolean;
+  isFeatured: boolean;
+  clientEmail?: string;
+  clientLinkedIn?: string;
+  verified: boolean;
+  verifiedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface TestimonialStats {
-  total: number;
-  verified: number;
-  featured: number;
-  averageRating: number;
+  overview: {
+    totalTestimonials: number;
+    activeTestimonials: number;
+    verifiedTestimonials: number;
+    featuredTestimonials: number;
+    averageRating: number;
+    uniqueCompanies: number;
+  };
+  ratings: Array<{ _id: number; count: number }>;
+  topCompanies: Array<{ _id: string; count: number }>;
 }
 
 export interface RatingStats {
@@ -632,36 +659,70 @@ export interface Contact {
   _id: string;
   name: string;
   email: string;
-  subject?: string;
+  subject: string;
   message: string;
-  status: 'unread' | 'read' | 'responded';
+  phone?: string;
+  company?: string;
+  status: 'new' | 'read' | 'replied' | 'closed';
+  priority: 'low' | 'medium' | 'high';
+  source: 'website' | 'email' | 'phone' | 'social';
+  tags: string[];
+  assignedTo?: string | any;
+  repliedAt?: string;
+  replyMessage?: string;
+  isSpam: boolean;
+  ipAddress?: string;
+  userAgent?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface ContactsResponse {
   contacts: Contact[];
-  pagination: {
-    current: number;
-    pages: number;
-    total: number;
-  };
+  pagination: Pagination;
 }
 
-export interface ContactDetailsResponse extends Contact { }
+export interface ContactDetailsResponse {
+  success: boolean;
+  data: Contact;
+}
 
 export interface ContactStats {
-  total: number;
-  unread: number;
-  read: number;
-  responded: number;
+  overview: {
+    _id: null;
+    totalContacts: number;
+    newContacts: number;
+    readContacts: number;
+    repliedContacts: number;
+    closedContacts: number;
+    spamContacts: number;
+  };
+  monthlyStats: Array<{
+    _id: { year: number; month: number };
+    count: number;
+  }>;
 }
 
 // ==================== Newsletter Models ====================
 export interface NewsletterSubscriber {
   _id: string;
   email: string;
-  status: 'active' | 'inactive';
+  firstName?: string;
+  lastName?: string;
+  status: 'pending' | 'subscribed' | 'unsubscribed';
   subscribedAt: string;
+  unsubscribedAt?: string;
+  tags?: string[];
+  source?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  preferences?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    categories: string[];
+  };
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export interface NewsletterSubscribersResponse {
@@ -671,17 +732,37 @@ export interface NewsletterSubscribersResponse {
     pages: number;
     total: number;
   };
+  stats?: {
+    pending: number;
+    subscribed: number;
+    unsubscribed: number;
+  };
 }
 
 export interface NewsletterCampaign {
   _id: string;
+  title: string;
   subject: string;
+  content: string;
+  htmlContent: string;
   status: 'draft' | 'scheduled' | 'sent';
   sentAt?: string;
-  stats: {
-    opens: number;
-    clicks: number;
+  scheduledAt?: string;
+  tags?: string[];
+  segments?: string[];
+  attachments?: any[];
+  recipients?: {
+    total: number;
+    sent: number;
+    delivered: number;
+    opened: number;
+    clicked: number;
+    bounced: number;
+    unsubscribed: number;
   };
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export interface CampaignsResponse {
@@ -692,6 +773,8 @@ export interface CampaignsResponse {
     total: number;
   };
 }
+
+export type Campaign = NewsletterCampaign;
 
 // ==================== Settings Models ====================
 export interface ThemeSettings {
@@ -796,7 +879,7 @@ export interface CommentsParams extends PaginationParams, SortParams {
   postType?: 'blog' | 'project';
 }
 
-export interface ContactsParams extends PaginationParams, SortParams {
+export interface ContactsParams extends SearchParams, SortParams {
   status?: 'new' | 'read' | 'replied' | 'archived' | 'spam';
   priority?: 'low' | 'medium' | 'high';
 }
@@ -812,9 +895,50 @@ export interface UsersParams extends PaginationParams, SearchParams {
 }
 
 export interface NewsletterParams extends PaginationParams, SearchParams, SortParams {
-  status?: 'subscribed' | 'unsubscribed';
+  status?: 'pending' | 'subscribed' | 'unsubscribed';
 }
 
 export interface LogsParams extends PaginationParams, DateRangeParams {
   level?: 'error' | 'warn' | 'info' | 'debug';
+}
+
+// ==================== Comment Models ====================
+export type CommentStatus = 'pending' | 'approved' | 'rejected' | 'spam';
+export type PostType = 'blog' | 'project';
+
+export interface CommentAuthor {
+  name: string;
+  email: string;
+  website?: string;
+  avatar?: string;
+}
+
+export interface PortfolioComment {
+  _id: string;
+  postId: { _id: string; title: string } | string; // Populated or ID
+  postType: PostType;
+  author: CommentAuthor;
+  content: string;
+  status: CommentStatus;
+  parentComment?: { _id: string; content: string } | string; // Populated or ID
+  replies: string[];
+  likes: number;
+  isVerified: boolean;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentStats {
+  pending: number;
+  approved: number;
+  rejected: number;
+  spam: number;
+}
+
+export interface CommentQuery extends PaginationParams {
+  status?: CommentStatus;
+  postType?: PostType;
+  postId?: string;
 }
